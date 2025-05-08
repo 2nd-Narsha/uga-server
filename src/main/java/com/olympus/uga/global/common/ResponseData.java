@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class ResponseData<T> extends Response {
-
     private final T data;
 
     private ResponseData(HttpStatus status, String message, T data) {
@@ -29,5 +28,4 @@ public class ResponseData<T> extends Response {
     public static <T> ResponseData<T> error(ErrorCode errorCode, String message) {
         return new ResponseData<>(errorCode.getStatus(), message, null);
     }
-
 }
