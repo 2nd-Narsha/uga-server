@@ -23,7 +23,7 @@ public class SmsController {
     }
 
     @GetMapping("/verify")
-    public void verifyMessage(@RequestParam String phoneNum, @RequestParam String code){
+    public void verifyMessage(@RequestParam String phoneNum, @RequestParam String code) {
         Response.of(smsService.verifyMessage(phoneNum, code));
     }
 }
