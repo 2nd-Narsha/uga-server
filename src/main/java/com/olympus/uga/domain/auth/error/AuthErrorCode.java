@@ -7,7 +7,7 @@ import com.olympus.uga.global.exception.error.CustomErrorCode;
 
 @Getter
 @RequiredArgsConstructor
-public enum AuthErrorCode implements CustomErrorCode {
+public enum AuthErrorCode implements CustomErrorCode {//
     PHONE_NUM_ALREADY(HttpStatus.CONFLICT, "이미 존재하는 전화번호입니다."),
     USER_ALREADY(HttpStatus.CONFLICT, "이미 존재하는 유저입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."),
