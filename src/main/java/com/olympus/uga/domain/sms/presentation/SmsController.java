@@ -18,12 +18,12 @@ public class SmsController {
     private final SmsService smsService;
 
     @PostMapping("/send")
-    public void sendMessage(@RequestBody SmsSendingReq req) {
-        Response.of(smsService.sendMessage(req));
+    public Response sendMessage(@RequestBody SmsSendingReq req) {
+        return smsService.sendMessage(req);
     }
 
     @GetMapping("/verify")
-    public void verifyMessage(@RequestParam String phoneNum, @RequestParam String code) {
-        Response.of(smsService.verifyMessage(phoneNum, code));
+    public Response verifyCode(@RequestParam String phoneNum, @RequestParam String code) {
+        return smsService.verifyCode(phoneNum, code);
     }
 }
