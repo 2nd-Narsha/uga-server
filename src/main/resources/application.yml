@@ -6,6 +6,11 @@ spring:
       ddl-auto: create
     show-sql: true
 
+jwt:
+  secretKey: rTUS9rPwE1BJWApUY6lhwZZOCdvM5blMzr6b1mRShLdbMn9eZNmXltdkP+AkLvArPlY44B2gwP0XQEp11+SZTA==
+  refreshExp: 604800000 # 1?
+  accessExp: 6000000 # 2??
+
 springdoc:
   api-docs:
     enabled: true
