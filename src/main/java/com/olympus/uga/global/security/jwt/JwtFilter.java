@@ -1,0 +1,60 @@
+package com.olympus.uga.global.security.jwt;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.exception.ErrorResponse;
+import com.olympus.uga.global.security.jwt.error.JwtErrorCode;
+import com.olympus.uga.global.security.jwt.util.JwtExtractor;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+@RequiredArgsConstructor
+public class JwtFilter extends OncePerRequestFilter {
+    private final JwtExtractor jwtExtractor;
+    private final ObjectMapper objectMapper;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = jwtExtractor.getToken(request);
+
+            if (token != null) {
+                SecurityContextHolder.getContext().setAuthentication(jwtExtractor.getAuthentication(token));
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            sendError(response, new CustomException(JwtErrorCode.EXPIRED_TOKEN));
+        } catch (MalformedJwtException e) {
+            sendError(response, new CustomException(JwtErrorCode.MALFORMED_TOKEN));
+        } catch (CustomException e) {
+            sendError(response, e);
+        }
+    }
+
+    private void sendError(HttpServletResponse response, CustomException exception) throws IOException {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(exception.getError().getStatus().value())
+                .message(exception.getError().getMessage())
+                .build();
+
+        response.setStatus(exception.getError().getStatus().value());
+        try (var outputStream = response.getOutputStream()) {
+            outputStream.write(objectMapper.writeValueAsBytes(errorResponse));
+            outputStream.flush();
+        }
+    }
+}

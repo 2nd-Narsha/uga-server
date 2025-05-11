@@ -1,4 +1,4 @@
-package com.olympus.uga.global.security.jwt.config;
+package com.olympus.uga.global.security.jwt;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
