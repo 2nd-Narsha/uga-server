@@ -1,5 +1,6 @@
 package com.olympus.uga.global.security.jwt.util;
 
+import com.olympus.uga.domain.auth.presentation.dto.response.RefreshRes;
 import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.security.jwt.JwtProperties;
@@ -21,6 +22,11 @@ public class JwtProvider {
     private final JwtProperties jwtProperties;
     private final UserJpaRepo userJpaRepo;
 
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public SignInRes createToken(String phoneNum) {
         return SignInRes.builder()
                 .accessToken(createAccessToken(phoneNum))
@@ -28,7 +34,7 @@ public class JwtProvider {
                 .build();
     }
 
-    private String createAccessToken(String phoneNum) {
+    public String createAccessToken(String phoneNum) {
         return Jwts.builder()
                 .setHeaderParam(Header.JWT_TYPE, TokenType.ACCESS)
                 .setSubject(phoneNum)
@@ -48,8 +54,8 @@ public class JwtProvider {
                 .compact();
     }
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
-        return Keys.hmacShaKeyFor(keyBytes);
+    public RefreshRes refreshToken(String phoneNum) {
+        return RefreshRes.builder()
+                .accessToken(createAccessToken(phoneNum)).build();
     }
 }
