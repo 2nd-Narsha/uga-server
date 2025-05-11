@@ -9,14 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
-    @Getter
-    @Builder
-    @RequiredArgsConstructor
-    private static class ErrorResponse {
-        private final int status;
-        private final String message;
-    }
-
     @ExceptionHandler({CustomException.class})
     public ResponseEntity<ErrorResponse> handleException(CustomException ex) {
         ErrorResponse response = ErrorResponse.builder()
