@@ -6,9 +6,11 @@ import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.AuthDetails;
 import com.olympus.uga.global.security.jwt.JwtProperties;
+import com.olympus.uga.global.security.jwt.enums.TokenType;
 import com.olympus.uga.global.security.jwt.error.JwtErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -53,6 +55,17 @@ public class JwtExtractor {
         AuthDetails details = new AuthDetails(user);
 
         return new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
+    }
+
+    public String getPhoneNum(String token) {
+        return getClaims(token).getBody().getSubject();
+    }
+
+    public boolean isWrongType(String token, TokenType tokenType) {
+        Jws<Claims> claims = getClaims(token);
+        Object header = claims.getHeader().get(Header.JWT_TYPE);
+
+        return !tokenType.toString().equals(String.valueOf(header));
     }
 
     private Jws<Claims> getClaims(String token) {
