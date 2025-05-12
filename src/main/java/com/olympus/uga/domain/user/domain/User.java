@@ -34,7 +34,7 @@ public class User {
     @Column(name = "mbti", nullable = false)
     private String mbti;
 
-    @Column(name = "character", nullable = false)
+    @Column(name = "character_type", nullable = false)
     private Character character;
 
     @Column(name = "interests", nullable = false)

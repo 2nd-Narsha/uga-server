@@ -23,16 +23,16 @@ public class AuthUseCase {
     private final JwtExtractor jwtExtractor;
     private final JwtProvider jwtProvider;
 
-    @Transactional
-    public Response signUp(SignUpReq req) {
-        if(userJpaRepo.existsById(req.phoneNum())){
-            throw new CustomException(UserErrorCode.PHONE_NUM_ALREADY);
-        }
-
-        userJpaRepo.save(req.);
-
-        return Response.created("회원가입에 성공하였습니다.");
-    }
+//    @Transactional
+//    public Response signUp(SignUpReq req) {
+//        if(userJpaRepo.existsById(req.phoneNum())){
+//            throw new CustomException(UserErrorCode.PHONE_NUM_ALREADY);
+//        }
+//
+//        userJpaRepo.save(req.);
+//
+//        return Response.created("회원가입에 성공하였습니다.");
+//    }
 
     public ResponseData<RefreshRes> refresh(RefreshReq req) {
         if (jwtExtractor.isWrongType(req.refreshToken(), TokenType.REFRESH)) {
