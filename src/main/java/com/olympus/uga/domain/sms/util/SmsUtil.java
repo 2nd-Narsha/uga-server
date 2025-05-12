@@ -25,7 +25,6 @@ public class SmsUtil {
         this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecretKey, "https://api.coolsms.co.kr");
     }
 
-    // 단일 메시지 발송 예제
     public SingleMessageSentResponse sendOne(String to, String verificationCode) {
         Message message = new Message();
         message.setFrom(fromPhoneNumber);
