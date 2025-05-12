@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class SmsController {
     private final SmsService smsService;
 
-    @PostMapping("/send")
-    public Response sendMessage(@RequestBody SmsSendingReq req) {
-        return smsService.sendMessage(req);
-    }
-
-    @GetMapping("/verify")
-    public Response verifyCode(@RequestParam String phoneNum, @RequestParam String code) {
-        return smsService.verifyCode(phoneNum, code);
-    }
+//    @PostMapping("/send")
+//    public Response sendMessage(@RequestBody SmsSendingReq req) {
+//        return smsService.sendMessage(req);
+//    }
+//
+//    @GetMapping("/verify")
+//    public Response verifyCode(@RequestParam String phoneNum, @RequestParam String code) {
+//        return smsService.verifyCode(phoneNum, code);
+//    }
 }
