@@ -1,6 +1,6 @@
 package com.olympus.uga.domain.user.domain;
 
-import com.olympus.uga.domain.user.domain.enums.Character;
+import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,13 +8,16 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Entity
 @SuperBuilder
 @Table(name = "tb_user")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
     @Column(name = "phoneNum",nullable = false, unique = true)
@@ -37,7 +40,8 @@ public class User {
     private String mbti;
 
     @Column(name = "character_type", nullable = false)
-    private Character character;
+    @Enumerated(EnumType.STRING)
+    private UserCharacter character;
 
     @Column(name = "interests", nullable = false)
     private String interests;

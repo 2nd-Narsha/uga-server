@@ -41,7 +41,13 @@ public class SmsService {
             throw new CustomException(SmsErrorCode.CODE_MISMATCH);
         }
 
-        redisTemplate.delete(phoneNum); // 검증 성공 → Redis에서 삭제
+        redisTemplate.delete(phoneNum);
+
+        redisTemplate.opsForValue().set(
+                phoneNum + ":verified",
+                "true",
+                10, TimeUnit.MINUTES
+        );
 
         return Response.ok("인증이 완료되었습니다.");
     }

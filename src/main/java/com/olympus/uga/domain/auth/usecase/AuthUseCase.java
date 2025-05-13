@@ -37,8 +37,8 @@ public class AuthUseCase {
             throw new CustomException(UserErrorCode.PHONE_NUM_ALREADY);
         }
 
-        Boolean isVerified = redisTemplate.hasKey("sms:verified:" + req.phoneNum());
-        if (isVerified == null || !isVerified) {
+        String verified = redisTemplate.opsForValue().get(req.phoneNum() + ":verified");
+        if (!"true".equals(verified)) {
             throw new CustomException(SmsErrorCode.PHONE_NUM_NOT_VERIFIED);
         }
 
