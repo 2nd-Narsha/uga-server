@@ -26,23 +26,23 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "birth", nullable = false)
+    @Column(name = "birth")
     private String birth;
 
-    @Column(name = "gender", nullable = false)
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "mbti", nullable = false)
+    @Column(name = "mbti")
     private String mbti;
 
-    @Column(name = "character_type", nullable = false)
+    @Column(name = "character_type")
     @Enumerated(EnumType.STRING)
     private UserCharacter character;
 
-    @Column(name = "interests", nullable = false)
+    @Column(name = "interests")
     private String interests;
 }
