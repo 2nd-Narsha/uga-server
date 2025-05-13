@@ -9,9 +9,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Entity
+@SuperBuilder
 @Table(name = "tb_user")
 public class User {
     @Id

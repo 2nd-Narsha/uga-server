@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthUseCase authUseCase;
 
-//    @PostMapping("/sign-up")
-//    public Response signUp(@RequestBody SignUpReq req) {
-//        return authUseCase.signUp(req);
-//    }
-//
-//    @PostMapping("/sign-in")
-//    public ResponseData<SignInRes> signIn(@Validated @RequestBody SignInReq req) {
-//        return authUseCase.signIn(req);
-//    }
+    @PostMapping("/sign-up")
+    public Response signUp(@RequestBody SignUpReq req) {
+        return authUseCase.signUp(req);
+    }
+
+    @PostMapping("/sign-in")
+    public ResponseData<SignInRes> signIn(@Validated @RequestBody SignInReq req) {
+        return authUseCase.signIn(req);
+    }
 
     @PostMapping("/refresh")
     public ResponseData<RefreshRes> refresh(@Validated @RequestBody RefreshReq req) {
