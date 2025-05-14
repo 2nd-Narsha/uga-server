@@ -47,9 +47,9 @@ public class JwtExtractor {
 
     public Authentication getAuthentication(String token) {
         Jws<Claims> claims = getClaims(token);
-        String phoneNum = claims.getBody().getSubject();
+        Long userId = Long.valueOf(claims.getBody().getSubject());
 
-        User user = userJpaRepo.findById(phoneNum)
+        User user = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         AuthDetails details = new AuthDetails(user);
@@ -57,8 +57,8 @@ public class JwtExtractor {
         return new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
     }
 
-    public String getPhoneNum(String token) {
-        return getClaims(token).getBody().getSubject();
+    public Long getUserId(String token) {
+        return Long.valueOf(getClaims(token).getBody().getSubject());
     }
 
     public boolean isWrongType(String token, TokenType tokenType) {
