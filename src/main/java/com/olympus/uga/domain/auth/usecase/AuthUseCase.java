@@ -33,7 +33,7 @@ public class AuthUseCase {
 
     @Transactional
     public Response signUp(SignUpReq req) {
-        if(userJpaRepo.existsById(req.phoneNum())) {
+        if(userJpaRepo.existsByPhoneNum(req.phoneNum())) {
             throw new CustomException(UserErrorCode.PHONE_NUM_ALREADY);
         }
 
@@ -49,14 +49,14 @@ public class AuthUseCase {
     }
 
     public ResponseData<SignInRes> signIn(SignInReq req) {
-        User user = userJpaRepo.findById(req.phoneNum())
+        User user = userJpaRepo.findByPhoneNum(req.phoneNum())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(req.password(), user.getPassword())) {
             throw new CustomException(UserErrorCode.WRONG_PASSWORD);
         }
 
-        return ResponseData.ok("로그인에 성공하였습니다.", jwtProvider.createToken(req.phoneNum()));
+        return ResponseData.ok("로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
     }
 
     public ResponseData<RefreshRes> refresh(RefreshReq req) {
@@ -64,8 +64,8 @@ public class AuthUseCase {
             throw new  CustomException(JwtErrorCode.TOKEN_TYPE_ERROR);
         }
 
-        String phoneNum = jwtExtractor.getPhoneNum(req.refreshToken());
+        Long userId = jwtExtractor.getUserId(req.refreshToken());
 
-        return ResponseData.created("리프레쉬를 성공하였습니다.", jwtProvider.refreshToken(phoneNum));
+        return ResponseData.created("리프레쉬를 성공하였습니다.", jwtProvider.refreshToken(userId));
     }
 }
