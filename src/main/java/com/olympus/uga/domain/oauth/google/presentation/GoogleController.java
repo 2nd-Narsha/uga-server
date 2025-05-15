@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GoogleController {
     private final GoogleService googleService;
 
-    @PostMapping("/login")
-    public ResponseData<LoginRes> login(@Valid @RequestBody LoginReq req) {
-        return googleService.login(req);
-    }
+//    @PostMapping("/login")
+//    public ResponseData<LoginRes> login(@Valid @RequestBody LoginReq req) {
+//        return googleService.login(req);
+//    }
 }

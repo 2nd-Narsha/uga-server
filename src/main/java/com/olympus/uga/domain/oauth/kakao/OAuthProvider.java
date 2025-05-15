@@ -21,8 +21,8 @@ public class OAuthProvider {
     @Value("${oauth.kakao.redirect-uri}")
     private String redirectUri;
 
-    @Value("${oauth.kakao.client-id}")
-    private String clientId;
+//    @Value("${oauth.kakao.client-id}")
+//    private String clientId;
 
     private final RestTemplate restTemplate;
 }

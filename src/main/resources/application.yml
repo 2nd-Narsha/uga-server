@@ -29,7 +29,7 @@ oauth:
     token-request-uri: "https://kauth.kakao.com/oauth/token" # 액세스 토큰 요청 URI
     member-info-request-uri: "https://kapi.kakao.com/v2/user/me" # 사용자 정보 요청 URI
     redirect-uri: "https://your.domain.com/oauth/kakao/callback" # Kakao Developers에 등록한 리다이렉트 URI
-    client-id: "카카오 REST API 키 입력"
+#    client-id: "카카오 REST API 키 입력"
 
 springdoc:
   api-docs:
