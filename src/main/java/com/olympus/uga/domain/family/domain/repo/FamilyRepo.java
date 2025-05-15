@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FamilyRepo extends JpaRepository<Family, Long> {
+public interface FamilyRepo extends JpaRepository<Family, String> {
     Optional<Family> findByFamilyCode(String familyCode);
 }
