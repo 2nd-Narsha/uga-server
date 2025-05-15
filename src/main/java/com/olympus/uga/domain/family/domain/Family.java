@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -50,6 +51,8 @@ public class Family {
         this.profileLink = req.getProfileLink();
         this.presentUgaId = req.getPresentUgaId();
         this.representativePhoneNum = SecurityContextHolder.getContext().getAuthentication().getName();
+        this.memberList = new ArrayList<>();
+        this.familyUgaList = new ArrayList<>();
         this.memberList.add(this.representativePhoneNum);
         this.createdAt = LocalDateTime.now();
     }
