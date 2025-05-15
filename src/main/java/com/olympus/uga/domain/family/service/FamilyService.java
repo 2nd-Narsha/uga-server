@@ -23,7 +23,13 @@ public class FamilyService {
     //가족 생성
     @Transactional
     public Response createFamily(FamilyCreateReq familyCreateReq) {
-        Family family = new Family(familyCreateReq, codeGenerator.generateCode());
+        String code = codeGenerator.generateCode();
+
+        while (familyRepo.findByFamilyCode(code).isPresent()) {
+            code = codeGenerator.generateCode();
+        }
+
+        Family family = new Family(familyCreateReq, code);
         familyRepo.save(family);
         return Response.created(family.getFamilyCode());
     }
