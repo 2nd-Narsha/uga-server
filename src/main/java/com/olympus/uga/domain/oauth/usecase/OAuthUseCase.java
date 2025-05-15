@@ -1,7 +1,6 @@
 package com.olympus.uga.domain.oauth.usecase;
 
 import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
-import com.olympus.uga.domain.oauth.presentation.dto.request.OAuthLoginReq;
 import com.olympus.uga.domain.oauth.presentation.dto.response.GoogleUserInfoDto;
 import com.olympus.uga.domain.oauth.presentation.dto.response.KakaoUserInfoDto;
 import com.olympus.uga.domain.oauth.service.GoogleOAuthService;
