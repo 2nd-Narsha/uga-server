@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GoogleService {
-    public ResponseData<LoginRes> login(LoginReq req) {
-
-    }
+//    public ResponseData<LoginRes> login(LoginReq req) {
+//
+//    }
 }
