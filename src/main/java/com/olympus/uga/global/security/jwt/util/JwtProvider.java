@@ -27,35 +27,35 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public SignInRes createToken(String phoneNum) {
+    public SignInRes createToken(Long userId) {
         return SignInRes.builder()
-                .accessToken(createAccessToken(phoneNum))
-                .refreshToken(createRefreshToken(phoneNum))
+                .accessToken(createAccessToken(userId))
+                .refreshToken(createRefreshToken(userId))
                 .build();
     }
 
-    public String createAccessToken(String phoneNum) {
+    public String createAccessToken(Long userId) {
         return Jwts.builder()
                 .setHeaderParam(Header.JWT_TYPE, TokenType.ACCESS)
-                .setSubject(phoneNum)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExp()))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private String createRefreshToken(String phoneNum) {
+    private String createRefreshToken(Long userId) {
         return Jwts.builder()
                 .setHeaderParam(Header.JWT_TYPE, TokenType.REFRESH)
-                .setSubject(phoneNum)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExp()))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public RefreshRes refreshToken(String phoneNum) {
+    public RefreshRes refreshToken(Long userId) {
         return RefreshRes.builder()
-                .accessToken(createAccessToken(phoneNum)).build();
+                .accessToken(createAccessToken(userId)).build();
     }
 }

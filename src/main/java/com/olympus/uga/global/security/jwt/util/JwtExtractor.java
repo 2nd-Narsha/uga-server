@@ -2,7 +2,7 @@ package com.olympus.uga.global.security.jwt.util;
 
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.domain.auth.error.AuthErrorCode;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.AuthDetails;
 import com.olympus.uga.global.security.jwt.JwtProperties;
@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 
@@ -47,18 +46,18 @@ public class JwtExtractor {
 
     public Authentication getAuthentication(String token) {
         Jws<Claims> claims = getClaims(token);
-        String phoneNum = claims.getBody().getSubject();
+        Long userId = Long.valueOf(claims.getBody().getSubject());
 
-        User user = userJpaRepo.findById(phoneNum)
-                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        User user = userJpaRepo.findById(userId)
+                .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
 
         AuthDetails details = new AuthDetails(user);
 
         return new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
     }
 
-    public String getPhoneNum(String token) {
-        return getClaims(token).getBody().getSubject();
+    public Long getUserId(String token) {
+        return Long.valueOf(getClaims(token).getBody().getSubject());
     }
 
     public boolean isWrongType(String token, TokenType tokenType) {
