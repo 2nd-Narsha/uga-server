@@ -1,5 +1,6 @@
 package com.olympus.uga.domain.oauth.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.olympus.uga.domain.oauth.error.OAuthErrorCode;
 import com.olympus.uga.domain.oauth.presentation.dto.response.KakaoUserInfoDto;
@@ -10,8 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -26,7 +30,38 @@ public class KakaoOAuthService {
     @Value("${oauth.kakao.client-secret}")
     private String clientSecret;
 
+    @Value("${oauth.kakao.redirect-uri}")
+    private String redirectUri;
+
     private static final String KAKAO_USER_INFO_URI = "https://kapi.kakao.com/v2/user/me";
+
+    public String getAccessToken(String code) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("grant_type", "authorization_code");
+            body.add("client_id", clientId);
+            body.add("client_secret", clientSecret);
+            body.add("redirect_uri", redirectUri);
+            body.add("code", code);
+
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://kauth.kakao.com/oauth/token",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            JsonNode jsonNode = objectMapper.readTree(response.getBody());
+            return jsonNode.get("access_token").asText();
+        } catch (Exception e) {
+            throw new CustomException(OAuthErrorCode.KAKAO_API_ERROR);
+        }
+    }
 
     public KakaoUserInfoDto getUserInfo(String accessToken) {
         try {

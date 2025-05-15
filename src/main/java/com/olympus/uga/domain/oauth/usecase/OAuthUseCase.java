@@ -27,21 +27,31 @@ public class OAuthUseCase {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public ResponseData<SignInRes> loginWithKakao(OAuthLoginReq req) {
-        KakaoUserInfoDto userInfo = kakaoOAuthService.getUserInfo(req.accessToken());
+    public ResponseData<SignInRes> loginWithKakaoCode(String code) {
+        String accessToken = kakaoOAuthService.getAccessToken(code);
+
+        KakaoUserInfoDto userInfo = kakaoOAuthService.getUserInfo(accessToken);
 
         User user = userJpaRepo.findByOauthIdAndLoginType(userInfo.id(), LoginType.KAKAO)
-                .orElseGet(() -> registerKakaoUser(userInfo));
+                .orElseGet(() -> {
+                    User newUser = registerKakaoUser(userInfo);
+                    return userJpaRepo.save(newUser);
+                });
 
         return ResponseData.ok("카카오 로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
     }
 
     @Transactional
-    public ResponseData<SignInRes> loginWithGoogle(OAuthLoginReq req) {
-        GoogleUserInfoDto userInfo = googleOAuthService.getUserInfo(req.accessToken());
+    public ResponseData<SignInRes> loginWithGoogleCode(String code) {
+        String accessToken = googleOAuthService.getAccessToken(code);
+
+        GoogleUserInfoDto userInfo = googleOAuthService.getUserInfo(accessToken);
 
         User user = userJpaRepo.findByOauthIdAndLoginType(userInfo.id(), LoginType.GOOGLE)
-                .orElseGet(() -> registerGoogleUser(userInfo));
+                .orElseGet(() -> {
+                    User newUser = registerGoogleUser(userInfo);
+                    return userJpaRepo.save(newUser);
+                });
 
         return ResponseData.ok("구글 로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
     }
