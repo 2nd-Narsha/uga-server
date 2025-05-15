@@ -24,7 +24,7 @@ public class FamilyController {
     }
 
     @GetMapping("/members")
-    public FamilyInfoRes getMembers(@RequestBody String familyCode) {
+    public FamilyInfoRes getMembers(@RequestParam String familyCode) {
         return familyService.getFamily(familyCode);
     }
 
