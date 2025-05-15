@@ -35,11 +35,11 @@ public class Family {
     private String representativePhoneNum;
 
     @ElementCollection
-    @CollectionTable(name="tb_family_uga")
+    @CollectionTable(name = "tb_family_uga")
     private List<String> familyUgaList;
 
     @ElementCollection
-    @CollectionTable(name="tb_family_member")
+    @CollectionTable(name = "tb_family_member")
     private List<String> memberList;
 
     @Column
