@@ -2,7 +2,7 @@ package com.olympus.uga.global.security.jwt.util;
 
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.domain.auth.error.AuthErrorCode;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.AuthDetails;
 import com.olympus.uga.global.security.jwt.JwtProperties;
@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 
@@ -50,7 +49,7 @@ public class JwtExtractor {
         Long userId = Long.valueOf(claims.getBody().getSubject());
 
         User user = userJpaRepo.findById(userId)
-                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
 
         AuthDetails details = new AuthDetails(user);
 

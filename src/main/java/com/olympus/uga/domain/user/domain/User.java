@@ -57,4 +57,7 @@ public class User {
     @Column(name = "login_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
+
+    @Column(name = "oauth_id")
+    private String oauthId;
 }
