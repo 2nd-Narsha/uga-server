@@ -19,17 +19,17 @@ public class FamilyController {
     }
 
     @PostMapping("/join")
-    public Response joinFamily(@RequestBody String familyCode) {
+    public Response joinFamily(@RequestParam String familyCode) {
         return familyService.joinFamily(familyCode);
     }
 
     @GetMapping("/members")
-    public FamilyInfoRes getMembers(@RequestParam String familyCode) {
-        return familyService.getFamily(familyCode);
+    public FamilyInfoRes getMembers() {
+        return familyService.getFamily();
     }
 
     @PostMapping("/leave")
-    public Response leaveFamily(@RequestBody String familyCode) {
-        return familyService.leaveFamily(familyCode);
+    public Response leaveFamily() {
+        return familyService.leaveFamily();
     }
 }

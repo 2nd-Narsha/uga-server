@@ -6,6 +6,7 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
@@ -14,11 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
     private final FamilyRepo familyRepo;
     private final CodeGenerator codeGenerator;
+    private final UserJpaRepo userJpaRepo;
 
     //가족 생성
     @Transactional
@@ -44,14 +48,25 @@ public class FamilyService {
     }
 
     //가족 조회
-    public FamilyInfoRes getFamily(String familyCode) {
-        return new FamilyInfoRes(familyRepo.findByFamilyCode(familyCode).orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND)));
+    public FamilyInfoRes getFamily() {
+        Family family = familyRepo.findAll()
+                .stream()
+                .filter(f -> f.getMemberList().contains(SecurityContextHolder.getContext().getAuthentication().getName()))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
+
+        return new FamilyInfoRes(family);
     }
 
     //가족 떠나기
     @Transactional
-    public Response leaveFamily(String familyCode) {
-        Family family = familyRepo.findByFamilyCode(familyCode).orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
+    public Response leaveFamily() {
+        Family family = familyRepo.findAll()
+                .stream()
+                .filter(f -> f.getMemberList().contains(SecurityContextHolder.getContext().getAuthentication().getName()))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
+
         if (family.getMemberList().contains(SecurityContextHolder.getContext().getAuthentication().getName())) {
             family.getMemberList().remove(SecurityContextHolder.getContext().getAuthentication().getName());
         } else {
