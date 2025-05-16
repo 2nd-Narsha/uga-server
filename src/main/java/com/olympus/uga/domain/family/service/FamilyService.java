@@ -22,9 +22,10 @@ import java.util.List;
 public class FamilyService {
     private final FamilyRepo familyRepo;
     private final CodeGenerator codeGenerator;
-    private final UserJpaRepo userJpaRepo;
 
     //가족 생성
+    //이미지 서버 만들어서 가족 생성할때 프로필 사진 만들어야 함
+    //우가 생성이랑 연계 필요
     @Transactional
     public Response createFamily(FamilyCreateReq familyCreateReq) {
         String code = codeGenerator.generateCode();
