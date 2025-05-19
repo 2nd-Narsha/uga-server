@@ -1,9 +1,9 @@
 package com.olympus.uga.domain.user.presentation;
 
-import com.olympus.uga.domain.user.presentation.dto.CharacterReq;
-import com.olympus.uga.domain.user.presentation.dto.InterestReq;
-import com.olympus.uga.domain.user.presentation.dto.MbtiReq;
-import com.olympus.uga.domain.user.presentation.dto.UsernameBirthGenderReq;
+import com.olympus.uga.domain.user.presentation.dto.request.CharacterReq;
+import com.olympus.uga.domain.user.presentation.dto.request.InterestReq;
+import com.olympus.uga.domain.user.presentation.dto.request.MbtiReq;
+import com.olympus.uga.domain.user.presentation.dto.request.UsernameBirthGenderReq;
 import com.olympus.uga.domain.user.service.UserSettingService;
 import com.olympus.uga.global.common.Response;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ public class UserSettingController {
     @PostMapping("/1")
     @Operation(summary = "이름, 생년월일, 성별", description = "성별: MALE, FEMALE")
     public Response setUsernameBirthGender(@RequestBody UsernameBirthGenderReq req) {
-        return userSettingService.setUsernameBirth(req);
+        return userSettingService.setUsernameBirthGender(req);
     }
 
     @PostMapping("/2")
