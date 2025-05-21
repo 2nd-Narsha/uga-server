@@ -36,4 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
+.DS_Store
+
 /src/main/java/com/olympus/uga/domain/family/
+
