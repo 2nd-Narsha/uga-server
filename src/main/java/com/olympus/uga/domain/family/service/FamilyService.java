@@ -27,7 +27,6 @@ public class FamilyService {
     private final ImageService imageService;
 
     //가족 생성
-    //이미지 서버 만들어서 가족 생성할때 프로필 사진 만들어야 함
     //우가 생성이랑 연계 필요
     @Transactional
     public Response createFamily(MultipartFile familyProfile, FamilyCreateReq familyCreateReq) {
