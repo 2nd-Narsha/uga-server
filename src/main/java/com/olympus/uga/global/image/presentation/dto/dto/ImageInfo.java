@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.image.presentation.dto.dto;
+package com.olympus.uga.global.image.presentation.dto.dto;
 
 import lombok.Data;
 
