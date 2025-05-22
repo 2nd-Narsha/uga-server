@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.family.presentation;
 
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
+import com.olympus.uga.domain.family.presentation.dto.request.RepresentativeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.service.FamilyService;
 import com.olympus.uga.global.common.Response;
@@ -32,5 +33,10 @@ public class FamilyController {
     @PostMapping("/leave")
     public Response leaveFamily() {
         return familyService.leaveFamily();
+    }
+
+    @PostMapping("/change")
+    public Response changeRepresentative(@RequestBody RepresentativeReq req) {
+        return familyService.changeRepresentative(req.getFamilyCode(), req.getPhoneNum());
     }
 }

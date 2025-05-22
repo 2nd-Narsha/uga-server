@@ -6,6 +6,8 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.uga.domain.repo.UgaRepo;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
@@ -15,15 +17,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
     private final FamilyRepo familyRepo;
     private final CodeGenerator codeGenerator;
     private final ImageService imageService;
+    private final UserJpaRepo userJpaRepo;
 
     //가족 생성
-    //우가 생성이랑 연계 필요
     @Transactional
     public Response createFamily(MultipartFile familyProfile, FamilyCreateReq familyCreateReq) {
         String code = codeGenerator.generateCode();
@@ -54,7 +58,13 @@ public class FamilyService {
                 .findFirst()
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
 
-        return new FamilyInfoRes(family);
+        return new FamilyInfoRes(
+                family,
+                family.getMemberList().stream()
+                        .map(f -> userJpaRepo.findById(f)
+                                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER)))
+                        .collect(Collectors.toList())
+                );
     }
 
     //가족 떠나기
@@ -74,5 +84,11 @@ public class FamilyService {
         return Response.ok("가족 " + family.getFamilyName() + "을/를 떠나셨습니다.");
     }
 
-    //리더 넘기기랑 가족에 포인트 넣어야 함 (포인트 기능 만들어서 연계 해야 함)
+    //리더 넘기기
+    public Response changeRepresentative(String familyCode, String phoneNum) {
+        familyRepo.findByFamilyCode(familyCode)
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND))
+                .setRepresentativePhoneNum(phoneNum);
+        return Response.ok(userJpaRepo.findById(phoneNum) + "님에게 리더를 넘기셨습니다.");
+    }
 }
