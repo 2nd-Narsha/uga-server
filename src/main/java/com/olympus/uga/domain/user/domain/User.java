@@ -60,4 +60,20 @@ public class User {
 
     @Column(name = "oauth_id")
     private String oauthId;
+
+    public void updateUsernameBirthGender(String username, String birth, Gender gender) {
+        this.username = username;
+        this.birth = birth;
+        this.gender = gender;
+    }
+    public void updateInterest(String interests) {
+        this.interests = interests;
+    }
+    public void updateCharacter(UserCharacter character) {
+        this.character = character;
+    }
+    public void updateMbti(String mbti) {
+        this.mbti = mbti;
+    }
 }
+
