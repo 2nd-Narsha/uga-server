@@ -1,12 +1,12 @@
-package com.olympus.uga.domain.image.service;
+package com.olympus.uga.global.image.service;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.olympus.uga.domain.image.domain.ImageDetails;
-import com.olympus.uga.domain.image.domain.repo.ImageRepo;
-import com.olympus.uga.domain.image.error.ImageErrorCode;
-import com.olympus.uga.domain.image.presentation.dto.dto.ImageInfo;
+import com.olympus.uga.global.image.domain.ImageDetails;
+import com.olympus.uga.global.image.domain.repo.ImageRepo;
+import com.olympus.uga.global.image.error.ImageErrorCode;
+import com.olympus.uga.global.image.presentation.dto.dto.ImageInfo;
 import com.olympus.uga.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

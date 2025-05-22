@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.image.domain;
+package com.olympus.uga.global.image.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
