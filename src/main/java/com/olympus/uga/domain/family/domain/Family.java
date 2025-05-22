@@ -2,6 +2,7 @@ package com.olympus.uga.domain.family.domain;
 
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -13,7 +14,6 @@ import java.util.List;
 
 @Data
 @Entity
-@SuperBuilder
 @Table(name = "tb_family")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Family {
@@ -29,14 +29,13 @@ public class Family {
     private int presentUgaId;
 
     @Column
+    private int point;
+
+    @Column
     private String profileLink;
 
     @Column
     private String representativePhoneNum;
-
-    @ElementCollection
-    @CollectionTable(name = "tb_family_uga")
-    private List<String> familyUgaList;
 
     @ElementCollection
     @CollectionTable(name = "tb_family_member")
@@ -49,10 +48,9 @@ public class Family {
         this.familyCode = familyCode;
         this.familyName = req.getFamilyName();
         this.profileLink = profileLink;
-        this.presentUgaId = req.getPresentUgaId();
+        this.point = 500;
         this.representativePhoneNum = SecurityContextHolder.getContext().getAuthentication().getName();
         this.memberList = new ArrayList<>();
-        this.familyUgaList = new ArrayList<>();
         this.memberList.add(this.representativePhoneNum);
         this.createdAt = LocalDateTime.now();
     }
