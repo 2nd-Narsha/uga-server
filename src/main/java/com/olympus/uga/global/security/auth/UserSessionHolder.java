@@ -14,7 +14,12 @@ public class UserSessionHolder{
     private final UserJpaRepo userJpaRepo;
 
     public User getUser() {
-        return userJpaRepo.findById(Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()))
-                .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof AuthDetails authDetails) {
+            return authDetails.getUser();
+        } else {
+            throw new CustomException(AuthErrorCode.USER_NOT_FOUND);
+        }
     }
 }

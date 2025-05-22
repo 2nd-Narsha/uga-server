@@ -13,6 +13,10 @@ import java.util.List;
 public class AuthDetails implements UserDetails {
     private final User user;
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public List<GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
