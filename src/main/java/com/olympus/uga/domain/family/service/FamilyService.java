@@ -6,9 +6,7 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
-import com.olympus.uga.domain.image.service.ImageService;
-import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import jakarta.transaction.Transactional;
@@ -16,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,4 +73,6 @@ public class FamilyService {
         }
         return Response.ok("가족 " + family.getFamilyName() + "을/를 떠나셨습니다.");
     }
+
+    //리더 넘기기랑 가족에 포인트 넣어야 함 (포인트 기능 만들어서 연계 해야 함)
 }
