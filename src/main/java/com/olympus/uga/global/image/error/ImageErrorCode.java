@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.image.error;
+package com.olympus.uga.global.image.error;
 
 import com.olympus.uga.global.exception.error.CustomErrorCode;
 import lombok.Getter;
