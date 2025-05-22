@@ -1,6 +1,6 @@
-package com.olympus.uga.domain.image.domain.repo;
+package com.olympus.uga.global.image.domain.repo;
 
-import com.olympus.uga.domain.image.domain.ImageDetails;
+import com.olympus.uga.global.image.domain.ImageDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
