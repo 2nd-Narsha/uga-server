@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 .requestMatchers("/sms/**").permitAll()
                                 .requestMatchers("/oauth/**").permitAll()
                                 .requestMatchers("user/setting/**").authenticated()
+                                .requestMatchers("/user/**").authenticated()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
