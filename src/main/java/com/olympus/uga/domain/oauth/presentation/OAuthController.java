@@ -16,12 +16,12 @@ public class OAuthController {
     private final OAuthUseCase oAuthUseCase;
 
     @PostMapping("/kakao/login")
-    public ResponseData<SignInRes> kakaoLogin(@RequestParam String code) {
+    public ResponseData<SignInRes> kakaoLogin(@RequestParam("code") String code) {
         return oAuthUseCase.loginWithKakaoCode(code);
     }
 
     @PostMapping("/google/login")
-    public ResponseData<SignInRes> googleLogin(@RequestParam String code) {
+    public ResponseData<SignInRes> googleLogin(@RequestParam("code") String code) {
         return oAuthUseCase.loginWithGoogleCode(code);
 
     }

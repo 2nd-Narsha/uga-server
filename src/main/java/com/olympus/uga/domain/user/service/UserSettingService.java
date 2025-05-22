@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.user.service;
 
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.presentation.dto.request.CharacterReq;
 import com.olympus.uga.domain.user.presentation.dto.request.InterestReq;
@@ -33,15 +34,17 @@ public class UserSettingService {
         User user = userSessionHolder.getUser();
 
         user.updateInterest(req.interests());
+        userJpaRepo.save(user);
 
         return Response.ok("사용자 관심 주제를 저장하였습니다.");
     }
 
     @Transactional
-    public Response setCharacter(CharacterReq req) {
+    public Response setCharacter(UserCharacter req) {
         User user = userSessionHolder.getUser();
 
-        user.updateCharacter(req.character());
+        user.updateCharacter(req);
+        userJpaRepo.save(user);
 
         return Response.ok("사용자 캐릭터를 저장하였습니다.");
     }
@@ -51,6 +54,7 @@ public class UserSettingService {
         User user = userSessionHolder.getUser();
 
         user.updateMbti(req.mbti());
+        userJpaRepo.save(user);
 
         return Response.ok("사용자 mbti를 저장하였습니다.");
     }
