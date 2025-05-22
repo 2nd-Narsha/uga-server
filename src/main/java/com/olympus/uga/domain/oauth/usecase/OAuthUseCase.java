@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import static com.olympus.uga.domain.oauth.presentation.dto.response.GoogleUserInfoDto.registerGoogleUser;
 import static com.olympus.uga.domain.oauth.presentation.dto.response.KakaoUserInfoDto.registerKakaoUser;
 
@@ -27,7 +30,8 @@ public class OAuthUseCase {
 
     @Transactional
     public ResponseData<SignInRes> loginWithKakaoCode(String code) {
-        String accessToken = kakaoOAuthService.getAccessToken(code);
+        String encoded = URLDecoder.decode(code, StandardCharsets.UTF_8);
+        String accessToken = kakaoOAuthService.getAccessToken(encoded);
 
         KakaoUserInfoDto userInfo = kakaoOAuthService.getUserInfo(accessToken);
 
@@ -42,7 +46,8 @@ public class OAuthUseCase {
 
     @Transactional
     public ResponseData<SignInRes> loginWithGoogleCode(String code) {
-        String accessToken = googleOAuthService.getAccessToken(code);
+        String encoded = URLDecoder.decode(code, StandardCharsets.UTF_8);
+        String accessToken = googleOAuthService.getAccessToken(encoded);
 
         GoogleUserInfoDto userInfo = googleOAuthService.getUserInfo(accessToken);
 
