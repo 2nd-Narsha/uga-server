@@ -3,7 +3,6 @@ package com.olympus.uga.domain.user.service;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.presentation.dto.request.CharacterReq;
 import com.olympus.uga.domain.user.presentation.dto.request.InterestReq;
 import com.olympus.uga.domain.user.presentation.dto.request.MbtiReq;
 import com.olympus.uga.domain.user.presentation.dto.request.UsernameBirthGenderReq;
