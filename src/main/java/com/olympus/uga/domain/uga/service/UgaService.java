@@ -50,7 +50,6 @@ public class UgaService {
         return Response.created("당신의 우가 " + ugaCreateReq.getUgaName() + "가 생성되었습니다.");
     }
 
-    //우가 성장 다 하면 기여도 리셋되게
     public Response ugaFeed(UgaFeedReq ugaFeedReq) {
 
         User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
