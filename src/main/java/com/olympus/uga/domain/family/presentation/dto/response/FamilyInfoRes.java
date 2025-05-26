@@ -12,7 +12,7 @@ public class FamilyInfoRes {
 
     private String familyCode;
     private String familyName;
-    private int presentUgaId;
+    private Long presentUgaId;
     private String profileLink;
     private String representativePhoneNum;
     private List<User> memberList;
