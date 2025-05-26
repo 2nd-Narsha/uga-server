@@ -5,13 +5,14 @@ import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@Getter
+@Data
 @Entity
 @SuperBuilder
 @Table(name = "tb_user")
@@ -40,10 +41,11 @@ public class User {
     @Column(name = "point")
     private int point;
 
-    @Column(name = "used_point")
-    private int usedPoint;
+    @Column(name = "contribution")
+    private int contribution;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "tb_belonging_food")
     private List<FoodType> foods;
 
     @Column(name = "character_type")
