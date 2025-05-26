@@ -12,6 +12,7 @@ import com.olympus.uga.domain.uga.presentation.dto.req.UgaCreateReq;
 import com.olympus.uga.domain.uga.presentation.dto.req.UgaFeedReq;
 import com.olympus.uga.domain.uga.presentation.dto.res.UgaInfoRes;
 import com.olympus.uga.domain.uga.presentation.dto.res.UgaListRes;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import jakarta.transaction.Transactional;
@@ -30,6 +31,7 @@ public class UgaService {
 
     private final UgaRepo ugaRepo;
     private final FamilyRepo familyRepo;
+    private final UserJpaRepo userJpaRepo;
 
     @Transactional
     public Response createUga(UgaCreateReq ugaCreateReq) {
