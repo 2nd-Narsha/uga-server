@@ -35,6 +35,7 @@ public class UgaService {
     private final FamilyRepo familyRepo;
     private final UserJpaRepo userJpaRepo;
 
+    //우가 생성
     @Transactional
     public Response createUga(UgaCreateReq ugaCreateReq) {
         Uga uga = new Uga(ugaCreateReq);
@@ -51,6 +52,7 @@ public class UgaService {
         return Response.created("당신의 우가 " + ugaCreateReq.getUgaName() + "가 생성되었습니다.");
     }
 
+    //먹이 주기
     public Response ugaFeed(UgaFeedReq ugaFeedReq) {
 
         User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
@@ -86,10 +88,12 @@ public class UgaService {
         return Response.ok("우가에게 먹이를 주었습니다.");
     }
 
+    //우가 하나 조회
     public UgaInfoRes getUga(Long ugaId) {
         return new UgaInfoRes(resetUga(ugaRepo.findById(ugaId).orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND))));
     }
 
+    //본인 가족의 우가 리스트 조회
     public List<UgaListRes> getUgaList() {
 
         Family family = familyRepo.findAll().stream()
@@ -102,6 +106,7 @@ public class UgaService {
                 .toList();
     }
 
+    //우가 성장도 설정
     private Uga resetUga(Uga uga) {
         long hoursLeft = Duration.between(LocalDateTime.now(), uga.getCompleteGrowthTime()).toHours();
 
