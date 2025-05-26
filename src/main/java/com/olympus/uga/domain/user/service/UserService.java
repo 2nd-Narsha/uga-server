@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
-    private JwtExtractor jwtExtractor;
-    private JwtTokenService jwtTokenService;
+    private final JwtExtractor jwtExtractor;
+    private final JwtTokenService jwtTokenService;
 
     @Transactional
     public ResponseData<UserResponse> getMe() {
