@@ -44,6 +44,7 @@ public class UgaService {
 
         uga.setFamily(family);
         family.setPresentUgaId(uga.getUgaId());
+        family.getMemberList().forEach(m -> {userJpaRepo.findById(m).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND)).setContribution(0);});
 
         ugaRepo.save(uga);
 
