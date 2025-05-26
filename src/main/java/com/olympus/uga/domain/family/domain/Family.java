@@ -26,7 +26,7 @@ public class Family {
     private String familyName;
 
     @Column
-    private int presentUgaId;
+    private Long presentUgaId;
 
     @Column
     private String profileLink;
