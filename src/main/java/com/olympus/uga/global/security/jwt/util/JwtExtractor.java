@@ -19,6 +19,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ import javax.crypto.SecretKey;
 public class JwtExtractor {
     private final JwtProperties jwtProperties;
     private final UserJpaRepo userJpaRepo;
+    private final StringRedisTemplate redisTemplate;
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
@@ -45,6 +47,10 @@ public class JwtExtractor {
     }
 
     public Authentication getAuthentication(String token) {
+        if (isTokenBlacklisted(token)) {
+            throw new CustomException(JwtErrorCode.INVALID_TOKEN);
+        }
+
         Jws<Claims> claims = getClaims(token);
         Long userId = Long.valueOf(claims.getBody().getSubject());
 
@@ -67,7 +73,7 @@ public class JwtExtractor {
         return !tokenType.toString().equals(String.valueOf(header));
     }
 
-    private Jws<Claims> getClaims(String token) {
+    public Jws<Claims> getClaims(String token) {
         try{
             return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
@@ -79,5 +85,8 @@ public class JwtExtractor {
         } catch (MalformedJwtException e) {
             throw new CustomException(JwtErrorCode.MALFORMED_TOKEN);
         }
+    }
+    private boolean isTokenBlacklisted(String token) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
     }
 }
