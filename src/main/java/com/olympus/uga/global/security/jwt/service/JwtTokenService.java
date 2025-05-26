@@ -26,7 +26,7 @@ public class JwtTokenService {
                 );
             }
         } catch (Exception e) {
-            // 토큰이 이미 만료되었거나 유효하지 않은 경우 무시
+            System.out.println("블랙리스트 추가 실패: " + e.getMessage());
         }
     }
 
