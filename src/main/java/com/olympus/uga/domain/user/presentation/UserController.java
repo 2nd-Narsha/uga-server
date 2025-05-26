@@ -5,9 +5,11 @@ import com.olympus.uga.domain.user.service.UserService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +23,11 @@ public class UserController {
     @Operation(summary = "마이페이지 정보")
     public ResponseData<UserResponse> getMe() {
         return userService.getMe();
+    }
+
+    @PostMapping("/logout")
+    public Response logout(HttpServletRequest req) {
+        return userService.logout(req);
     }
 
     @DeleteMapping("/delete")
