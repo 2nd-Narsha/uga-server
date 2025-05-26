@@ -38,5 +38,5 @@ out/
 
 .DS_Store
 
-#/src/main/java/com/olympus/uga/domain/family/
+/src/main/java/com/olympus/uga/domain/family/
 

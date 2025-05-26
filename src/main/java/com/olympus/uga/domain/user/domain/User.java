@@ -1,17 +1,15 @@
 package com.olympus.uga.domain.user.domain;
 
+import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Getter
 @Entity
@@ -38,6 +36,15 @@ public class User {
 
     @Column(name = "mbti")
     private String mbti;
+
+    @Column(name = "point")
+    private int point;
+
+    @Column(name = "used_point")
+    private int usedPoint;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<FoodType> foods;
 
     @Column(name = "character_type")
     @Enumerated(EnumType.STRING)
