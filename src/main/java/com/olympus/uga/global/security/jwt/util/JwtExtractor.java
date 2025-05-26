@@ -86,6 +86,7 @@ public class JwtExtractor {
             throw new CustomException(JwtErrorCode.MALFORMED_TOKEN);
         }
     }
+
     private boolean isTokenBlacklisted(String token) {
         return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
     }
