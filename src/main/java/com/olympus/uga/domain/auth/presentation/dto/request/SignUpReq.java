@@ -11,6 +11,7 @@ public record SignUpReq(
         return User.builder()
                 .phoneNum(req.phoneNum)
                 .password(password)
+                .point(0)
                 .foods(new ArrayList<>())
                 .build();
     }
