@@ -48,6 +48,10 @@ public class User {
     @CollectionTable(name = "tb_belonging_food")
     private List<FoodType> foods;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "tb_got_letters")
+    private List<Long> lettersId;
+
     @Column(name = "character_type")
     @Enumerated(EnumType.STRING)
     private UserCharacter character;

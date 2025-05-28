@@ -51,6 +51,7 @@ public class FamilyService {
     }
 
     //가족 조회
+    //가족 멤버들만 조회 가능하게
     public FamilyInfoRes getFamily() {
         Family family = familyRepo.findAll()
                 .stream()
