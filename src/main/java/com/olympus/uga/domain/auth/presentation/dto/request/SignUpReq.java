@@ -13,6 +13,7 @@ public record SignUpReq(
                 .password(password)
                 .point(0)
                 .foods(new ArrayList<>())
+                .lettersId(new ArrayList<>())
                 .build();
     }
 }
