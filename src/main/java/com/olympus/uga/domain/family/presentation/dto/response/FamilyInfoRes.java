@@ -12,6 +12,7 @@ public class FamilyInfoRes {
 
     private String familyCode;
     private String familyName;
+    private Long presentUgaId;
     private int presentUgaId;
     private int point;
     private String profileLink;

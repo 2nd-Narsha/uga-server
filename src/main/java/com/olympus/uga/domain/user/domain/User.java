@@ -1,5 +1,9 @@
 package com.olympus.uga.domain.user.domain;
 
+import com.olympus.uga.domain.uga.domain.enums.FoodType;
+import com.olympus.uga.domain.user.domain.enums.UserCharacter;
+import com.olympus.uga.domain.user.domain.enums.Gender;
+import jakarta.persistence.*;
 import com.olympus.uga.domain.user.domain.enums.LoginType;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
@@ -12,11 +16,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Getter
+import java.util.List;
+
+@Data
 @Entity
 @SuperBuilder
 @Table(name = "tb_user")
@@ -46,6 +53,16 @@ public class User {
 
     @Column(name = "mbti")
     private String mbti;
+
+    @Column(name = "point")
+    private int point;
+
+    @Column(name = "contribution")
+    private int contribution;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "tb_belonging_food")
+    private List<FoodType> foods;
 
     @Column(name = "character_type")
     @Enumerated(EnumType.STRING)
