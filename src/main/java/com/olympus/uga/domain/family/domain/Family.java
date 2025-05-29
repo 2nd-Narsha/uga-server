@@ -27,7 +27,6 @@ public class Family {
 
     @Column
     private Long presentUgaId;
-    private int presentUgaId;
 
     @Column
     private int point;
