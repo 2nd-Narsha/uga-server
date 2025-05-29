@@ -1,9 +1,7 @@
 package com.olympus.uga.domain.family.presentation.dto.response;
 
 import com.olympus.uga.domain.family.domain.Family;
-import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.user.domain.User;
-import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +11,6 @@ public class FamilyInfoRes {
     private String familyCode;
     private String familyName;
     private Long presentUgaId;
-    private int presentUgaId;
     private int point;
     private String profileLink;
     private String representativePhoneNum;
