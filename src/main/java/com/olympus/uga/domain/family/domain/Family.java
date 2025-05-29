@@ -27,6 +27,10 @@ public class Family {
 
     @Column
     private Long presentUgaId;
+    private int presentUgaId;
+
+    @Column
+    private int point;
 
     @Column
     private String profileLink;
@@ -45,6 +49,7 @@ public class Family {
         this.familyCode = familyCode;
         this.familyName = req.getFamilyName();
         this.profileLink = profileLink;
+        this.point = 500;
         this.representativePhoneNum = SecurityContextHolder.getContext().getAuthentication().getName();
         this.memberList = new ArrayList<>();
         this.memberList.add(this.representativePhoneNum);
