@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.auth.presentation.dto.request;
 
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.enums.LoginType;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ public record SignUpReq(
                 .password(password)
                 .point(0)
                 .foods(new ArrayList<>())
+                .loginType(LoginType.LOCAL)
                 .build();
     }
 }
