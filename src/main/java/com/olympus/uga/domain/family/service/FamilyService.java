@@ -84,10 +84,10 @@ public class FamilyService {
     }
 
     //리더 넘기기
-    public Response changeRepresentative(String familyCode, String phoneNum) {
+    public Response changeRepresentative(String familyCode, Long id) {
         familyRepo.findByFamilyCode(familyCode)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND))
-                .setRepresentativePhoneNum(phoneNum);
-        return Response.ok(userJpaRepo.findById(phoneNum) + "님에게 리더를 넘기셨습니다.");
+                .setRepresentativeId(id);
+        return Response.ok(userJpaRepo.findById(id) + "님에게 리더를 넘기셨습니다.");
     }
 }

@@ -11,9 +11,8 @@ public class FamilyInfoRes {
     private String familyCode;
     private String familyName;
     private Long presentUgaId;
-    private int point;
     private String profileLink;
-    private String representativePhoneNum;
+    private Long representativeId;
     private List<User> memberList;
     private LocalDateTime createdAt;
 
@@ -21,9 +20,8 @@ public class FamilyInfoRes {
         this.familyCode = family.getFamilyCode();
         this.familyName = family.getFamilyName();
         this.presentUgaId = family.getPresentUgaId();
-        this.point = family.getPoint();
         this.profileLink = family.getProfileLink();
-        this.representativePhoneNum = family.getRepresentativePhoneNum();
+        this.representativeId = family.getRepresentativeId();
         this.memberList = memberList;
         this.createdAt = family.getCreatedAt();
 

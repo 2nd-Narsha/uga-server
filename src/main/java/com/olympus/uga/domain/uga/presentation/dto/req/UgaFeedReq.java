@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class UgaFeedReq {
-
     private Long ugaId;
     private FoodType foodType;
 }
