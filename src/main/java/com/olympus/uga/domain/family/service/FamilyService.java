@@ -6,7 +6,6 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
-import com.olympus.uga.domain.uga.domain.repo.UgaRepo;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;

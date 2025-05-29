@@ -1,11 +1,7 @@
 package com.olympus.uga.domain.family.domain;
 
-import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
-import com.olympus.uga.domain.family.util.CodeGenerator;
-import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
