@@ -1,6 +1,8 @@
 package com.olympus.uga.domain.family.domain;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @SuperBuilder
@@ -34,6 +37,10 @@ public class Family {
 
     @Column
     private LocalDateTime createdAt;
+
+    @ElementCollection
+    @CollectionTable(name = "tb_family_member")
+    private List<Long> memberList;
 
     public void updateLeader(Long id) {
         this.leaderId = id;
