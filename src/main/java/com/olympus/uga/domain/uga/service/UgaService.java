@@ -1,7 +1,7 @@
 package com.olympus.uga.domain.uga.service;
 
 import com.olympus.uga.domain.family.domain.Family;
-import com.olympus.uga.domain.family.domain.repo.FamilyRepo;
+import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.enums.FoodType;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class UgaService {
 
     private final UgaRepo ugaRepo;
-    private final FamilyRepo familyRepo;
+    private final FamilyJpaRepo familyRepo;
     private final UserJpaRepo userJpaRepo;
 
     //우가 생성

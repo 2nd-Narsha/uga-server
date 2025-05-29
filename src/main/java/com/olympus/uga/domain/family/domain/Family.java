@@ -1,11 +1,18 @@
 package com.olympus.uga.domain.family.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@SuperBuilder
 @Entity
 @Table(name = "tb_family")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,11 +27,15 @@ public class Family {
     private Long leaderId;
 
     @Column
-    private String profileLink;
+    private String profileImage;
 
     @Column
     private Long presentUgaId; // 현재 우가
 
     @Column
     private LocalDateTime createdAt;
+
+    public void updateLeader(Long id) {
+        this.leaderId = id;
+    }
 }

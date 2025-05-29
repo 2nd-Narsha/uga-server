@@ -5,8 +5,6 @@ import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
 import jakarta.persistence.*;
 import com.olympus.uga.domain.user.domain.enums.LoginType;
-import com.olympus.uga.domain.user.domain.enums.UserCharacter;
-import com.olympus.uga.domain.user.domain.enums.Gender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,14 +14,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@Data
+@Getter
 @Entity
 @SuperBuilder
 @Table(name = "tb_user")

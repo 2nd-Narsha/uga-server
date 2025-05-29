@@ -1,15 +1,19 @@
 package com.olympus.uga.domain.family.service;
 
 import com.olympus.uga.domain.family.domain.Family;
-import com.olympus.uga.domain.family.domain.repo.FamilyRepo;
+import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
+import com.olympus.uga.domain.family.presentation.dto.request.LeaderChangeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
+import com.olympus.uga.global.common.ResponseData;
 import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.security.auth.UserSessionHolder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,37 +25,39 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
-    private final FamilyRepo familyRepo;
+    private final FamilyJpaRepo familyJpaRepo;
     private final CodeGenerator codeGenerator;
     private final ImageService imageService;
     private final UserJpaRepo userJpaRepo;
+    private final UserSessionHolder userSessionHolder;
 
     //가족 생성
     @Transactional
-    public Response createFamily(MultipartFile familyProfile, FamilyCreateReq familyCreateReq) {
+    public ResponseData<String> createFamily(MultipartFile familyProfile, FamilyCreateReq req) {
+        User user = userSessionHolder.getUser();
         String code = codeGenerator.generateCode();
 
-        while (familyRepo.findByFamilyCode(code).isPresent()) {
+        while (familyJpaRepo.findByFamilyCode(code).isPresent()) {
             code = codeGenerator.generateCode();
         }
 
-        Family family = new Family(familyCreateReq, imageService.uploadImage(familyProfile).getImageUrl(), code);
-        familyRepo.save(family);
-        return Response.created(family.getFamilyCode());
+        familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), imageService.uploadImage(familyProfile).getImageUrl()));
+        return ResponseData.created("가족 생성에 성공했습니다.", code);
     }
 
     //가족 가입
     @Transactional
     public Response joinFamily(String familyCode) {
-        Family family = familyRepo.findByFamilyCode(familyCode)
+        Family family = familyJpaRepo.findByFamilyCode(familyCode)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
         family.getMemberList().add(SecurityContextHolder.getContext().getAuthentication().getName());
+
         return Response.ok("가족 " + family.getFamilyName() + "에 가입하셨습니다.");
     }
 
     //가족 조회
     public FamilyInfoRes getFamily() {
-        Family family = familyRepo.findAll()
+        Family family = familyJpaRepo.findAll()
                 .stream()
                 .filter(f -> f.getMemberList().contains(SecurityContextHolder.getContext().getAuthentication().getName()))
                 .findFirst()
@@ -69,7 +75,7 @@ public class FamilyService {
     //가족 떠나기
     @Transactional
     public Response leaveFamily() {
-        Family family = familyRepo.findAll()
+        Family family = familyJpaRepo.findAll()
                 .stream()
                 .filter(f -> f.getMemberList().contains(SecurityContextHolder.getContext().getAuthentication().getName()))
                 .findFirst()
@@ -84,10 +90,13 @@ public class FamilyService {
     }
 
     //리더 넘기기
-    public Response changeRepresentative(String familyCode, Long id) {
-        familyRepo.findByFamilyCode(familyCode)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND))
-                .setRepresentativeId(id);
-        return Response.ok(userJpaRepo.findById(id) + "님에게 리더를 넘기셨습니다.");
+    public Response changeLeader(LeaderChangeReq req) {
+        Family family = familyJpaRepo.findByFamilyCode(req.familyCode())
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
+
+        family.updateLeader(req.id());
+        familyJpaRepo.save(family);
+
+        return Response.ok(userJpaRepo.findById(req.id()) + "님에게 리더를 넘겼습니다.");
     }
 }

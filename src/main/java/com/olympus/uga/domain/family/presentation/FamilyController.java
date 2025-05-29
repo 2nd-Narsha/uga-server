@@ -1,10 +1,11 @@
 package com.olympus.uga.domain.family.presentation;
 
 import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
-import com.olympus.uga.domain.family.presentation.dto.request.RepresentativeReq;
+import com.olympus.uga.domain.family.presentation.dto.request.LeaderChangeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.service.FamilyService;
 import com.olympus.uga.global.common.Response;
+import com.olympus.uga.global.common.ResponseData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +17,7 @@ public class FamilyController {
     private final FamilyService familyService;
 
     @PostMapping("/create")
-    public Response createFamily(@RequestPart MultipartFile familyProfile, @RequestBody FamilyCreateReq req) {
+    public ResponseData<String> createFamily(@RequestPart MultipartFile familyProfile, @RequestBody FamilyCreateReq req) {
         return familyService.createFamily(familyProfile, req);
     }
 
@@ -35,8 +36,8 @@ public class FamilyController {
         return familyService.leaveFamily();
     }
 
-    @PostMapping("/change")
-    public Response changeRepresentative(@RequestBody RepresentativeReq req) {
-        return familyService.changeRepresentative(req.getFamilyCode(), req.getPhoneNum());
+    @PostMapping("/change-leader")
+    public Response changeLeader(@RequestBody LeaderChangeReq req) {
+        return familyService.changeLeader(req);
     }
 }
