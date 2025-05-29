@@ -52,6 +52,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 .build();
 
         response.setStatus(exception.getError().getStatus().value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         try (var outputStream = response.getOutputStream()) {
             outputStream.write(objectMapper.writeValueAsBytes(errorResponse));
             outputStream.flush();

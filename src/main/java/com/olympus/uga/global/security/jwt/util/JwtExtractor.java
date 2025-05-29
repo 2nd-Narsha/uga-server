@@ -2,7 +2,7 @@ package com.olympus.uga.global.security.jwt.util;
 
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.domain.auth.error.AuthErrorCode;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.AuthDetails;
 import com.olympus.uga.global.security.jwt.JwtProperties;
@@ -19,10 +19,10 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 
@@ -31,6 +31,7 @@ import javax.crypto.SecretKey;
 public class JwtExtractor {
     private final JwtProperties jwtProperties;
     private final UserJpaRepo userJpaRepo;
+    private final StringRedisTemplate redisTemplate;
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
@@ -46,19 +47,23 @@ public class JwtExtractor {
     }
 
     public Authentication getAuthentication(String token) {
-        Jws<Claims> claims = getClaims(token);
-        String phoneNum = claims.getBody().getSubject();
+        if (isTokenBlacklisted(token)) {
+            throw new CustomException(JwtErrorCode.INVALID_TOKEN);
+        }
 
-        User user = userJpaRepo.findById(phoneNum)
-                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        Jws<Claims> claims = getClaims(token);
+        Long userId = Long.valueOf(claims.getBody().getSubject());
+
+        User user = userJpaRepo.findById(userId)
+                .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
 
         AuthDetails details = new AuthDetails(user);
 
         return new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
     }
 
-    public String getPhoneNum(String token) {
-        return getClaims(token).getBody().getSubject();
+    public Long getUserId(String token) {
+        return Long.valueOf(getClaims(token).getBody().getSubject());
     }
 
     public boolean isWrongType(String token, TokenType tokenType) {
@@ -68,7 +73,7 @@ public class JwtExtractor {
         return !tokenType.toString().equals(String.valueOf(header));
     }
 
-    private Jws<Claims> getClaims(String token) {
+    public Jws<Claims> getClaims(String token) {
         try{
             return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
@@ -80,5 +85,9 @@ public class JwtExtractor {
         } catch (MalformedJwtException e) {
             throw new CustomException(JwtErrorCode.MALFORMED_TOKEN);
         }
+    }
+
+    private boolean isTokenBlacklisted(String token) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
     }
 }
