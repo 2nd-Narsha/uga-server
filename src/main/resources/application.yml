@@ -13,6 +13,16 @@ spring:
       host: localhost
       port: 6379
 
+cloud:
+  aws:
+    s3:
+      bucket: ugafinal
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: AKIAXNGUVF4Z7FX6ZB6P
+      secretKey: 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
+
 jwt:
   secretKey: rTUS9rPwE1BJWApUY6lhwZZOCdvM5blMzr6b1mRShLdbMn9eZNmXltdkP+AkLvArPlY44B2gwP0XQEp11+SZTA==
   refreshExp: 604800000 # 1week
