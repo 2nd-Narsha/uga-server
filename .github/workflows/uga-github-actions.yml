@@ -1,0 +1,57 @@
+name: CI/CD using github actions & docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # 2. Spring Boot 애플리케이션 빌드
+      - name: Build with Gradle
+        run: |
+          ./gradlew build -x test
+
+      # 3. Docker 이미지 빌드
+      - name: docker image build
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/uga:latest .
+
+      # 4. DockerHub 로그인
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 5. Docker Hub 이미지 푸시
+      - name: docker Hub push
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/uga:latest
+
+      - name: EC2 Docker Run
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker stop uga
+            sudo docker rm uga
+            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uga:latest
+            sudo docker run -d -p 80:8080 --name uga ${{ secrets.DOCKER_USERNAME }}/uga:latest
+          debug: true

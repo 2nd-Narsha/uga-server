@@ -67,5 +67,6 @@ public class ImageService {
         }
 
         imageRepository.delete(imageRepository.findByImageName(fileName).orElseThrow(() -> new CustomException(ImageErrorCode.FILE_NOT_FOUND)));
+        imageRepository.delete(imageRepository.findByFileName(fileName).orElseThrow(() -> new CustomException(ImageErrorCode.FILE_NOT_FOUND)));
     }
 }
