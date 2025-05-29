@@ -6,7 +6,7 @@ import com.olympus.uga.domain.auth.presentation.dto.response.RefreshRes;
 import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
 import com.olympus.uga.domain.sms.error.SmsErrorCode;
 import com.olympus.uga.domain.user.domain.User;
-import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.domain.auth.error.AuthErrorCode;
 import com.olympus.uga.domain.auth.presentation.dto.request.SignUpReq;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
@@ -33,8 +33,8 @@ public class AuthUseCase {
 
     @Transactional
     public Response signUp(SignUpReq req) {
-        if(userJpaRepo.existsById(req.phoneNum())) {
-            throw new CustomException(UserErrorCode.PHONE_NUM_ALREADY);
+        if(userJpaRepo.existsByPhoneNum(req.phoneNum())) {
+            throw new CustomException(AuthErrorCode.PHONE_NUM_ALREADY);
         }
 
         String verified = redisTemplate.opsForValue().get(req.phoneNum() + ":verified");
@@ -49,14 +49,14 @@ public class AuthUseCase {
     }
 
     public ResponseData<SignInRes> signIn(SignInReq req) {
-        User user = userJpaRepo.findById(req.phoneNum())
-                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        User user = userJpaRepo.findByPhoneNum(req.phoneNum())
+                .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(req.password(), user.getPassword())) {
-            throw new CustomException(UserErrorCode.WRONG_PASSWORD);
+            throw new CustomException(AuthErrorCode.WRONG_PASSWORD);
         }
 
-        return ResponseData.ok("로그인에 성공하였습니다.", jwtProvider.createToken(req.phoneNum()));
+        return ResponseData.ok("로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
     }
 
     public ResponseData<RefreshRes> refresh(RefreshReq req) {
@@ -64,8 +64,8 @@ public class AuthUseCase {
             throw new  CustomException(JwtErrorCode.TOKEN_TYPE_ERROR);
         }
 
-        String phoneNum = jwtExtractor.getPhoneNum(req.refreshToken());
+        Long userId = jwtExtractor.getUserId(req.refreshToken());
 
-        return ResponseData.created("리프레쉬를 성공하였습니다.", jwtProvider.refreshToken(phoneNum));
+        return ResponseData.created("리프레쉬를 성공하였습니다.", jwtProvider.refreshToken(userId));
     }
 }
