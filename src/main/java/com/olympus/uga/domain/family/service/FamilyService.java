@@ -50,9 +50,11 @@ public class FamilyService {
     public Response joinFamily(String familyCode) {
         Family family = familyJpaRepo.findByFamilyCode(familyCode)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
-        family.getMemberList().add(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userSessionHolder.getUser();
 
-        return Response.ok("가족 " + family.getFamilyName() + "에 가입하셨습니다.");
+        family.getMemberList().add(user.getId());
+
+        return Response.ok("가족 " + family.getFamilyName() + "에 가입이 되었습니다.");
     }
 
     //가족 조회
