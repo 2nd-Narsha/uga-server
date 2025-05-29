@@ -13,6 +13,8 @@ public class FamilyInfoRes {
     private String familyCode;
     private String familyName;
     private Long presentUgaId;
+    private int presentUgaId;
+    private int point;
     private String profileLink;
     private String representativePhoneNum;
     private List<User> memberList;
@@ -22,6 +24,7 @@ public class FamilyInfoRes {
         this.familyCode = family.getFamilyCode();
         this.familyName = family.getFamilyName();
         this.presentUgaId = family.getPresentUgaId();
+        this.point = family.getPoint();
         this.profileLink = family.getProfileLink();
         this.representativePhoneNum = family.getRepresentativePhoneNum();
         this.memberList = memberList;
