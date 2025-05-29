@@ -4,6 +4,17 @@ import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
 import jakarta.persistence.*;
+import com.olympus.uga.domain.user.domain.enums.LoginType;
+import com.olympus.uga.domain.user.domain.enums.UserCharacter;
+import com.olympus.uga.domain.user.domain.enums.Gender;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -18,11 +29,16 @@ import java.util.List;
 @Table(name = "tb_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
-    @Id
-    @Column(name = "phoneNum",nullable = false, unique = true)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "phone_num", unique = true)
     private String phoneNum;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "email", unique = true)
+    private String email;
+
+    @Column(name = "password")
     private String password;
 
     @Column(name = "username")
@@ -54,4 +70,27 @@ public class User {
 
     @Column(name = "interests")
     private String interests;
+
+    @Column(name = "login_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
+    @Column(name = "oauth_id")
+    private String oauthId;
+
+    public void updateUsernameBirthGender(String username, String birth, Gender gender) {
+        this.username = username;
+        this.birth = birth;
+        this.gender = gender;
+    }
+    public void updateInterest(String interests) {
+        this.interests = interests;
+    }
+    public void updateCharacter(UserCharacter character) {
+        this.character = character;
+    }
+    public void updateMbti(String mbti) {
+        this.mbti = mbti;
+    }
 }
+
