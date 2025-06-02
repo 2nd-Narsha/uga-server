@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.uga.presentation.dto.res;
+package com.olympus.uga.domain.uga.presentation.dto.response;
 
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;

@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.olympus.uga.global.image.domain.ImageDetails;
 import com.olympus.uga.global.image.domain.repo.ImageRepo;
 import com.olympus.uga.global.image.error.ImageErrorCode;
-import com.olympus.uga.global.image.presentation.dto.dto.ImageInfo;
+import com.olympus.uga.global.image.presentation.dto.ImageInfo;
 import com.olympus.uga.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ImageService {
-
     private final AmazonS3Client amazonS3Client;
     private final ImageRepo imageRepository;
 

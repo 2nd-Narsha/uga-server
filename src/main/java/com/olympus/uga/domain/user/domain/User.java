@@ -51,15 +51,15 @@ public class User {
     @Column(name = "mbti")
     private String mbti;
 
-    @Column(name = "point")
-    private int point;
-
-    @Column(name = "contribution")
-    private int contribution;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "tb_belonging_food")
-    private List<FoodType> foods;
+//    @Column(name = "point")
+//    private int point;
+//
+//    @Column(name = "contribution")
+//    private int contribution;
+//
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @CollectionTable(name = "tb_belonging_food")
+//    private List<FoodType> foods;
 
     @Column(name = "character_type")
     @Enumerated(EnumType.STRING)

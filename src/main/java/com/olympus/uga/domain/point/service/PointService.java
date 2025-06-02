@@ -19,7 +19,8 @@ public class PointService {
     private final UserJpaRepo userJpaRepo;
 
     public int getPoint() {
-        return userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND)).getPoint();
+        return userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND)).getPoint();
     }
 
     public Response earnPoint(ActivityType activityType) {
@@ -32,7 +33,8 @@ public class PointService {
                 ActivityType.BIRTHDAY, 10
         );
 
-        User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         user.setPoint(user.getPoint() + activityEffect.get(activityType));
 
@@ -46,7 +48,8 @@ public class PointService {
                 FoodType.BANANA_KICK, 120
         );
 
-        User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         user.getFoods().add(food);
         user.setPoint(user.getPoint() - foodEffect.get(food));
