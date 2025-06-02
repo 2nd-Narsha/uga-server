@@ -1,10 +1,9 @@
 package com.olympus.uga.domain.uga.presentation;
 
-import com.olympus.uga.domain.family.service.FamilyService;
-import com.olympus.uga.domain.uga.presentation.dto.req.UgaCreateReq;
-import com.olympus.uga.domain.uga.presentation.dto.req.UgaFeedReq;
-import com.olympus.uga.domain.uga.presentation.dto.res.UgaInfoRes;
-import com.olympus.uga.domain.uga.presentation.dto.res.UgaListRes;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaCreateReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaFeedReq;
+import com.olympus.uga.domain.uga.presentation.dto.response.UgaInfoRes;
+import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
 import com.olympus.uga.domain.uga.service.UgaService;
 import com.olympus.uga.global.common.Response;
 import lombok.RequiredArgsConstructor;

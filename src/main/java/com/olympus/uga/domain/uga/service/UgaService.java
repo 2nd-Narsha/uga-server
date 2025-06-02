@@ -8,10 +8,8 @@ import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import com.olympus.uga.domain.uga.domain.repo.UgaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
-import com.olympus.uga.domain.uga.presentation.dto.req.UgaCreateReq;
-import com.olympus.uga.domain.uga.presentation.dto.req.UgaFeedReq;
-import com.olympus.uga.domain.uga.presentation.dto.res.UgaInfoRes;
-import com.olympus.uga.domain.uga.presentation.dto.res.UgaListRes;
+import com.olympus.uga.domain.uga.presentation.dto.request.*;
+import com.olympus.uga.domain.uga.presentation.dto.response.*;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
@@ -30,17 +28,14 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class UgaService {
-
     private final UgaRepo ugaRepo;
     private final FamilyJpaRepo familyRepo;
     private final UserJpaRepo userJpaRepo;
 
     //우가 생성
     @Transactional
-    public Response createUga(UgaCreateReq ugaCreateReq) {
-        Uga uga = new Uga(ugaCreateReq);
-
-        Family family = familyRepo.findById(ugaCreateReq.getFamilyCode())
+    public Response createUga(UgaCreateReq req) {
+        Family family = familyRepo.findById(req.familyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
 
         uga.setFamily(family);
@@ -49,16 +44,15 @@ public class UgaService {
 
         ugaRepo.save(uga);
 
-        return Response.created("당신의 우가 " + ugaCreateReq.getUgaName() + "가 생성되었습니다.");
+        return Response.created("당신의 우가 " + req.ugaName() + "가 생성되었습니다.");
     }
 
     //먹이 주기
-    public Response ugaFeed(UgaFeedReq ugaFeedReq) {
-
+    public Response ugaFeed(UgaFeedReq req) {
         User user = userJpaRepo.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        FoodType foodType = ugaFeedReq.getFoodType();
+        FoodType foodType = req.foodType();
 
         if (!user.getFoods().contains(foodType)) {
             throw new CustomException(UgaErrorCode.FOOD_SHORTAGE);
@@ -111,7 +105,7 @@ public class UgaService {
         long hoursLeft = Duration.between(LocalDateTime.now(), uga.getCompleteGrowthTime()).toHours();
 
         if (hoursLeft <= 180 && hoursLeft >= 90) {
-            uga.setGrowth(UgaGrowth.CHILD);
+            uga.getGrowth(UgaGrowth.CHILD);
         } else if (hoursLeft <= 270) {
             uga.setGrowth(UgaGrowth.TEENAGER);
         } else if (hoursLeft <= 365) {

@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/point")
+@RequiredArgsConstructor
 public class PointController {
     private final PointService pointService;
 
-    @GetMapping("/")
+    @GetMapping
     public int getPoint() {
         return pointService.getPoint();
     }
