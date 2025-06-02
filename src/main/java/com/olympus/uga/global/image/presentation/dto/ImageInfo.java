@@ -1,10 +1,9 @@
-package com.olympus.uga.global.image.presentation.dto.dto;
+package com.olympus.uga.global.image.presentation.dto;
 
 import lombok.Data;
 
 @Data
 public class ImageInfo {
-
     private String imageUrl;
     private String imageName;
 
