@@ -1,8 +1,14 @@
 package com.olympus.uga.domain.family.presentation.dto.request;
 
-import lombok.Data;
+import com.olympus.uga.domain.family.domain.Family;
 
-@Data
-public class FamilyCreateReq {
-    private String familyName;
+public record FamilyCreateReq(String familyName) {
+    public static Family fromFamilyCreateReq(String code, FamilyCreateReq req, Long id, String familyProfile){
+        return Family.builder()
+                .familyCode(code)
+                .familyName(req.familyName)
+                .leaderId(id)
+                .profileImage(familyProfile)
+                .build();
+    }
 }
