@@ -93,7 +93,6 @@ public class User {
     public void earnPoint(int amount) {
         this.point += amount;
     }
-
     public void usePoint(int amount) {
         if (this.point < amount) {
             throw new CustomException(PointErrorCode.INSUFFICIENT_POINT);
