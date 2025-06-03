@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ImageRepo extends JpaRepository<ImageDetails, Long> {
-    Optional<ImageDetails> findByImageName(String fileName);
-    Optional<ImageDetails> findByFileName(String fileName);
+public interface ImageRepo extends JpaRepository<ImageDetails, Integer> {
+    Optional<ImageDetails> findByImageName(String imageName);  // fileName 메서드 삭제, imageName으로 통일
 }
