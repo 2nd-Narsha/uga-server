@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -42,5 +42,5 @@ public class Letter {
     private String content;
 
     @Column()
-    private LocalDateTime sentAt; // 보낸 날짜
+    private LocalDate sentAt; // 보낸 날짜
 }
