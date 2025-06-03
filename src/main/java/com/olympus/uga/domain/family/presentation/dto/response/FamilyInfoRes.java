@@ -1,6 +1,5 @@
 package com.olympus.uga.domain.family.presentation.dto.response;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public record FamilyInfoRes(
