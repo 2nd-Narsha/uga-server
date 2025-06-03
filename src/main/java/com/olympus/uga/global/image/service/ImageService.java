@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.olympus.uga.global.image.domain.ImageDetails;
 import com.olympus.uga.global.image.domain.repo.ImageRepo;
 import com.olympus.uga.global.image.error.ImageErrorCode;
-import com.olympus.uga.global.image.presentation.dto.dto.ImageInfo;
+import com.olympus.uga.global.image.presentation.dto.ImageInfo;
 import com.olympus.uga.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ImageService {
-
     private final AmazonS3Client amazonS3Client;
     private final ImageRepo imageRepository;
 
@@ -66,7 +65,8 @@ public class ImageService {
             throw new CustomException(ImageErrorCode.FILE_DELETE_FAILED);
         }
 
-        imageRepository.delete(imageRepository.findByImageName(fileName).orElseThrow(() -> new CustomException(ImageErrorCode.FILE_NOT_FOUND)));
-        imageRepository.delete(imageRepository.findByFileName(fileName).orElseThrow(() -> new CustomException(ImageErrorCode.FILE_NOT_FOUND)));
+        ImageDetails image = imageRepository.findByImageName(fileName)
+                .orElseThrow(() -> new CustomException(ImageErrorCode.FILE_NOT_FOUND));
+        imageRepository.delete(image);
     }
 }

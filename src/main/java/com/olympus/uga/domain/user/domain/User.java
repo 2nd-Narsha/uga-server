@@ -1,12 +1,10 @@
 package com.olympus.uga.domain.user.domain;
 
-import com.olympus.uga.domain.uga.domain.enums.FoodType;
+import com.olympus.uga.domain.point.error.PointErrorCode;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
-import jakarta.persistence.*;
 import com.olympus.uga.domain.user.domain.enums.LoginType;
-import com.olympus.uga.domain.user.domain.enums.UserCharacter;
-import com.olympus.uga.domain.user.domain.enums.Gender;
+import com.olympus.uga.global.exception.CustomException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,14 +14,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
-@Data
+@Getter
 @Entity
 @SuperBuilder
 @Table(name = "tb_user")
@@ -54,15 +49,12 @@ public class User {
     @Column(name = "mbti")
     private String mbti;
 
-    @Column(name = "point")
-    private int point;
-
-    @Column(name = "contribution")
-    private int contribution;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "tb_belonging_food")
-    private List<FoodType> foods;
+//    @Column(name = "contribution")
+//    private int contribution;
+//
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @CollectionTable(name = "tb_belonging_food")
+//    private List<FoodType> foods;
 
     @Column(name = "character_type")
     @Enumerated(EnumType.STRING)
@@ -78,6 +70,10 @@ public class User {
     @Column(name = "oauth_id")
     private String oauthId;
 
+    @Column(name = "point", nullable = false)
+    private int point = 0;
+
+    // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
         this.username = username;
         this.birth = birth;
@@ -91,6 +87,17 @@ public class User {
     }
     public void updateMbti(String mbti) {
         this.mbti = mbti;
+    }
+
+    // point
+    public void earnPoint(int amount) {
+        this.point += amount;
+    }
+    public void usePoint(int amount) {
+        if (this.point < amount) {
+            throw new CustomException(PointErrorCode.INSUFFICIENT_POINT);
+        }
+        this.point -= amount;
     }
 }
 
