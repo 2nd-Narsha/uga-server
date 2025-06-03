@@ -17,6 +17,6 @@ public interface LetterJpaRepo extends JpaRepository<Letter, Long> {
     List<Letter> findByReceiver(@Param("receiver") User receiver);
 
     // 특정 사용자가 받은 편지 중 특정 ID의 편지 조회
-    @Query("SELECT l FROM Letter l WHERE l.id = :letterId AND l.receiver = :receiver")
+    @Query("SELECT l FROM Letter l WHERE l.letterId = :letterId AND l.receiver = :receiver")
     Optional<Letter> findByIdAndReceiver(@Param("letterId") Long letterId, @Param("receiver") User receiver);
 }

@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "image_details")
 public class ImageDetails {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private int Id;
+    private int id;
 
     @Column(nullable = false)
     private String imagePath;
@@ -23,12 +24,16 @@ public class ImageDetails {
     @Column(nullable = false)
     private String imageName;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     public ImageDetails(String imagePath, String imageName) {
         this.imagePath = imagePath;
         this.imageName = imageName;
+    }
+
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
