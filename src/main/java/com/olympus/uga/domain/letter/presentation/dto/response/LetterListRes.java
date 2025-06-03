@@ -4,10 +4,10 @@ import com.olympus.uga.domain.letter.domain.Letter;
 
 import java.time.LocalDate;
 
-public record LetterListRes(Long id, String senderName, LocalDate sentAt) {
+public record LetterListRes(Long letterId, String senderName, LocalDate sentAt) {
     public static LetterListRes from(Letter letter) {
         return new LetterListRes(
-                letter.getId(),
+                letter.getLetterId(),
                 letter.getSender().getUsername(),
                 letter.getSentAt()
         );
