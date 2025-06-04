@@ -33,8 +33,11 @@ public class JwtFilter extends OncePerRequestFilter {
         // 인증 필요 없는 경로는 필터 지나가게
         if (uri.startsWith("/auth/")
                 || uri.startsWith("/sms/")
-                || uri.startsWith("/swagger-ui/")
-                || uri.startsWith("/v3/api-docs")
+                || uri.startsWith("/swagger-ui")           // 슬래시 없이: 전체 경로 포함
+                || uri.startsWith("/v3/api-docs")           // JSON 문서 요청
+                || uri.startsWith("/swagger-resources")     // Swagger 리소스
+                || uri.startsWith("/webjars/")              // JS/CSS 정적 파일
+                || uri.equals("/favicon.ico")               // 파비콘
                 || uri.startsWith("/oauth/")) {
             filterChain.doFilter(request, response);
             return;
