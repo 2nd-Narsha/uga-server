@@ -48,9 +48,43 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker rm -f uga || true
-            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest || true
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uga:latest
-            sudo docker run -d -p 80:8080 --name uga ${{ secrets.DOCKER_USERNAME }}/uga:latest
+            CONTAINER_NAME=uga
+            IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/uga:latest
+
+            # 로그인
+            echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            # 컨테이너 존재 시 중지 및 삭제
+            if [ "$(sudo docker ps -aq -f name=$CONTAINER_NAME)" ]; then
+              echo "컨테이너 존재함! 중지 후 삭제할게요"
+              sudo docker stop $CONTAINER_NAME
+              sudo docker rm $CONTAINER_NAME
+            else
+              echo "삭제할 컨테이너 없음!"
+            fi
+
+            # 이미지 삭제 (있을 경우)
+            if sudo docker images | grep -q "$IMAGE_NAME"; then
+              sudo docker rmi $IMAGE_NAME
+            fi
+
+            # 새 이미지 pull 및 run
+            sudo docker pull $IMAGE_NAME
+            sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $IMAGE_NAME
           debug: true
+
+
+#      - name: EC2 Docker Run
+#        uses: appleboy/ssh-action@v0.1.8
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_KEY }}
+#          port: ${{ secrets.EC2_PORT }}
+#          script: |
+#            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#            sudo docker rm -f uga || true
+#            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest || true
+#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uga:latest
+#            sudo docker run -d -p 80:8080 --name uga ${{ secrets.DOCKER_USERNAME }}/uga:latest
+#          debug: true
