@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 인증 필요 없는 경로는 필터 지나가게
         if (uri.startsWith("/auth/")
                 || uri.startsWith("/sms/")
-                || uri.startsWith("/swagger-ui")
+                || uri.startsWith("/swagger-ui/")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/oauth/")) {
             filterChain.doFilter(request, response);
