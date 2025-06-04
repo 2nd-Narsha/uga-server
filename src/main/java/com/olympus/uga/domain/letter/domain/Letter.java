@@ -25,14 +25,14 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Letter {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long letterId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender; // 보내는 사람
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
+    @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver; // 받는 사람
 
     @Column
@@ -41,6 +41,6 @@ public class Letter {
     @Column(nullable = false)
     private String content;
 
-    @Column()
+    @Column(nullable = false)
     private LocalDate sentAt; // 보낸 날짜
 }
