@@ -28,6 +28,18 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+
+        // 🔐 인증이 필요 없는 경로는 바로 통과
+        if (uri.startsWith("/auth/")
+                || uri.startsWith("/sms/")
+                || uri.startsWith("/swagger")
+                || uri.startsWith("/v3/api-docs")
+                || uri.startsWith("/oauth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String token = jwtExtractor.getToken(request);
 
