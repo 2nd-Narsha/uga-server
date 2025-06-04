@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 .requestMatchers("/question/**").authenticated()
                                 .requestMatchers("/answer/**").authenticated()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling ->
