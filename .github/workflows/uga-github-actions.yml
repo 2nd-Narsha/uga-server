@@ -73,7 +73,6 @@ jobs:
             sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $IMAGE_NAME
           debug: true
 
-
 #      - name: EC2 Docker Run
 #        uses: appleboy/ssh-action@v0.1.8
 #        with:
