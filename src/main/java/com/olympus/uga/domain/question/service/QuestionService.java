@@ -69,7 +69,7 @@ public class QuestionService {
         // 답변한 경우에만 다른 사람들의 답변 조회
         List<AnswerRes> answers;
         if (hasAnswered) {
-            List<Answer> answerList = answerJpaRepo.findByQuestionOrderByCreatedAtAsc(question);
+            List<Answer> answerList = answerJpaRepo.findByQuestion(question);
             answers = answerList.stream()
                     .map(AnswerRes::from)
                     .toList();
