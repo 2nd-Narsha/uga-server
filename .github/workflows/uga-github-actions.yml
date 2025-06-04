@@ -49,9 +49,8 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            sudo docker stop uga
-            sudo docker rm uga
-            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest
+            sudo docker rm -f uga || true
+            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest || true
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uga:latest
             sudo docker run -d -p 80:8080 --name uga ${{ secrets.DOCKER_USERNAME }}/uga:latest
           debug: true
