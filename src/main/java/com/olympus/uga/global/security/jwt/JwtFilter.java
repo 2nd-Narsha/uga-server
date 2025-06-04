@@ -30,10 +30,10 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
 
-        // 🔐 인증이 필요 없는 경로는 바로 통과
+        // 인증 필요 없는 경로는 필터 지나가게
         if (uri.startsWith("/auth/")
                 || uri.startsWith("/sms/")
-                || uri.startsWith("/swagger")
+                || uri.startsWith("/swagger-ui")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/oauth/")) {
             filterChain.doFilter(request, response);
@@ -42,11 +42,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             String token = jwtExtractor.getToken(request);
-
             if (token != null) {
                 SecurityContextHolder.getContext().setAuthentication(jwtExtractor.getAuthentication(token));
             }
-
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             sendError(response, new CustomException(JwtErrorCode.EXPIRED_TOKEN));
