@@ -1,6 +1,6 @@
-package com.olympus.uga.domain.question.domain;
+package com.olympus.uga.domain.answer.domain;
 
-import com.olympus.uga.domain.family.domain.Family;
+import com.olympus.uga.domain.question.domain.Question;
 import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,28 +8,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
-
 @Getter
 @Entity
 @SuperBuilder
-@Table(name = "tb_question")
+@Table(name = "tb_answer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Question {
+public class Answer {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long questionId;
+    private Long answerId;
 
     @Column(nullable = false)
-    private String question;
+    private String answer;
 
-    @Column(nullable = false)
-    private LocalDate createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
+    private Question question;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
-    private Family family;
-
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
 }
