@@ -10,7 +10,7 @@ spring:
     show-sql: true
   data:
     redis:
-      host: localhost
+      host: 172.30.3.33
       port: 6379
 
 cloud:
