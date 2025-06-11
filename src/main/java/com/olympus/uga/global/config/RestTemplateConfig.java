@@ -32,5 +32,4 @@ public class RestTemplateConfig {
     RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory factory) {
         return new RestTemplate(factory);
     }
-
 }
