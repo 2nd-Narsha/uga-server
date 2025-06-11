@@ -55,12 +55,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-//        corsConfiguration.addAllowedOriginPattern("*");
 
-        corsConfiguration.addAllowedOrigin("http://localhost:8080");     // 로컬 개발
-        corsConfiguration.addAllowedOrigin("http://3.39.96.216:8080");   // EC2 퍼블릭 IP
-        corsConfiguration.addAllowedOrigin("http://3.39.96.216");   // EC2 퍼블릭 IP
-
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
+        corsConfiguration.addAllowedOrigin("http://3.39.96.216");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
