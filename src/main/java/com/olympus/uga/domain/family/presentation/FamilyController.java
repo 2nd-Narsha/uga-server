@@ -8,6 +8,7 @@ import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FamilyController {
     private final FamilyService familyService;
 
-    @PostMapping("/create")
-    public ResponseData<String> createFamily(@RequestPart MultipartFile familyProfile, @RequestBody FamilyCreateReq req) {
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseData<String> createFamily(
+            @RequestPart(name = "familyProfile") MultipartFile familyProfile,
+            @RequestPart(name = "req") FamilyCreateReq req) {
         return familyService.createFamily(familyProfile, req);
     }
 
