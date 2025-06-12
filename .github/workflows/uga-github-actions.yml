@@ -72,18 +72,3 @@ jobs:
             sudo docker pull $IMAGE_NAME
             sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $IMAGE_NAME
           debug: true
-
-#      - name: EC2 Docker Run
-#        uses: appleboy/ssh-action@v0.1.8
-#        with:
-#          host: ${{ secrets.EC2_HOST }}
-#          username: ${{ secrets.EC2_USERNAME }}
-#          key: ${{ secrets.EC2_KEY }}
-#          port: ${{ secrets.EC2_PORT }}
-#          script: |
-#            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#            sudo docker rm -f uga || true
-#            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/uga:latest || true
-#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uga:latest
-#            sudo docker run -d -p 80:8080 --name uga ${{ secrets.DOCKER_USERNAME }}/uga:latest
-#          debug: true
