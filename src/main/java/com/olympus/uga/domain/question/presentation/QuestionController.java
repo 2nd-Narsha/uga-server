@@ -23,6 +23,7 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @PostMapping("/create")
+    @Operation(summary = "가족 질문 생성")
     public Response createQuestion(@RequestBody QuestionReq req) {
         return questionService.createQuestion(req);
     }
@@ -34,7 +35,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{questionId}")
-    @Operation(summary = "질문 상세 조회")
+    @Operation(summary = "질문 상세 조회", description = "hasAnswered: true 시 다른 구성원 답변 조회 가능")
     public QuestionRes getQuestion(@PathVariable Long questionId) {
         return questionService.getQuestion(questionId);
     }
