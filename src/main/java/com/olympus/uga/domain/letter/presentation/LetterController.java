@@ -23,6 +23,7 @@ public class LetterController {
     private final LetterService letterService;
 
     @PostMapping("/write")
+    @Operation(summary = "편지 작성")
     public Response writeLetter(@RequestBody LetterReq req) {
         return letterService.writeLetter(req);
     }
