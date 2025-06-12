@@ -26,6 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "토큰 재사용 불가, 다시 로그인")
     public Response logout(HttpServletRequest req) {
         return userService.logout(req);
     }

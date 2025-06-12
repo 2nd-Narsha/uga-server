@@ -15,6 +15,7 @@ public class PointController {
     private final PointService pointService;
 
     @GetMapping
+    @Operation(summary = "포인트 조회")
     public int getPoint() {
         return pointService.getPoint();
     }
@@ -26,7 +27,7 @@ public class PointController {
     }
 
     @PostMapping("/use")
-    @Operation(summary = "포인트 사용")
+    @Operation(summary = "포인트 사용", description = "SIGN_UP(회원가입), LETTER(편지작성), ATTENDANCE(하루출석), SEVENTH_ATTENDANCE(7일출석), ANSWER(답변), BIRTHDAY(생일)")
     public Response usePoint(@RequestParam FoodType food) {
         return pointService.usePoint(food);
     }
