@@ -6,11 +6,11 @@ import com.olympus.uga.domain.user.domain.User;
 
 import java.time.LocalDate;
 
-public record LetterReq(User receiverId, PaperType paperType, String content) {
-    public static Letter fromLetterReq(User sender, LetterReq req) {
+public record LetterReq(Long receiverId, PaperType paperType, String content) {
+    public static Letter fromLetterReq(User sender, User receiver, LetterReq req) {
         return Letter.builder()
                 .sender(sender)
-                .receiver(req.receiverId)
+                .receiver(receiver)
                 .paperType(req.paperType)
                 .content(req.content)
                 .sentAt(LocalDate.now())
