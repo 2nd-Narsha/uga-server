@@ -57,7 +57,7 @@ public class FamilyController {
     }
 
     @PostMapping("/change-leader")
-    @Operation(summary = "가족 리더 넘기기")
+    @Operation(summary = "가족 리더 넘기기", description = "id: 넘겨줄 구성원의 아이디")
     public Response changeLeader(@RequestBody LeaderChangeReq req) {
         return familyService.changeLeader(req);
     }
