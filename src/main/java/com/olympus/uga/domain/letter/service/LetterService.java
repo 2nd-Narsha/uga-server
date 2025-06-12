@@ -7,6 +7,7 @@ import com.olympus.uga.domain.letter.presentation.dto.request.LetterReq;
 import com.olympus.uga.domain.letter.presentation.dto.response.LetterListRes;
 import com.olympus.uga.domain.letter.presentation.dto.response.LetterRes;
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
@@ -21,14 +22,18 @@ import java.util.List;
 public class LetterService {
     private final LetterJpaRepo letterJpaRepo;
     private final UserSessionHolder userSessionHolder;
+    private final UserJpaRepo userJpaRepo;
 
     @Transactional
     public Response writeLetter(LetterReq req) {
-        User user = userSessionHolder.getUser();
+        User sender = userSessionHolder.getUser();
 
-        letterJpaRepo.save(LetterReq.fromLetterReq(user, req));
+        User receiver = userJpaRepo.findById(req.receiverId())
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
-        return Response.created(req.receiverId() + "에게 편지를 보냈습니다.");
+        letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
+
+        return Response.created(receiver.getUsername() + "에게 편지를 보냈습니다.");
     }
 
     public List<LetterListRes> getInbox() {
