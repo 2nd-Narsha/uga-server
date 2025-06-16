@@ -73,6 +73,9 @@ public class User {
     @Column(name = "point", nullable = false)
     private int point = 0;
 
+    @Column
+    private String profileImage;
+
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
         this.username = username;
@@ -87,6 +90,11 @@ public class User {
     }
     public void updateMbti(String mbti) {
         this.mbti = mbti;
+    }
+
+    // user profile
+    public void updateProfile(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     // point

@@ -9,9 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,12 @@ public class UserController {
     @Operation(summary = "마이페이지 정보")
     public ResponseData<UserResponse> getMe() {
         return userService.getMe();
+    }
+
+    @PatchMapping("/update/profileImage")
+    @Operation(summary = "프로필 이미지 변경")
+    public Response updateProfile(@RequestPart(name = "profileImage") MultipartFile profileImage) {
+        return userService.updateProfile(profileImage);
     }
 
     @PostMapping("/logout")
