@@ -7,6 +7,7 @@ import com.olympus.uga.global.common.ResponseData;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,7 +29,7 @@ public class UserController {
         return userService.getMe();
     }
 
-    @PatchMapping("/update/profileImage")
+    @PatchMapping(value = "/update/profileImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "프로필 이미지 변경")
     public Response updateProfile(@RequestPart(name = "profileImage") MultipartFile profileImage) {
         return userService.updateProfile(profileImage);
