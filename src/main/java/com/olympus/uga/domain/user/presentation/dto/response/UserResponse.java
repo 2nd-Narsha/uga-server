@@ -4,10 +4,11 @@ import com.olympus.uga.domain.user.domain.User;
 import lombok.Builder;
 
 @Builder
-public record UserResponse(String username) {
-    public static UserResponse getUsername(User user) {
+public record UserResponse(String username, String profileImage) {
+    public static UserResponse from(User user) {
         return UserResponse.builder()
                 .username(user.getUsername())
+                .profileImage(user.getProfileImage())
                 .build();
     }
 }
