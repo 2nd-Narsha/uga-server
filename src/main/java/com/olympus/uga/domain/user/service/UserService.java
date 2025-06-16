@@ -36,6 +36,8 @@ public class UserService {
         User user = userSessionHolder.getUser();
         user.updateProfile(imageService.uploadImage(profileImage).getImageUrl());
 
+        userJpaRepo.save(user);
+
         return Response.ok("프로필이 성공적으로 변경되었습니다.");
     }
 
