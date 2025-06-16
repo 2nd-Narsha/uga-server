@@ -8,6 +8,7 @@ import com.olympus.uga.domain.letter.presentation.dto.response.LetterListRes;
 import com.olympus.uga.domain.letter.presentation.dto.response.LetterRes;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
+import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
@@ -29,7 +30,7 @@ public class LetterService {
         User sender = userSessionHolder.getUser();
 
         User receiver = userJpaRepo.findById(req.receiverId())
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
 
