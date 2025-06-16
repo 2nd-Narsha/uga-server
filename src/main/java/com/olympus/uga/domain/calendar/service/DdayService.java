@@ -15,6 +15,7 @@ import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class DdayService {
                 .toList();
     }
 
+    @Transactional
     public Response createDday(DdayReq req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
@@ -45,6 +47,7 @@ public class DdayService {
         return Response.created(req.title() + "의 디데이를 생성하였습니다.");
     }
 
+    @Transactional
     public Response updateDday(DdayUpdateReq req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
@@ -54,9 +57,10 @@ public class DdayService {
 
         dday.updateDday(req.title(), req.date(), req.isHighlight());
 
-        return Response.created("디데이를 수정하였습니다.");
+        return Response.ok("디데이를 수정하였습니다.");
     }
 
+    @Transactional
     public Response deleteDday(Long ddayId) {
         User currentUser = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(currentUser.getId());
