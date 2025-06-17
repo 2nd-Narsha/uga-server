@@ -22,7 +22,7 @@ jobs:
 
       # 2. Spring Boot 애플리케이션 빌드
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew bootJar -x test
 
       # **여기서 빌드된 JAR 파일 확인**
       - name: Check JAR exists
