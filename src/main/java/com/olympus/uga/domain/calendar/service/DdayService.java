@@ -62,8 +62,8 @@ public class DdayService {
 
     @Transactional
     public Response deleteDday(Long ddayId) {
-        User currentUser = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(currentUser.getId());
+        User user = userSessionHolder.getUser();
+        String userFamilyCode = getUserFamilyCode(user.getId());
 
         Dday dday = ddayJpaRepo.findByIdAndFamilyCode(ddayId, userFamilyCode)
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.DDAY_NOT_FOUND));
