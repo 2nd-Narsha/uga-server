@@ -12,6 +12,7 @@ public record FamilyInfoRes(
     public record FamilyMemberInfo(
             Long id,
             String username,
+            String profileImage,
             String birth,
             String interests,
             boolean isLeader
