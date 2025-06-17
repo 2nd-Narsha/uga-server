@@ -1,5 +1,7 @@
 package com.olympus.uga.domain.user.service;
 
+import com.olympus.uga.domain.family.domain.Family;
+import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.presentation.dto.response.UserResponse;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -24,11 +28,19 @@ public class UserService {
     private final JwtExtractor jwtExtractor;
     private final JwtTokenService jwtTokenService;
     private final ImageService imageService;
+    private final FamilyJpaRepo familyJpaRepo;
 
     public ResponseData<UserResponse> getMe() {
         User user = userSessionHolder.getUser();
 
-        return ResponseData.ok("사용자 정보를 성공적으로 가져왔습니다.", UserResponse.from(user));
+        // 사용자가 속한 가족에서 리더인지 확인
+        boolean isLeader = false;
+        Optional<Family> family = familyJpaRepo.findByMemberListContaining(user.getId());
+        if (family.isPresent()) {
+            isLeader = family.get().getLeaderId().equals(user.getId());
+        }
+
+        return ResponseData.ok("사용자 정보를 성공적으로 가져왔습니다.", UserResponse.from(user, isLeader));
     }
 
     @Transactional
