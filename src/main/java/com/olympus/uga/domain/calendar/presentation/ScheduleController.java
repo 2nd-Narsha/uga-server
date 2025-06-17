@@ -2,7 +2,6 @@ package com.olympus.uga.domain.calendar.presentation;
 
 import com.olympus.uga.domain.calendar.presentation.dto.request.ScheduleReq;
 import com.olympus.uga.domain.calendar.presentation.dto.request.ScheduleUpdateReq;
-import com.olympus.uga.domain.calendar.presentation.dto.response.DdayListRes;
 import com.olympus.uga.domain.calendar.presentation.dto.response.ScheduleListRes;
 import com.olympus.uga.domain.calendar.service.ScheduleService;
 import com.olympus.uga.global.common.Response;
