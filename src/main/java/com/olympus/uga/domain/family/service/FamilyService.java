@@ -79,6 +79,7 @@ public class FamilyService {
                     return new FamilyInfoRes.FamilyMemberInfo(
                             memberUser.getId(),
                             memberUser.getUsername(),
+                            memberUser.getProfileImage(),
                             memberUser.getBirth(),
                             memberUser.getInterests(),
                             family.getLeaderId().equals(memberUser.getId()) // 리더 여부
