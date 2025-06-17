@@ -22,8 +22,11 @@ jobs:
 
       # 2. Spring Boot 애플리케이션 빌드
       - name: Build with Gradle
-        run: |
-          ./gradlew build -x test
+        run: ./gradlew build -x test
+
+      # **여기서 빌드된 JAR 파일 확인**
+      - name: Check JAR exists
+        run: ls -l build/libs
 
       # 3. Docker 이미지 빌드
       - name: docker image build
