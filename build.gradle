@@ -70,3 +70,7 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+jar {
+	archiveFileName = 'uga-0.0.1-SNAPSHOT.jar'
+}
