@@ -1,6 +1,6 @@
 package com.olympus.uga.domain.user.presentation;
 
-import com.olympus.uga.domain.user.presentation.dto.response.UserResponse;
+import com.olympus.uga.domain.user.presentation.dto.response.UserInfoRes;
 import com.olympus.uga.domain.user.service.UserService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping("/me")
     @Operation(summary = "마이페이지 정보")
-    public ResponseData<UserResponse> getMe() {
+    public ResponseData<UserInfoRes> getMe() {
         return userService.getMe();
     }
 

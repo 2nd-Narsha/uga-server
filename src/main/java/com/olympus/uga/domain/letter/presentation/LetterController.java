@@ -36,7 +36,7 @@ public class LetterController {
 
     @GetMapping("/{letterId}")
     @Operation(summary = "편지 상세 조회")
-    public LetterRes getLetter(@PathVariable Long letterId) {
+    public LetterRes getLetter(@PathVariable("letterId") Long letterId) {
         return letterService.getLetter(letterId);
     }
 }
