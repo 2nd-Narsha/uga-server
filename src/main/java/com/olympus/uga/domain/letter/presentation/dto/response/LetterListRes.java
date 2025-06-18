@@ -9,12 +9,14 @@ public record LetterListRes(
         Long letterId,
         String senderName,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate sentAt) {
+        LocalDate sentAt,
+        Boolean isRead) {
     public static LetterListRes from(Letter letter) {
         return new LetterListRes(
                 letter.getLetterId(),
                 letter.getSender().getUsername(),
-                letter.getSentAt()
+                letter.getSentAt(),
+                letter.getIsRead()
         );
     }
 }

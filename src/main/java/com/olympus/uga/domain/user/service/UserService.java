@@ -4,7 +4,7 @@ import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
-import com.olympus.uga.domain.user.presentation.dto.response.UserResponse;
+import com.olympus.uga.domain.user.presentation.dto.response.UserInfoRes;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
 import com.olympus.uga.global.image.service.ImageService;
@@ -30,7 +30,7 @@ public class UserService {
     private final ImageService imageService;
     private final FamilyJpaRepo familyJpaRepo;
 
-    public ResponseData<UserResponse> getMe() {
+    public ResponseData<UserInfoRes> getMe() {
         User user = userSessionHolder.getUser();
 
         // 사용자가 속한 가족에서 리더인지 확인
@@ -40,7 +40,7 @@ public class UserService {
             isLeader = family.get().getLeaderId().equals(user.getId());
         }
 
-        return ResponseData.ok("사용자 정보를 성공적으로 가져왔습니다.", UserResponse.from(user, isLeader));
+        return ResponseData.ok("사용자 정보를 성공적으로 가져왔습니다.", UserInfoRes.from(user, isLeader));
     }
 
     @Transactional

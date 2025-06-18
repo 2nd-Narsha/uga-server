@@ -38,9 +38,9 @@ public class LetterService {
     }
 
     public List<LetterListRes> getInbox() {
-        User currentUser = userSessionHolder.getUser();
+        User user = userSessionHolder.getUser();
 
-        List<Letter> receivedLetters = letterJpaRepo.findByReceiver(currentUser);
+        List<Letter> receivedLetters = letterJpaRepo.findByReceiver(user);
 
         return receivedLetters.stream()
                 .map(LetterListRes::from)
@@ -48,10 +48,16 @@ public class LetterService {
     }
 
     public LetterRes getLetter(Long letterId) {
-        User currentUser = userSessionHolder.getUser();
+        User user = userSessionHolder.getUser();
 
-        Letter letter = letterJpaRepo.findByIdAndReceiver(letterId, currentUser)
+        Letter letter = letterJpaRepo.findByIdAndReceiver(letterId, user)
                 .orElseThrow(() -> new CustomException(LetterErrorCode.LETTER_NOT_FOUND));
+
+        // 편지를 읽지 않은 상태라면 읽음 처리
+        if (!letter.getIsRead()) {
+            letter.markAsRead();
+            letterJpaRepo.save(letter); // 변경사항 저장
+        }
 
         return LetterRes.from(letter);
     }
