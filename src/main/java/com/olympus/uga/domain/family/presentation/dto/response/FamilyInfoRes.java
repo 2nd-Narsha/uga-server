@@ -14,7 +14,7 @@ public record FamilyInfoRes(
             String username,
             String profileImage,
             String birth,
-            String interests,
+            List<String> interests,
             boolean isLeader
     ) {}
 }
