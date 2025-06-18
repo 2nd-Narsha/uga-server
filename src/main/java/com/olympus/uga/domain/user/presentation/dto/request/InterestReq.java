@@ -1,4 +1,6 @@
 package com.olympus.uga.domain.user.presentation.dto.request;
 
-public record InterestReq(String interests) {
+import java.util.List;
+
+public record InterestReq(List<String> interests) {
 }
