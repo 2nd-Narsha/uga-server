@@ -43,4 +43,12 @@ public class Letter {
 
     @Column(nullable = false)
     private LocalDate sentAt; // 보낸 날짜
+
+    @Column(nullable = false)
+    private Boolean isRead = false;
+
+    // 편지 읽음 처리 메서드
+    public void markAsRead() {
+        this.isRead = true;
+    }
 }
