@@ -18,6 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Getter
 @Entity
 @SuperBuilder
@@ -60,7 +62,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserCharacter character;
 
-    @Column(name = "interests")
+    // 쉽표로 구분된 문자열로 저장
+    @Column(name = "interests", columnDefinition = "TEXT")
     private String interests;
 
     @Column(name = "login_type", nullable = false)
@@ -82,8 +85,12 @@ public class User {
         this.birth = birth;
         this.gender = gender;
     }
-    public void updateInterest(String interests) {
-        this.interests = interests;
+    public void updateInterest(List<String> interestList) {
+        if (interestList == null || interestList.isEmpty()) {
+            this.interests = "";
+            return;
+        }
+        this.interests = String.join(",", interestList); // 쉼표로 구분해서 저장
     }
     public void updateCharacter(UserCharacter character) {
         this.character = character;
