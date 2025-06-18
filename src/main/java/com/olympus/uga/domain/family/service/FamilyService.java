@@ -10,6 +10,7 @@ import com.olympus.uga.domain.family.util.CodeGenerator;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
+import com.olympus.uga.domain.user.util.InterestConverter;
 import com.olympus.uga.global.common.ResponseData;
 import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;
@@ -76,12 +77,15 @@ public class FamilyService {
                     User memberUser = userJpaRepo.findById(memberId)
                             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
+                    // 문자열을 리스트로 변환
+                    List<String> interestList = InterestConverter.stringToList(memberUser.getInterests());
+
                     return new FamilyInfoRes.FamilyMemberInfo(
                             memberUser.getId(),
                             memberUser.getUsername(),
                             memberUser.getProfileImage(),
                             memberUser.getBirth(),
-                            memberUser.getInterests(),
+                            interestList,
                             family.getLeaderId().equals(memberUser.getId()) // 리더 여부
                     );
                 })
