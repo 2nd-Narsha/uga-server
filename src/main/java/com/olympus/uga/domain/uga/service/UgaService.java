@@ -3,14 +3,20 @@ package com.olympus.uga.domain.uga.service;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
+import com.olympus.uga.domain.letter.presentation.dto.response.LetterListRes;
+import com.olympus.uga.domain.uga.domain.Uga;
+import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.presentation.dto.request.UgaCreateReq;
+import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +32,17 @@ public class UgaService {
         ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, userFamilyCode));
 
         return Response.created("우가가 성공적으로 생성되었습니다.");
+    }
+
+    public List<UgaListRes> getDictionary() {
+        User user = userSessionHolder.getUser();
+        String userFamilyCode = getUserFamilyCode(user.getId());
+
+        List<Uga> independenceUgas = ugaJpaRepo.findByFamilyCodeAndGrowth(userFamilyCode, UgaGrowth.INDEPENDENCE);
+
+        return independenceUgas.stream()
+                .map(UgaListRes::from)
+                .toList();
     }
 
     private String getUserFamilyCode(Long userId) {
