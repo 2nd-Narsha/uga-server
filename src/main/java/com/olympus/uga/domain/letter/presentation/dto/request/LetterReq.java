@@ -14,6 +14,7 @@ public record LetterReq(Long receiverId, PaperType paperType, String content) {
                 .paperType(req.paperType)
                 .content(req.content)
                 .sentAt(LocalDate.now())
+                .isRead(false)
                 .build();
     }
 }
