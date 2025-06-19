@@ -32,7 +32,7 @@ public class Uga {
     @Enumerated(EnumType.STRING)
     private UgaGrowth growth; // 우가 성장도
 
-    @Column
+    @Column(nullable = false)
     private LocalDate createdAt;
 
     @Column
