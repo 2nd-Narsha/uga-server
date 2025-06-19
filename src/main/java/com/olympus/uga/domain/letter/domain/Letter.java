@@ -4,6 +4,8 @@ import com.olympus.uga.domain.letter.domain.enums.PaperType;
 import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +38,7 @@ public class Letter {
     private User receiver; // 받는 사람
 
     @Column
+    @Enumerated(EnumType.STRING)
     private PaperType paperType;
 
     @Column(nullable = false)
