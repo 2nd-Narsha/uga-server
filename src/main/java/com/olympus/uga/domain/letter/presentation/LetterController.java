@@ -23,7 +23,8 @@ public class LetterController {
     private final LetterService letterService;
 
     @PostMapping("/write")
-    @Operation(summary = "편지 작성")
+    @Operation(summary = "편지 작성",
+            description = "paperType : SOBORO(소보로/고양이), CHUNBOGI(춘복이/강아지), BERINGKEON(베링컨/돼지), NICHOLAS(니콜라스/여우), MILK(밀크/양), HODU(호두/다람쥐), NAELLEUM(낼름/뱀), PENGDUGI(펭두기/펭귄)")
     public Response writeLetter(@RequestBody LetterReq req) {
         return letterService.writeLetter(req);
     }

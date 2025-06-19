@@ -1,5 +1,5 @@
 package com.olympus.uga.domain.letter.domain.enums;
 
 public enum PaperType {
-    CORNER_FLOWER, FLOWER, HAND_HEART
+    SOBORO, CHUNBOGI, BERINGKEON, NICHOLAS, MILK, HODU, NAELLEUM, PENGDUGI
 }
