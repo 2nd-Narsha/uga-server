@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface UgaJpaRepo extends JpaRepository<Uga, Long> {
-    List<Uga> findByFamilyCodeAndGrowth(String familyCode, UgaGrowth growth);
+    List<Uga> findByFamilyCodeAndGrowth(String familyCode, UgaGrowth growth); // 우가 사전 기능에 사용
 }
