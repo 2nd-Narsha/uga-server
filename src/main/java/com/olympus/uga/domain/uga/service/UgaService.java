@@ -40,7 +40,6 @@ public class UgaService {
 
         Uga uga = ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, userFamilyCode));
 
-        // 가족의 현재 우가로 설정
         Family family = familyJpaRepo.findById(userFamilyCode)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
         family.updatePresentUgaId(uga.getId());
