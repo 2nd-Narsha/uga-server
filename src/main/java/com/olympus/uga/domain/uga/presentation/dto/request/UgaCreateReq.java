@@ -11,6 +11,8 @@ public record UgaCreateReq(String ugaName) {
                 .ugaName(req.ugaName)
                 .growth(UgaGrowth.BABY)
                 .createdAt(LocalDate.now())
+                .currentGrowthDays(0)
+                .totalGrowthDays(0)
                 .familyCode(familyCode)
                 .build();
     }
