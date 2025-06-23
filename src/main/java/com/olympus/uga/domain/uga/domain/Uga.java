@@ -35,9 +35,51 @@ public class Uga {
     @Column(nullable = false)
     private LocalDate createdAt;
 
+    @Column(nullable = false)
+    private Integer currentGrowthDays = 0; // 현재 성장 일수
+
+    @Column(nullable = false)
+    private Integer totalGrowthDays = 0; // 총 성장 일수 (자연 + 먹이)
+
     @Column
-    private LocalDate completeGrowthTime;
+    private LocalDate completeGrowthDate; // 성장 완료한 날
 
     @Column(nullable = false)
     private String familyCode;
+
+    // 성장도 업데이트 메서드
+    public void updateGrowth(int additionalDays) {
+        this.totalGrowthDays += additionalDays;
+        this.currentGrowthDays += additionalDays;
+        updateGrowthStage();
+    }
+
+    // 자연 성장 (하루 1일)
+    public void naturalGrowth() {
+        this.currentGrowthDays += 1;
+        this.totalGrowthDays += 1;
+        updateGrowthStage();
+    }
+
+    // 성장 단계 업데이트
+    private void updateGrowthStage() {
+        if (currentGrowthDays >= 365) {
+            this.growth = UgaGrowth.INDEPENDENCE;
+            this.completeGrowthDate = LocalDate.now();
+        } else if (currentGrowthDays >= 274) {
+            this.growth = UgaGrowth.ADULT;
+        } else if (currentGrowthDays >= 183) {
+            this.growth = UgaGrowth.TEENAGER;
+        } else if (currentGrowthDays >= 92) {
+            this.growth = UgaGrowth.CHILD;
+        } else {
+            this.growth = UgaGrowth.BABY;
+        }
+    }
+
+    // 독립 처리
+    public void makeIndependence() {
+        this.growth = UgaGrowth.INDEPENDENCE;
+        this.completeGrowthDate = LocalDate.now();
+    }
 }

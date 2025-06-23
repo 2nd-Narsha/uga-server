@@ -45,4 +45,8 @@ public class Family {
     public void updateLeader(Long id) {
         this.leaderId = id;
     }
+
+    public void updatePresentUgaId(Long ugaId) {
+        this.presentUgaId = ugaId;
+    }
 }
