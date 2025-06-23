@@ -14,7 +14,7 @@ public record CurrentUgaRes(
         Double myContributionRate
 ) {
     public static CurrentUgaRes from(Uga uga, Double contributionRate) {
-        double growthRate = Math.min((uga.getCurrentGrowthDays() / 365.0) * 100, 100.0);
+        double growthRate = Math.min((uga.getCurrentGrowthDays() / 365.0) * 100, 100.0); // 성장도 계산
         return new CurrentUgaRes(
                 uga.getId(),
                 uga.getUgaName(),
