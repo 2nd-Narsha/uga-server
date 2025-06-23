@@ -36,10 +36,10 @@ public class Uga {
     private LocalDate createdAt;
 
     @Column(nullable = false)
-    private Integer currentGrowthDays = 0; // 현재 성장 일수
+    private Integer currentGrowthDays; // 현재 성장 일수
 
     @Column(nullable = false)
-    private Integer totalGrowthDays = 0; // 총 성장 일수 (자연 + 먹이)
+    private Integer totalGrowthDays; // 총 성장 일수 (자연 + 먹이)
 
     @Column
     private LocalDate completeGrowthDate; // 성장 완료한 날
