@@ -64,7 +64,7 @@ public class Uga {
     // 성장 단계 업데이트
     private void updateGrowthStage() {
         if (currentGrowthDays >= 365) {
-            this.growth = UgaGrowth.INDEPENDENCE;
+            this.growth = UgaGrowth.ALL_GROWTH;
             this.completeGrowthDate = LocalDate.now();
         } else if (currentGrowthDays >= 274) {
             this.growth = UgaGrowth.ADULT;
