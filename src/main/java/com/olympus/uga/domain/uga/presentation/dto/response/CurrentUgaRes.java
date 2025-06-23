@@ -9,18 +9,17 @@ public record CurrentUgaRes(
         Long ugaId,
         String ugaName,
         UgaGrowth growth,
-        Integer currentGrowthDays,
-        Integer totalGrowthDays,
+        Double growthRate, // 성장도
         LocalDate createdAt,
         Double myContributionRate
 ) {
     public static CurrentUgaRes from(Uga uga, Double contributionRate) {
+        double growthRate = Math.min((uga.getCurrentGrowthDays() / 365.0) * 100, 100.0);
         return new CurrentUgaRes(
                 uga.getId(),
                 uga.getUgaName(),
                 uga.getGrowth(),
-                uga.getCurrentGrowthDays(),
-                uga.getTotalGrowthDays(),
+                growthRate,
                 uga.getCreatedAt(),
                 contributionRate
         );
