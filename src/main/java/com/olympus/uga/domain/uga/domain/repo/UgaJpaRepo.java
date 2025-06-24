@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface UgaJpaRepo extends JpaRepository<Uga, Long> {
     List<Uga> findByFamilyCodeAndGrowth(String familyCode, UgaGrowth growth);
-
+    List<Uga> findByGrowthNot(UgaGrowth growth);
 }
