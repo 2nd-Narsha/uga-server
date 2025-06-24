@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.uga.util;
 
 import com.olympus.uga.domain.uga.domain.enums.FoodType;
+import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -36,5 +37,9 @@ public class UgaFeedUtil {
 
     public static int calculateTotalCost(FoodType foodType, int familyMemberCount) {
         return getFoodPrice(foodType) * familyMemberCount;
+    }
+
+    public static boolean canFeed(UgaGrowth growth) {
+        return growth != UgaGrowth.ALL_GROWTH && growth != UgaGrowth.INDEPENDENCE;
     }
 }
