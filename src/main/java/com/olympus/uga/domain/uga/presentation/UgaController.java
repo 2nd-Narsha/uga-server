@@ -2,6 +2,7 @@ package com.olympus.uga.domain.uga.presentation;
 
 import com.olympus.uga.domain.uga.presentation.dto.request.UgaCreateReq;
 import com.olympus.uga.domain.uga.presentation.dto.request.UgaFeedReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaIndependenceReq;
 import com.olympus.uga.domain.uga.presentation.dto.response.CurrentUgaRes;
 import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
 import com.olympus.uga.domain.uga.service.UgaService;
