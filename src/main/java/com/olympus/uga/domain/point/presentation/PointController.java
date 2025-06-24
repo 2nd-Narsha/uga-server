@@ -26,9 +26,9 @@ public class PointController {
         return pointService.earnPoint(activityType);
     }
 
-    @PostMapping("/use")
-    @Operation(summary = "포인트 사용")
-    public Response usePoint(@RequestParam FoodType food) {
-        return pointService.usePoint(food);
-    }
+//    @PostMapping("/use")
+//    @Operation(summary = "포인트 사용")
+//    public Response usePoint(@RequestParam FoodType food) {
+//        return pointService.usePoint(food);
+//    }
 }

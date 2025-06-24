@@ -1,0 +1,55 @@
+package com.olympus.uga.domain.uga.presentation;
+
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaCreateReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaFeedReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaIndependenceReq;
+import com.olympus.uga.domain.uga.presentation.dto.response.CurrentUgaRes;
+import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
+import com.olympus.uga.domain.uga.service.UgaService;
+import com.olympus.uga.global.common.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/uga")
+public class UgaController {
+    private final UgaService ugaService;
+
+    @PostMapping("/create")
+    @Operation(summary = "우가 생성")
+    public Response createUga(@RequestBody UgaCreateReq req){
+        return ugaService.createUga(req);
+    }
+
+    @GetMapping("/current")
+    @Operation(summary = "현재 우가 조회", description = "growthRate: 성장도, myContributionRate: 나의 기여도 - 전체 성장 일수 대비 사용자의 기여도")
+    public CurrentUgaRes getCurrentUga() {
+        return ugaService.getCurrentUga();
+    }
+
+    @PostMapping("/feed")
+    @Operation(summary = "우가 먹이 주기", description = "FoodType: BANANA_CHIP(20P, 하루), BANANA(55P, 3일),  BANANA_KICK(120P, 7일) - 가족 수 만큼 곱해서 계산")
+    public Response feedUga(@RequestBody UgaFeedReq req) {
+        return ugaService.feedUga(req);
+    }
+
+    @PostMapping("/independence")
+    @Operation(summary = "우가 독립")
+    public Response setIndependence(@RequestBody UgaIndependenceReq req) {
+        return ugaService.setIndependence(req);
+    }
+
+    @GetMapping("/dictionary")
+    @Operation(summary = "우가 사전")
+    public List<UgaListRes> getDictionary() {
+        return ugaService.getDictionary();
+    }
+}
