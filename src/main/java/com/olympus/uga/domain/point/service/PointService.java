@@ -32,11 +32,6 @@ public class PointService {
             ActivityType.ANSWER, 3,
             ActivityType.BIRTHDAY, 10
     );
-    private static final Map<FoodType, Integer> FOOD_PRICES = Map.of(
-            FoodType.BANANA_CHIP, 20,
-            FoodType.BANANA, 55,
-            FoodType.BANANA_KICK, 120
-    );
 
     public int getPoint() {
         User user = userSessionHolder.getUser();
@@ -56,18 +51,18 @@ public class PointService {
         return Response.ok("현재 포인트: " + user.getPoint());
     }
 
-    @Transactional
-    public Response usePoint(FoodType food) {
-        User user = userSessionHolder.getUser();
-
-        Family family = familyJpaRepo.findByMemberListContaining(user.getId())
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        int totalCost = UgaFeedUtil.calculateTotalCost(food, family.getMemberList().size());
-        user.usePoint(totalCost);
-
-        userJpaRepo.save(user);
-
-        return Response.ok("현재 포인트: " + user.getPoint());
-    }
+//    @Transactional
+//    public Response usePoint(FoodType food) {
+//        User user = userSessionHolder.getUser();
+//
+//        Family family = familyJpaRepo.findByMemberListContaining(user.getId())
+//                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
+//
+//        int totalCost = UgaFeedUtil.calculateTotalCost(food, family.getMemberList().size());
+//        user.usePoint(totalCost);
+//
+//        userJpaRepo.save(user);
+//
+//        return Response.ok("현재 포인트: " + user.getPoint());
+//    }
 }
