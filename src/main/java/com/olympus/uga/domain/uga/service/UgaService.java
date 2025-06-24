@@ -70,8 +70,9 @@ public class UgaService {
         Uga currentUga = ugaJpaRepo.findById(family.getPresentUgaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        // 기여도 계산
-        Double contributionRate = contributionCalculator.calculateContributionRate(currentUga.getId(), user.getId());
+        // 기여도 계산 - 전체 성장 일수 대비 사용자의 먹이 기여도
+        Double contributionRate = contributionCalculator.calculateContributionRate(
+                currentUga.getId(), user.getId(), currentUga.getTotalGrowthDays());
 
         return CurrentUgaRes.from(currentUga, contributionRate);
     }

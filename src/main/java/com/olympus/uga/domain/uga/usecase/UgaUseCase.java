@@ -13,6 +13,7 @@ import com.olympus.uga.domain.uga.presentation.dto.request.UgaFeedReq;
 import com.olympus.uga.domain.uga.presentation.dto.request.UgaIndependenceReq;
 import com.olympus.uga.domain.uga.util.UgaFeedUtil;
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,13 @@ public class UgaUseCase {
     private final UgaJpaRepo ugaJpaRepo;
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
+    private final UserJpaRepo userJpaRepo;
 
     @Transactional
     public Response feedUga(UgaFeedReq req, User user) {
         Uga uga = ugaJpaRepo.findById(req.ugaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        // 가족 권한 확인
         String userFamilyCode = getUserFamilyCode(user.getId());
         if (!uga.getFamilyCode().equals(userFamilyCode)) {
             throw new CustomException(UgaErrorCode.NOT_FAMILY_UGA);
@@ -54,9 +55,10 @@ public class UgaUseCase {
         Family family = familyJpaRepo.findById(userFamilyCode)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
-        // 비용 계산 및 포인트 차감
+        // 포인트 차감
         int totalCost = UgaFeedUtil.calculateTotalCost(req.foodType(), family.getMemberList().size());
         user.usePoint(totalCost);
+        userJpaRepo.save(user);
 
         // 우가 성장 처리
         int growthDays = UgaFeedUtil.getGrowthDays(req.foodType());
