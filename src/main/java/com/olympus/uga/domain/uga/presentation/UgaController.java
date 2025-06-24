@@ -30,13 +30,13 @@ public class UgaController {
     }
 
     @GetMapping("/current")
-    @Operation(summary = "현재 우가 조회")
+    @Operation(summary = "현재 우가 조회", description = "growthRate: 성장도, myContributionRate: 나의 기여도 - 전체 성장 일수 대비 사용자의 기여도")
     public CurrentUgaRes getCurrentUga() {
         return ugaService.getCurrentUga();
     }
 
     @PostMapping("/feed")
-    @Operation(summary = "우가 먹이 주기")
+    @Operation(summary = "우가 먹이 주기", description = "FoodType: BANANA_CHIP(20P, 하루), BANANA(55P, 3일),  BANANA_KICK(120P, 7일) - 가족 수 만큼 곱해서 계산")
     public Response feedUga(@RequestBody UgaFeedReq req) {
         return ugaService.feedUga(req);
     }
