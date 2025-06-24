@@ -34,11 +34,17 @@ public class UgaController {
         return ugaService.getCurrentUga();
     }
 
-//    @PostMapping("/feed")
-//    @Operation(summary = "우가 먹이 주기")
-//    public Response feedUga(@RequestBody UgaFeedReq req) {
-//        return ugaService.feedUga(req);
-//    }
+    @PostMapping("/feed")
+    @Operation(summary = "우가 먹이 주기")
+    public Response feedUga(@RequestBody UgaFeedReq req) {
+        return ugaService.feedUga(req);
+    }
+
+    @PostMapping("/independence")
+    @Operation(summary = "우가 독립")
+    public Response setIndependence(@RequestBody UgaIndependenceReq req) {
+        return ugaService.setIndependence(req);
+    }
 
     @GetMapping("/dictionary")
     @Operation(summary = "우가 사전")
