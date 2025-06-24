@@ -10,18 +10,20 @@ import org.springframework.stereotype.Component;
 public class UgaContributionCalculator {
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
 
-    public Double calculateContributionRate(Long ugaId, Long userId) {
+    /**
+     * 사용자의 기여도를 백분율로 계산
+     * 전체 성장 일수(자연 성장 + 먹이 성장) 대비 사용자의 먹이 기여도
+     */
+    public Double calculateContributionRate(Long ugaId, Long userId, int totalGrowthDays) {
         UgaContribution userContribution = ugaContributionJpaRepo.findByUgaIdAndUserId(ugaId, userId)
                 .orElse(UgaContribution.create(ugaId, userId));
 
-        Integer totalContributedDays = ugaContributionJpaRepo.getTotalContributedDaysByUgaId(ugaId);
-
-        // 아무도 먹이를 주지 않은 경우 (자연 성장만 있는 경우)
-        if (totalContributedDays == null || totalContributedDays == 0) {
-            return 0.0; // 먹이 기여가 0%
+        // 전체 성장 일수가 0이면 기여도도 0%
+        if (totalGrowthDays == 0) {
+            return 0.0;
         }
 
-        // 사용자의 기여도 계산 (퍼센트)
-        return (double) userContribution.getContributedDays() / totalContributedDays * 100;
+        // 사용자가 먹이로 기여한 일수 / 전체 성장 일수 * 100
+        return Math.round((double) userContribution.getContributedDays() / totalGrowthDays * 100 * 100.0) / 100.0;
     }
 }
