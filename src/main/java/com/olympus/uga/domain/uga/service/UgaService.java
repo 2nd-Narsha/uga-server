@@ -11,9 +11,12 @@ import com.olympus.uga.domain.uga.domain.repo.UgaContributionJpaRepo;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
 import com.olympus.uga.domain.uga.presentation.dto.request.UgaCreateReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaFeedReq;
+import com.olympus.uga.domain.uga.presentation.dto.request.UgaIndependenceReq;
 import com.olympus.uga.domain.uga.presentation.dto.response.CurrentUgaRes;
 import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
 import com.olympus.uga.domain.uga.service.helper.UgaContributionCalculator;
+import com.olympus.uga.domain.uga.usecase.UgaUseCase;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
@@ -33,6 +36,7 @@ public class UgaService {
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final UgaContributionCalculator contributionCalculator;
+    private final UgaUseCase ugaUseCase;
 
     @Transactional
     public Response createUga(UgaCreateReq req) {
@@ -72,8 +76,14 @@ public class UgaService {
         return CurrentUgaRes.from(currentUga, contributionRate);
     }
 
-    public Response feedUga(FoodType foodType) {
+    public Response feedUga(UgaFeedReq req) {
+        User user = userSessionHolder.getUser();
+        return ugaUseCase.feedUga(req, user);
+    }
 
+    public Response setIndependence(UgaIndependenceReq req) {
+        User user = userSessionHolder.getUser();
+        return ugaUseCase.setIndependence(req, user);
     }
 
     public List<UgaListRes> getDictionary() {
