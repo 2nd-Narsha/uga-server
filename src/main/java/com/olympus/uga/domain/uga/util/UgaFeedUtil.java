@@ -11,9 +11,9 @@ import java.util.Map;
 public class UgaFeedUtil {
     // 먹이별 성장 촉진 일수
     private static final Map<FoodType, Integer> FOOD_GROWTH_DAYS = Map.of(
-            FoodType.BANANA_CHIP, 1,  // 1일
-            FoodType.BANANA, 3,       // 3일
-            FoodType.BANANA_KICK, 7   // 7일
+            FoodType.BANANA_CHIP, 1,
+            FoodType.BANANA, 3,
+            FoodType.BANANA_KICK, 7
     );
 
     // 먹이별 가격
