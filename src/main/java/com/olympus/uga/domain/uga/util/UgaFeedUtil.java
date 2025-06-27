@@ -15,7 +15,7 @@ public class UgaFeedUtil {
             FoodType.BANANA, 3,
             FoodType.BANANA_KICK, 7
     );
-
+    
     // 먹이별 가격
     private static final Map<FoodType, Integer> FOOD_PRICES = Map.of(
             FoodType.BANANA_CHIP, 20,
