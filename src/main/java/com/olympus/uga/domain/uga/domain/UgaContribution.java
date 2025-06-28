@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Table(name = "tb_uga_contribution")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UgaContribution {
+public class UgaContribution { // 우가 키우기 기여도
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
