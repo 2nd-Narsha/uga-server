@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Table(name = "tb_schedule_participant")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ScheduleParticipant {
+public class ScheduleParticipant { // 일정 참여 인원
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
