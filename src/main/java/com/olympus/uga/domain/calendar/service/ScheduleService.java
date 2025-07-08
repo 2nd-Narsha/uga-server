@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -36,6 +37,17 @@ public class ScheduleService {
         String userFamilyCode = getUserFamilyCode(user.getId());
 
         List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(userFamilyCode);
+
+        return scheduleList.stream()
+                .map(this::convertToScheduleListRes)
+                .toList();
+    }
+
+    public List<ScheduleListRes> getListByDate(LocalDate date) {
+        User user = userSessionHolder.getUser();
+        String userFamilyCode = getUserFamilyCode(user.getId());
+
+        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(userFamilyCode, date);
 
         return scheduleList.stream()
                 .map(this::convertToScheduleListRes)
