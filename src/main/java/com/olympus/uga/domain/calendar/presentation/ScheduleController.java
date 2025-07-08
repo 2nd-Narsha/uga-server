@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,6 +30,12 @@ public class ScheduleController {
     @Operation(summary = "일정 목록 조회")
     public List<ScheduleListRes> getList() {
         return scheduleService.getList();
+    }
+
+    @GetMapping("{date}")
+    @Operation(summary = "날짜별 일정 조회", description = "2023-09-04 이 형식으로 입력할 것")
+    public List<ScheduleListRes> getListByDate(@RequestParam("date") LocalDate date) {
+        return scheduleService.getListByDate(date);
     }
 
     @PostMapping("/create")
