@@ -4,7 +4,6 @@ import com.olympus.uga.domain.calendar.domain.Schedule;
 import com.olympus.uga.domain.user.domain.User;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public record ScheduleListRes(
