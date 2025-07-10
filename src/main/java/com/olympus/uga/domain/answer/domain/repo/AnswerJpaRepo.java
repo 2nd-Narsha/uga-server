@@ -20,4 +20,6 @@ public interface AnswerJpaRepo extends JpaRepository<Answer, Long> {
     // 특정 사용자가 특정 질문에 답변했는지 확인
     @Query("SELECT a FROM Answer a WHERE a.question = :question AND a.writer = :writer")
     Optional<Answer> findByQuestionAndWriter(@Param("question") Question question, @Param("writer") User writer);
+
+    void deleteAllByWriter(User user);
 }
