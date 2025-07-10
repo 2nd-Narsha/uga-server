@@ -1,5 +1,6 @@
 package com.olympus.uga.domain.calendar.domain.repo;
 
+import com.olympus.uga.domain.calendar.domain.Schedule;
 import com.olympus.uga.domain.calendar.domain.ScheduleParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +13,7 @@ import java.util.List;
 public interface ScheduleParticipantJpaRepo extends JpaRepository<ScheduleParticipant, Long> {
     @Query("SELECT sp.userId FROM ScheduleParticipant sp WHERE sp.schedule.id = :scheduleId")
     List<Long> findUserIdsByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT sp.schedule FROM ScheduleParticipant sp WHERE sp.userId = :userId")
+    List<Schedule> findSchedulesByUserId(@Param("userId") Long userId);
 }
