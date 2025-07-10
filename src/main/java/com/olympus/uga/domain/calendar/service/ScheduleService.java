@@ -91,8 +91,8 @@ public class ScheduleService {
         schedule.updateSchedule(
                 req.title(),
                 req.date(),
-                LocalTime.parse(req.startTime()),
-                LocalTime.parse(req.endTime())
+                req.startTime(),
+                req.endTime()
         );
 
         // 기존 참여자 삭제 후 새로 추가
