@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -91,8 +90,8 @@ public class ScheduleService {
         schedule.updateSchedule(
                 req.title(),
                 req.date(),
-                LocalTime.parse(req.startTime()),
-                LocalTime.parse(req.endTime())
+                req.startTime(),
+                req.endTime()
         );
 
         // 기존 참여자 삭제 후 새로 추가

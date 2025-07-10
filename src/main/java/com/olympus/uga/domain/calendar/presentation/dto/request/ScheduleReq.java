@@ -3,7 +3,6 @@ package com.olympus.uga.domain.calendar.presentation.dto.request;
 import com.olympus.uga.domain.calendar.domain.Schedule;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public record ScheduleReq(
@@ -17,8 +16,8 @@ public record ScheduleReq(
         return Schedule.builder()
                 .title(req.title)
                 .date(req.date)
-                .startTime(LocalTime.parse(req.startTime))
-                .endTime(LocalTime.parse(req.endTime))
+                .startTime(req.startTime)
+                .endTime(req.endTime)
                 .familyCode(familyCode)
                 .build();
     }
