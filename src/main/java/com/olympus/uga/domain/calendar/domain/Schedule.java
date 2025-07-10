@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +33,10 @@ public class Schedule {
     private LocalDate date;
 
     @Column(nullable = false)
-    private LocalTime startTime;
+    private String startTime;
 
     @Column(nullable = false)
-    private LocalTime endTime;
+    private String endTime;
 
     @Column(nullable = false)
     private String familyCode;
@@ -45,7 +44,7 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleParticipant> participants;
 
-    public void updateSchedule(String title, LocalDate date,LocalTime startTime, LocalTime endTime) {
+    public void updateSchedule(String title, LocalDate date, String startTime, String endTime) {
         this.title = title;
         this.date = date;
         this.startTime = startTime;
