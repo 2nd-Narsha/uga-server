@@ -17,8 +17,8 @@ public record ScheduleReq(
         return Schedule.builder()
                 .title(req.title)
                 .date(req.date)
-                .startTime(LocalTime.parse(req.startTime))
-                .endTime(LocalTime.parse(req.endTime))
+                .startTime(req.startTime)
+                .endTime(req.endTime)
                 .familyCode(familyCode)
                 .build();
     }

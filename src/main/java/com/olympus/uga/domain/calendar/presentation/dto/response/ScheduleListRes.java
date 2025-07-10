@@ -11,8 +11,8 @@ public record ScheduleListRes(
         Long scheduleId,
         String title,
         LocalDate date,
-        LocalTime startTime,
-        LocalTime endTime,
+        String startTime,
+        String endTime,
         List<ParticipantInfo> participants
 ) {
     public static ScheduleListRes from(Schedule schedule, List<User> participantUsers) {
