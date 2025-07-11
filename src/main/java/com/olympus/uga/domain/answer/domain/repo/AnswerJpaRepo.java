@@ -21,5 +21,9 @@ public interface AnswerJpaRepo extends JpaRepository<Answer, Long> {
     @Query("SELECT a FROM Answer a WHERE a.question = :question AND a.writer = :writer")
     Optional<Answer> findByQuestionAndWriter(@Param("question") Question question, @Param("writer") User writer);
 
+    // 유저가 답한 질문 ID 목록 조회
+    @Query("SELECT a.question.questionId FROM Answer a WHERE a.writer = :writer")
+    List<Long> findAnsweredQuestionIdsByWriter(@Param("writer") User writer);
+
     void deleteAllByWriter(User user);
 }

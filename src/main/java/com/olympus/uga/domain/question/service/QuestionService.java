@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -49,8 +51,12 @@ public class QuestionService {
 
         List<Question> questions = questionJpaRepo.findByFamilyOrderByCreatedAtDesc(userFamily);
 
+        // 미리 유저가 답한 질문 ID 목록 조회
+        List<Long> answeredQuestionIds = answerJpaRepo.findAnsweredQuestionIdsByWriter(user);
+        Set<Long> answeredIdSet = new HashSet<>(answeredQuestionIds);
+
         return questions.stream()
-                .map(QuestionListRes::from)
+                .map(q -> QuestionListRes.from(q, answeredIdSet.contains(q.getQuestionId())))
                 .toList();
     }
 
