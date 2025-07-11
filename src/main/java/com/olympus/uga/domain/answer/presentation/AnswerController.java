@@ -19,7 +19,7 @@ public class AnswerController {
 
     @PostMapping("/{questionId}")
     @Operation(summary = "질문에 답변하기")
-    public Response createAnswer(@PathVariable Long questionId, @RequestBody AnswerReq req) {
+    public Response createAnswer(@PathVariable("questionId") Long questionId, @RequestBody AnswerReq req) {
         return answerService.createAnswer(questionId, req);
     }
 }

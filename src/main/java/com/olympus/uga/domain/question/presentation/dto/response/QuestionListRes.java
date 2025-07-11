@@ -9,12 +9,14 @@ public record QuestionListRes(
         Long questionId,
         String question,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate createdAt) {
-    public static QuestionListRes from(Question question) {
+        LocalDate createdAt,
+        boolean hasAnswered) {
+    public static QuestionListRes from(Question question, boolean hasAnswered) {
         return new QuestionListRes(
                 question.getQuestionId(),
                 question.getQuestion(),
-                question.getCreatedAt()
+                question.getCreatedAt(),
+                hasAnswered
         );
     }
 }
