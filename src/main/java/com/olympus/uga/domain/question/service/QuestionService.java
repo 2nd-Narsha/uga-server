@@ -32,6 +32,12 @@ public class QuestionService {
     private final FamilyJpaRepo familyJpaRepo;
     private final AnswerJpaRepo answerJpaRepo;
 
+    @Transactional(readOnly = true)
+    public Long getNextQuestionId() {
+        Long lastId = questionJpaRepo.findMaxId().orElse(0L);
+        return lastId + 1;
+    }
+
     @Transactional
     public Response createQuestion(QuestionReq req) {
         User user = userSessionHolder.getUser();
