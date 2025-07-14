@@ -18,14 +18,13 @@ public class OAuthController {
 
     @PostMapping("/kakao/login")
     @Operation(summary = "카카오 oauth")
-    public ResponseData<SignInRes> kakaoLogin(@RequestParam("code") String code) {
-        return oAuthUseCase.loginWithKakaoCode(code);
+    public ResponseData<SignInRes> kakaoLogin(@RequestParam("accessToken") String accessToken) {
+        return oAuthUseCase.loginWithKakaoToken(accessToken);
     }
 
     @PostMapping("/google/login")
     @Operation(summary = "구글 oauth")
-    public ResponseData<SignInRes> googleLogin(@RequestParam("code") String code) {
-        return oAuthUseCase.loginWithGoogleCode(code);
-
+    public ResponseData<SignInRes> googleLogin(@RequestParam("accessToken") String accessToken) {
+        return oAuthUseCase.loginWithGoogleToken(accessToken);
     }
 }
