@@ -25,6 +25,7 @@ public class KakaoOAuthService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
+            headers.set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<String> response = restTemplate.exchange(
@@ -36,9 +37,14 @@ public class KakaoOAuthService {
 
             KakaoUserResponseDto userResponse = objectMapper.readValue(response.getBody(), KakaoUserResponseDto.class);
 
+            String email = null;
+            if (userResponse.getKakaoAccount() != null) {
+                email = userResponse.getKakaoAccount().getEmail();
+            }
+
             return new KakaoUserInfoDto(
                     String.valueOf(userResponse.getId()),
-                    userResponse.getKakaoAccount().getEmail()
+                    email != null ? email : "no-email@kakao.com"
             );
         } catch (Exception e) {
             throw new CustomException(OAuthErrorCode.KAKAO_API_ERROR);
