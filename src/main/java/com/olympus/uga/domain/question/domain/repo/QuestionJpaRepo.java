@@ -21,5 +21,8 @@ public interface QuestionJpaRepo extends JpaRepository<Question, Long> {
     @Query("SELECT q FROM Question q WHERE q.questionId = :questionId AND q.family = :family")
     Optional<Question> findByQuestionIdAndFamily(@Param("questionId") Long questionId, @Param("family") Family family);
 
+    @Query("SELECT MAX(q.questionId) FROM Question q")
+    Optional<Long> findMaxId();
+
     void deleteAllByWriter(User user);
 }

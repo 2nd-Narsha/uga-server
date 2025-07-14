@@ -22,6 +22,12 @@ import java.util.List;
 public class QuestionController {
     private final QuestionService questionService;
 
+    @GetMapping("/next-id")
+    @Operation(summary = "다음 질문 ID 예측 조회 (주의: 실제 ID와 다를 수 있음)")
+    public Long getNextQuestionId() {
+        return questionService.getNextQuestionId();
+    }
+
     @PostMapping("/create")
     @Operation(summary = "가족 질문 생성")
     public Response createQuestion(@RequestBody QuestionReq req) {
@@ -36,7 +42,7 @@ public class QuestionController {
 
     @GetMapping("/{questionId}")
     @Operation(summary = "질문 상세 조회", description = "hasAnswered: true 시 다른 구성원 답변 조회 가능")
-    public QuestionRes getQuestion(@PathVariable Long questionId) {
+    public QuestionRes getQuestion(@PathVariable("questionId") Long questionId) {
         return questionService.getQuestion(questionId);
     }
 }
