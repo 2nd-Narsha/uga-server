@@ -86,6 +86,7 @@ public class FamilyService {
                             memberUser.getProfileImage(),
                             memberUser.getBirth(),
                             interestList,
+                            memberUser.getCharacter(),
                             family.getLeaderId().equals(memberUser.getId()) // 리더 여부
                     );
                 })

@@ -1,5 +1,7 @@
 package com.olympus.uga.domain.family.presentation.dto.response;
 
+import com.olympus.uga.domain.user.domain.enums.UserCharacter;
+
 import java.util.List;
 
 public record FamilyInfoRes(
@@ -15,6 +17,7 @@ public record FamilyInfoRes(
             String profileImage,
             String birth,
             List<String> interests,
+            UserCharacter character,
             boolean isLeader
     ) {}
 }
