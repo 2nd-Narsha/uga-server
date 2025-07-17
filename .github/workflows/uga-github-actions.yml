@@ -22,31 +22,35 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
-      # 2. Spring Boot 애플리케이션 빌드
-      - name: Build with Gradle
-        run: ./gradlew bootJar -x test
+      # 2. Gradle clean build로 최신 JAR 생성 (캐시 제거)
+      - name: Clean and Build with Gradle
+        run: ./gradlew clean bootJar -x test
 
-      # 3. 빌드된 JAR 파일 확인
-      - name: Check JAR exists
-        run: ls -l build/libs
+      # 3. 빌드된 JAR 파일 확인 (시간, 용량 체크)
+      - name: Check built JAR
+        run: ls -lh build/libs
 
       # 👇 아래 작업들은 push일 때만 실행됨
-      - name: docker image build
+      # 4. Docker 이미지 빌드 (캐시 없이 강제 새로 빌드)
+      - name: Docker Image Build (no cache)
         if: github.event_name == 'push'
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/uga:latest .
+        run: docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/uga:latest .
 
-      - name: docker login
+      # 5. DockerHub 로그인
+      - name: Docker Login
         if: github.event_name == 'push'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: docker Hub push
+      # 6. Docker 이미지 푸시
+      - name: Docker Hub Push
         if: github.event_name == 'push'
         run: docker push ${{ secrets.DOCKER_USERNAME }}/uga:latest
 
-      - name: EC2 Docker Run
+      # 7. EC2에 배포 (기존 컨테이너 제거 → 이미지 pull → 컨테이너 실행)
+      - name: Deploy to EC2 via SSH
         if: github.event_name == 'push'
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -58,10 +62,8 @@ jobs:
             CONTAINER_NAME=uga
             IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/uga:latest
 
-            # 로그인
             echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-            # 컨테이너 존재 시 중지 및 삭제
             if [ "$(sudo docker ps -aq -f name=$CONTAINER_NAME)" ]; then
               echo "컨테이너 존재함! 중지 후 삭제할게요"
               sudo docker stop $CONTAINER_NAME
@@ -70,11 +72,10 @@ jobs:
               echo "삭제할 컨테이너 없음!"
             fi
 
-            # 이미지 삭제 (있을 경우)
             if sudo docker images | grep -q "$IMAGE_NAME"; then
+              echo "이전 이미지 삭제할게요"
               sudo docker rmi $IMAGE_NAME
             fi
 
-            # 새 이미지 pull 및 run
             sudo docker pull $IMAGE_NAME
             sudo docker run -d -p 80:8080 --name $CONTAINER_NAME $IMAGE_NAME
