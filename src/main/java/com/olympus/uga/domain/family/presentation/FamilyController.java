@@ -33,9 +33,8 @@ public class FamilyController {
                 <br>
                 ⚠️ Swagger에서는 multipart/form-data + JSON 조합이 정상 동작하지 않을 수 있습니다.""")
     public ResponseData<String> createFamily(
-            @RequestPart(name = "familyProfile") MultipartFile familyProfile,
             @RequestPart(name = "req") FamilyCreateReq req) {
-        return familyService.createFamily(familyProfile, req);
+        return familyService.createFamily(req);
     }
 
     @PostMapping("/join")
