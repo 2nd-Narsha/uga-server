@@ -34,7 +34,7 @@ public class FamilyService {
 
     //가족 생성
     @Transactional
-    public ResponseData<String> createFamily(MultipartFile familyProfile, FamilyCreateReq req) {
+    public ResponseData<String> createFamily(FamilyCreateReq req) {
         User user = userSessionHolder.getUser();
         String code = codeGenerator.generateCode();
 
@@ -42,7 +42,7 @@ public class FamilyService {
             code = codeGenerator.generateCode();
         }
 
-        familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), imageService.uploadImage(familyProfile).getImageUrl()));
+        familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), imageService.uploadImage(req.getFamilyProfile()).getImageUrl()));
 
         return ResponseData.created("가족 생성에 성공했습니다.", code);
     }
