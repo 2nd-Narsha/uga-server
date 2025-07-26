@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.olympus.uga.global.image.domain.ImageDetails;
 import com.olympus.uga.global.image.domain.repo.ImageRepo;
 import com.olympus.uga.global.image.error.ImageErrorCode;
-import com.olympus.uga.global.image.presentation.dto.ImageInfo;
 import com.olympus.uga.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,7 @@ public class ImageService {
     private String bucket;
 
     //이미지 업로드(DB, S3 둘 다)
-    public ImageInfo uploadImage(MultipartFile file) {
+    public String uploadImage(MultipartFile file) {
         if (file.isEmpty()) {
             throw new CustomException(ImageErrorCode.FILE_EMPTY);
         }
@@ -44,7 +43,7 @@ public class ImageService {
 
             imageRepository.save(new ImageDetails(fileUrl, fileName));
 
-            return new ImageInfo(fileUrl, fileName);
+            return fileUrl;
         } catch (IOException e) {
             throw new CustomException(ImageErrorCode.FILE_CONVERT_FAILED);
         } catch (SdkClientException e) {

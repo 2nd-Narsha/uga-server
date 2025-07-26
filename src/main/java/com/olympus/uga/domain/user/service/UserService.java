@@ -61,7 +61,7 @@ public class UserService {
     @Transactional
     public Response updateProfile(MultipartFile profileImage) {
         User user = userSessionHolder.getUser();
-        user.updateProfile(imageService.uploadImage(profileImage).getImageUrl());
+        user.updateProfile(imageService.uploadImage(profileImage));
 
         userJpaRepo.save(user);
 
