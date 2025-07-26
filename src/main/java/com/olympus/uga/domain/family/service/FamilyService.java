@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class FamilyService {
     private final FamilyJpaRepo familyJpaRepo;
     private final CodeGenerator codeGenerator;
-    private final ImageService imageService;
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
 
@@ -43,7 +42,7 @@ public class FamilyService {
             code = codeGenerator.generateCode();
         }
 
-        familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), imageService.uploadImage(req.getFamilyProfile()).getImageUrl()));
+        familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), req.getFileUrl()));
 
         return ResponseData.created("가족 생성에 성공했습니다.", code);
     }
