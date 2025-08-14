@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class FamilyCreateReq {
     private String familyName;
-    private MultipartFile familyProfile;
+    private String fileUrl;
 
     public static Family fromFamilyCreateReq(String code, FamilyCreateReq req, Long id, String familyProfile) {
         return Family.builder()
@@ -23,6 +23,7 @@ public class FamilyCreateReq {
                 .leaderId(id)
                 .profileImage(familyProfile)
                 .memberList(new ArrayList<>(List.of(id)))
+                .profileImage(familyProfile)
                 .build();
     }
 }
