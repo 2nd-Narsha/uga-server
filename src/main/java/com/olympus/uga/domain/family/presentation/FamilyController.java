@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FamilyController {
     private final FamilyService familyService;
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @Operation(
             summary = "가족 생성",
             description = """
