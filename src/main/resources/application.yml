@@ -65,3 +65,5 @@ springdoc:
     tags-sorter: alpha
     operationsSorter: alpha
     path: /swagger-ui.html
+
+  forward-headers-strategy: framework
