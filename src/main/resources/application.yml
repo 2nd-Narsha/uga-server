@@ -66,4 +66,6 @@ springdoc:
     operationsSorter: alpha
     path: /swagger-ui.html
 
-  forward-headers-strategy: framework
+  server:
+    forward-headers-strategy: framework
+    use-forward-headers: true
