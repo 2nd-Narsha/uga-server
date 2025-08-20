@@ -10,7 +10,7 @@ spring:
     show-sql: true
   data:
     redis:
-      host: 172.30.3.33
+      host: 10.0.0.83
 #      host: localhost
       port: 6379
   servlet:
