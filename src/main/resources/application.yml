@@ -44,11 +44,11 @@ oauth:
   kakao:
     client-id: 68638129f14ab8bd58b51039c4da7473
     client-secret: VGFGgmBTK4pLjIiBlTknkO4Qjx2K5vxN
-    redirect-uri: http://localhost:8080/oauth/kakao/login
+    redirect-uri: https://uga.r-e.kr/oauth/kakao/login
   google:
     client-id: 622016426850-tj6617aaus6vts59hsncf7e58td66b4k.apps.googleusercontent.com
     client-secret: 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
-    redirect-uri: http://localhost:8080/oauth/google/login
+    redirect-uri: https://uga.r-e.kr/oauth/google/login
 
 springdoc:
   api-docs:
