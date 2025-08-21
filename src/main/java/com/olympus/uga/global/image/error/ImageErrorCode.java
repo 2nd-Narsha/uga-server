@@ -18,7 +18,9 @@ public enum ImageErrorCode implements CustomErrorCode {
     AWS_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AWS S3 서비스 오류가 발생했습니다."),
     FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이름의 이미지를 찾을 수 없습니다."),
-    FILE_EMPTY(HttpStatus.BAD_REQUEST, "업로드한 파일이 비어 있습니다.");
+    FILE_EMPTY(HttpStatus.BAD_REQUEST, "업로드한 파일이 비어 있습니다."),
+    FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "파일 크기가 너무 큽니다."),
+    FILE_TOO_SMALL(HttpStatus.BAD_REQUEST, "파일 크기가 너무 작습니다.");
 
     private final HttpStatus status;
     private final String message;
