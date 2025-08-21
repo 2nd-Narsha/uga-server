@@ -45,6 +45,8 @@ dependencies {
 	// MySQL Connector
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
+	implementation 'org.postgresql:postgresql:42.7.3'
+
 	//S3 bucket
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
