@@ -35,7 +35,7 @@ public class UserSettingController {
     @PostMapping("/3")
     @Operation(summary = "캐릭터",
             description = "SOBORO(소보로/고양이), CHUNBOGI(춘복이/강아지), BERINGKEON(베링컨/돼지), BERRY(베리/토끼), CHARLES(찰스/말), BONGGU(봉구/곰), NICHOLAS(니콜라스/여우), MILK(밀크/양), HODU(호두/다람쥐), NAELLEUM(낼름/뱀), OGONGI(오공이/원숭이), PENGDUGI(펭두기/펭귄), ACHIMI(아침이/닭)")
-    public Response setCharacter(@RequestParam UserCharacter req) {
+    public Response setCharacter(@RequestParam("req") UserCharacter req) {
         return userSettingService.setCharacter(req);
     }
 
