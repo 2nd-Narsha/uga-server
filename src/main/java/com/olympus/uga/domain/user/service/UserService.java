@@ -89,31 +89,41 @@ public class UserService {
     public Response deleteUser() {
         User user = userSessionHolder.getUser();
         Long userId = user.getId();
-        Family userFamily = familyJpaRepo.findByMemberListContaining(user.getId())
+
+        // 1. 가족 정보 가져오기
+        Family userFamily = familyJpaRepo.findByMemberListContaining(userId)
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
-        // 1. 리더인지 확인하고, 아직 리더 권한이 본인이라면 탈퇴 금지
+        // 2. 리더인지 확인
         if (userFamily.getLeaderId().equals(userId)) {
             throw new CustomException(FamilyErrorCode.LEADER_CANNOT_LEAVE);
         }
 
-        // 2. 가족 멤버에서 제거
+        // 3. 가족 멤버 리스트에서 제거
         userFamily.getMemberList().remove(userId);
 
-        // 3. 편지, 질문, 답변, 기여도 삭제 등 처리
+        // 4. 연관 데이터 삭제 순서
+        // 4-1. 편지 삭제 (보낸 편지 먼저, 받은 편지 나중)
+        letterJpaRepo.deleteAllBySender(user);
+        letterJpaRepo.deleteAllByReceiver(user);
+
+        // 4-2. 답변 삭제
         answerJpaRepo.deleteAllByWriter(user);
+
+        // 4-3. 질문 삭제
         questionJpaRepo.deleteAllByWriter(user);
-        letterJpaRepo.deleteAllBySenderOrReceiver(user, user);
+
+        // 4-4. 우가 기여도 삭제
         ugaContributionJpaRepo.deleteAllByUserId(userId);
 
-        // 4. 스케줄 참여 제거
+        // 4-5. 스케줄 참여 제거
         List<Schedule> schedules = scheduleParticipantJpaRepo.findSchedulesByUserId(userId);
         for (Schedule schedule : schedules) {
             schedule.getParticipants().removeIf(p -> p.getUserId().equals(userId));
         }
 
         // 5. 유저 삭제
-        userJpaRepo.deleteById(userId);
+        userJpaRepo.delete(user);
 
         return Response.ok("회원탈퇴에 성공하였습니다.");
     }
