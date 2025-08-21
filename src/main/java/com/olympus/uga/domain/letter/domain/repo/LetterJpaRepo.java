@@ -20,5 +20,12 @@ public interface LetterJpaRepo extends JpaRepository<Letter, Long> {
     @Query("SELECT l FROM Letter l WHERE l.letterId = :letterId AND l.receiver = :receiver")
     Optional<Letter> findByIdAndReceiver(@Param("letterId") Long letterId, @Param("receiver") User receiver);
 
+    // 유저가 보낸 편지 모두 삭제
+    void deleteAllBySender(User sender);
+
+    // 유저가 받은 편지 모두 삭제
+    void deleteAllByReceiver(User receiver);
+
+    // 유저가 보낸/받은 편지 모두 삭제
     void deleteAllBySenderOrReceiver(User sender, User receiver);
 }
