@@ -12,14 +12,12 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.domain.user.util.InterestConverter;
 import com.olympus.uga.global.common.ResponseData;
-import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
