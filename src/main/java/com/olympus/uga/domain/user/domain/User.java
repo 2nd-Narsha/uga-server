@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,8 @@ import java.util.List;
 @Getter
 @Entity
 @SuperBuilder
-@Table(name = "tb_user")
+@Table(name = "tb_user",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"oauth_id", "login_type"})})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +34,7 @@ public class User {
     @Column(name = "phone_num", unique = true)
     private String phoneNum;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", unique = false)
     private String email;
 
     @Column(name = "password")
