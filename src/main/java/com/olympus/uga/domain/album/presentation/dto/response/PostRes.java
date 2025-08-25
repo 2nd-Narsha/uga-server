@@ -2,19 +2,22 @@ package com.olympus.uga.domain.album.presentation.dto.response;
 
 import com.olympus.uga.domain.album.domain.Post;
 import java.time.LocalDate;
+import java.util.List;
 
 public record PostRes(String profileImage,
                       String writerName,
                       String content,
                       String imageUrl,
-                      LocalDate createdAt) {
-    public static PostRes from(Post post) {
+                      LocalDate createdAt,
+                      List<CommentRes> comments) {
+    public static PostRes from(Post post, List<CommentRes> comments) {
         return new PostRes(
                 post.getWriter().getProfileImage(),
                 post.getWriter().getUsername(),
                 post.getContent(),
                 post.getImageUrl(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                comments
         );
     }
 }
