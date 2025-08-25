@@ -44,7 +44,7 @@ public class KakaoOAuthService {
 
             return new KakaoUserInfoDto(
                     String.valueOf(userResponse.getId()),
-                    email != null ? email : "no-email@kakao.com"
+                    email != null ? email : "no-email-" + userResponse.getId() + "@kakao.com"
             );
         } catch (Exception e) {
             throw new CustomException(OAuthErrorCode.KAKAO_API_ERROR);
