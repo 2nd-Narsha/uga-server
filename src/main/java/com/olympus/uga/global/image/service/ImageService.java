@@ -49,8 +49,8 @@ public class ImageService {
         }
 
         // 파일 크기 검증 추가
-        final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-        final long MIN_FILE_SIZE = 10 * 1024;        // 10KB
+        final long MAX_FILE_SIZE = 5L * 1024 * 1024 * 1024; // 5GB
+        final long MIN_FILE_SIZE = 5 * 1024 * 1024;        // 5MB
 
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new CustomException(ImageErrorCode.FILE_TOO_LARGE);
