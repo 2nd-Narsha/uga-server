@@ -1,6 +1,5 @@
 package com.olympus.uga.domain.album.domain;
 
-import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,20 +17,19 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Entity
 @SuperBuilder
-@Table(name = "tb_comment")
+@Table(name = "tb_album_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class PostImage {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
+    private Long imageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", nullable = false)
-    private User writer;
+    @Column(nullable = false)
+    private String imageUrl;
 
     @Column(nullable = false)
-    private String content;
+    private Integer imageOrder; // 이미지 순서 (1~5)
 }
