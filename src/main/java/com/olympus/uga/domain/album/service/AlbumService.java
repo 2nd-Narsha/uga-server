@@ -40,7 +40,7 @@ public class AlbumService {
     private final CommentJpaRepo commentJpaRepo;
     private final PostImageJpaRepo postImageJpaRepo;
 
-    // 게시글 관련 서비스 메서드
+    // 게시글 서비스 메서드
     public List<PostListRes> getPosts() {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
@@ -111,7 +111,7 @@ public class AlbumService {
         return Response.ok("게시글이 삭제되었습니다.");
     }
 
-    // 댓글 관련 서비스 메서드
+    // 댓글 서비스 메서드
     @Transactional
     public Response createComment(Long postId, CommentReq req) {
         User user = userSessionHolder.getUser();

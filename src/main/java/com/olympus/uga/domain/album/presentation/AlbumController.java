@@ -25,7 +25,7 @@ import java.util.List;
 public class AlbumController {
     private final AlbumService albumService;
 
-    // 게시글 관련 API
+    // 게시글 API
     @GetMapping("/posts")
     public List<PostListRes> getPosts() {
         return albumService.getPosts();
@@ -46,7 +46,7 @@ public class AlbumController {
         return albumService.deletePost(postId);
     }
 
-    // 댓글 관련 API
+    // 댓글 API
     @PostMapping("/comment/{postId}")
     public Response createComment(@PathVariable("postId") Long postId, @RequestBody CommentReq req) {
         return albumService.createComment(postId, req);
