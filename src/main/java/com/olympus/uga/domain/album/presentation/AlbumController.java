@@ -1,6 +1,8 @@
 package com.olympus.uga.domain.album.presentation;
 
+import com.olympus.uga.domain.album.presentation.dto.request.CommentReq;
 import com.olympus.uga.domain.album.presentation.dto.request.PostReq;
+import com.olympus.uga.domain.album.presentation.dto.response.CommentRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostListRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostRes;
 import com.olympus.uga.domain.album.service.AlbumService;
@@ -22,23 +24,38 @@ import java.util.List;
 public class AlbumController {
     private final AlbumService albumService;
 
+    // 게시글 관련 API
     @GetMapping("/posts")
     public List<PostListRes> getPosts() {
         return albumService.getPosts();
     }
 
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/post/{postId}")
     public PostRes getPost(@PathVariable("postId") Long postId) {
         return albumService.getPost(postId);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/post/create")
     public Response createPost(@RequestBody PostReq req) {
         return albumService.createPost(req);
     }
 
-    @DeleteMapping("delete/{postId}")
+    @DeleteMapping("/post/delete/{postId}")
     public Response deletePost(@PathVariable("postId") Long postId) {
         return albumService.deletePost(postId);
     }
+
+    // 댓글 관련 API
+    @PostMapping("/comment/{postId}")
+    public Response createComment(@PathVariable("postId") Long postId, @RequestBody CommentReq req) {
+        return albumService.createComment(postId, req);
+    }
+
+    @DeleteMapping("/comment/delete/{commentId}")
+    public Response deleteComment(@PathVariable("commentId") Long commentId) {
+        return albumService.deleteComment(commentId);
+    }
+
+    // 갤러리 API
+    
 }
