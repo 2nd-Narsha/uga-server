@@ -3,6 +3,7 @@ package com.olympus.uga.domain.album.presentation;
 import com.olympus.uga.domain.album.presentation.dto.request.CommentReq;
 import com.olympus.uga.domain.album.presentation.dto.request.PostReq;
 import com.olympus.uga.domain.album.presentation.dto.response.CommentRes;
+import com.olympus.uga.domain.album.presentation.dto.response.GalleryRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostListRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostRes;
 import com.olympus.uga.domain.album.service.AlbumService;
@@ -57,5 +58,8 @@ public class AlbumController {
     }
 
     // 갤러리 API
-    
+    @GetMapping("/gallery")
+    public List<GalleryRes> getGallery() {
+        return albumService.getGallery();
+    }
 }

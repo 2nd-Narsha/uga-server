@@ -10,6 +10,7 @@ import com.olympus.uga.domain.album.error.AlbumErrorCode;
 import com.olympus.uga.domain.album.presentation.dto.request.CommentReq;
 import com.olympus.uga.domain.album.presentation.dto.request.PostReq;
 import com.olympus.uga.domain.album.presentation.dto.response.CommentRes;
+import com.olympus.uga.domain.album.presentation.dto.response.GalleryRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostListRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostRes;
 import com.olympus.uga.domain.family.domain.Family;
@@ -23,7 +24,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +83,11 @@ public class AlbumService {
     public Response createPost(PostReq req) {
         User user = userSessionHolder.getUser();
 
+        // 이미지 개수 검증
+        if (req.imageUrls() != null && req.imageUrls().size() > 5) {
+            throw new CustomException(AlbumErrorCode.TOO_MANY_IMAGES);
+        }
+
         postJpaRepo.save(PostReq.fromPostReq(user, req));
 
         return Response.created("게시글이 생성되었습니다.");
@@ -89,6 +100,11 @@ public class AlbumService {
 
         Post post = postJpaRepo.findByIdAndFamilyCode(postId, userFamilyCode)
                         .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
+
+        // 본인 확인
+        if (!Objects.equals(post.getWriter().getId(), user.getId())) {
+            throw new CustomException(AlbumErrorCode.UNAUTHORIZED_POST_ACCESS);
+        }
 
         postJpaRepo.delete(post);
 
@@ -117,9 +133,38 @@ public class AlbumService {
         Comment comment = commentJpaRepo.findByIdAndFamilyCode(commentId, userFamilyCode)
                 .orElseThrow(() -> new CustomException(AlbumErrorCode.COMMENT_NOT_FOUND));
 
+        // 본인 확인
+        if (!Objects.equals(comment.getWriter().getId(), user.getId())) {
+            throw new CustomException(AlbumErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
+        }
+
         commentJpaRepo.delete(comment);
 
         return Response.ok("댓글이 삭제되었습니다.");
+    }
+
+    // 갤러리 서비스 메서드
+    public List<GalleryRes> getGallery() {
+        User user = userSessionHolder.getUser();
+        String userFamilyCode = getUserFamilyCode(user.getId());
+
+        // 이미지가 있는 게시글들만 가져오기
+        List<Post> postsWithImages = postJpaRepo.findPostsWithImagesByFamilyCode(userFamilyCode);
+
+        // 날짜별로 그룹핑
+        Map<LocalDate, List<PostImage>> imagesByDate = postsWithImages.stream()
+                .flatMap(post -> post.getImages().stream())
+                .collect(Collectors.groupingBy(
+                        image -> image.getPost().getCreatedAt(),
+                        TreeMap::new, // 날짜 순 정렬
+                        Collectors.toList()
+                ));
+
+        // GalleryRes로 변환
+        return imagesByDate.entrySet().stream()
+                .sorted(Map.Entry.<LocalDate, List<PostImage>>comparingByKey().reversed()) // 최신 날짜부터
+                .map(entry -> GalleryRes.from(entry.getKey(), entry.getValue()))
+                .toList();
     }
 
     private String getUserFamilyCode(Long userId) {
