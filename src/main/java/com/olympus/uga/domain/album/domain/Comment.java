@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Entity
 @SuperBuilder
-@Table(name = "tb_comment")
+@Table(name = "tb_album_comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
