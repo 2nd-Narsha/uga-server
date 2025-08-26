@@ -11,7 +11,10 @@ import java.util.Optional;
 
 @Repository
 public interface PostJpaRepo extends JpaRepository<Post, Long> {
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.writer.family.familyCode = :familyCode ORDER BY p.createdAt DESC")
     List<Post> findByFamilyCodeOrderByCreatedAtDesc(String familyCode);
+
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.postId = :id AND p.writer.family.familyCode = :familyCode")
     Optional<Post> findByIdAndFamilyCode(Long id, String familyCode);
 
     // 갤러리용 쿼리 - 이미지가 있는 게시글만 조회
