@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface PostJpaRepo extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.family.familyCode = :familyCode ORDER BY p.createdAt DESC")
-    List<Post> findByFamilyCodeOrderByCreatedAtDesc(String familyCode);
+    List<Post> findByFamilyCodeOrderByCreatedAtDesc(@Param("familyCode") String familyCode);
 
     @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.postId = :id AND p.family.familyCode = :familyCode")
     Optional<Post> findByIdAndFamilyCode(Long id, String familyCode);
