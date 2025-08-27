@@ -13,9 +13,11 @@ public record PostReq(String content, List<String> imageUrls) {
     public static Post fromPostReq(User writer, Family family, PostReq req) {
         Post post = Post.builder()
                 .writer(writer)
-                .family(family)  // Family 추가
+                .family(family)
                 .content(req.content())
                 .createdAt(LocalDate.now())
+                .images(new ArrayList<>())
+                .comments(new ArrayList<>())
                 .build();
 
         // 이미지 처리
