@@ -50,7 +50,7 @@ public class AlbumService {
 
         return postList.stream()
                 .map(post -> {
-                    Long commentCount = commentJpaRepo.countByPostId(post.getPostId());
+                    Long commentCount = commentJpaRepo.countByPostPostId(post.getPostId());
                     List<String> imageUrls = postImageJpaRepo.findByPostPostIdOrderByImageOrder(post.getPostId())
                             .stream()
                             .map(PostImage::getImageUrl)
