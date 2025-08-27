@@ -95,16 +95,20 @@ public class UserService {
         Long userId = user.getId();
 
         // 1. 가족 정보 가져오기
-        Family userFamily = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
+        Optional<Family> userFamilyOpt = familyJpaRepo.findByMemberListContaining(userId);
 
-        // 2. 리더인지 확인
-        if (userFamily.getLeaderId().equals(userId)) {
-            throw new CustomException(FamilyErrorCode.LEADER_CANNOT_LEAVE);
+        // 가족 정보가 있다면, 리더 확인 및 멤버 제거 처리
+        if (userFamilyOpt.isPresent()) {
+            Family userFamily = userFamilyOpt.get();
+
+            // 2. 리더인지 확인
+            if (userFamily.getLeaderId().equals(userId)) {
+                throw new CustomException(FamilyErrorCode.LEADER_CANNOT_LEAVE);
+            }
+
+            // 3. 가족 멤버 리스트에서 제거
+            userFamily.getMemberList().remove(userId);
         }
-
-        // 3. 가족 멤버 리스트에서 제거
-        userFamily.getMemberList().remove(userId);
 
         // 4. 연관 데이터 삭제 순서
         // 4-1. 편지 삭제 (보낸 편지 먼저, 받은 편지 나중)
