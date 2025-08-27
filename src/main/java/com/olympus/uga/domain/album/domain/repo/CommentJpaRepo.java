@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface CommentJpaRepo extends JpaRepository<Comment, Long> {
-    Long countByPostId(Long postId);
+    Long countByPostPostId(Long postId);
     List<Comment> findByPostPostIdOrderByCreatedAtAsc(Long postId);
     void deleteAllByWriter(User writer);
 
