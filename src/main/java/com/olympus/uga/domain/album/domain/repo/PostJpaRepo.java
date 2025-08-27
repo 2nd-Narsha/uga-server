@@ -24,7 +24,7 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
             "JOIN p.images i " +
             "WHERE p.family.familyCode = :familyCode " +
             "ORDER BY p.createdAt DESC")
-    List<Post> findByFamilyCodeWithImagesOrderByCreatedAtDesc(@Param("familyCode") String familyCode);
+    List<Post> findPostsWithImagesByFamilyCode(@Param("familyCode") String familyCode);
 
     void deleteAllByWriter(User writer);
 
