@@ -11,16 +11,17 @@ import java.util.Optional;
 
 @Repository
 public interface PostJpaRepo extends JpaRepository<Post, Long> {
-    @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.writer.family.familyCode = :familyCode ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer w JOIN FETCH w.family WHERE w.family.familyCode = :familyCode ORDER BY p.createdAt DESC")
     List<Post> findByFamilyCodeOrderByCreatedAtDesc(String familyCode);
 
-    @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.postId = :id AND p.writer.family.familyCode = :familyCode")
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer w JOIN FETCH w.family WHERE p.postId = :id AND w.family.familyCode = :familyCode")
     Optional<Post> findByIdAndFamilyCode(Long id, String familyCode);
 
     // 갤러리용 쿼리 - 이미지가 있는 게시글만 조회
     @Query("SELECT DISTINCT p FROM Post p " +
-            "JOIN FETCH p.writer " +
-            "WHERE p.writer.family.familyCode = :familyCode AND " +
+            "JOIN FETCH p.writer w " +
+            "JOIN FETCH w.family " +
+            "WHERE w.family.familyCode = :familyCode AND " +
             "EXISTS (SELECT 1 FROM PostImage pi WHERE pi.post = p) " +
             "ORDER BY p.createdAt DESC")
     List<Post> findPostsWithImagesByFamilyCode(@Param("familyCode") String familyCode);
