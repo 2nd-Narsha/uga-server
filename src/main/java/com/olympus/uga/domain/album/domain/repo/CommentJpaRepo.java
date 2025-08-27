@@ -12,13 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface CommentJpaRepo extends JpaRepository<Comment, Long> {
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.postId = :postId")
-    Long countByPostId(@Param("postId") Long postId);
-
-    @Query("SELECT c FROM Comment c JOIN FETCH c.writer WHERE c.commentId = :commentId AND c.writer.id = :writerId")
-    Optional<Comment> findByIdAndWriterId(@Param("commentId") Long commentId, @Param("writerId") Long writerId);
-
+    Long countByPostId(Long postId);
     List<Comment> findByPostPostIdOrderByCreatedAtAsc(Long postId);
-
     void deleteAllByWriter(User writer);
+
+    @Query("SELECT c FROM Comment c WHERE c.commentId = :commentId AND c.writer.id = :writerId")
+    Optional<Comment> findByIdAndWriterId(@Param("commentId") Long commentId, @Param("writerId") Long writerId);
 }
