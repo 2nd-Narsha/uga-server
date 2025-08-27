@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 .requestMatchers("/point/**").authenticated()
                                 .requestMatchers("/question/**").authenticated()
                                 .requestMatchers("/answer/**").authenticated()
+                                .requestMatchers("/album/**").authenticated()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs").permitAll()
                                 .anyRequest().permitAll()
                 )
@@ -57,6 +58,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.addAllowedOrigin("https://uga.r-e.kr");
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);

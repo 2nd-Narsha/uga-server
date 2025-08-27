@@ -1,5 +1,7 @@
 package com.olympus.uga.domain.user.service;
 
+import com.olympus.uga.domain.album.domain.repo.CommentJpaRepo;
+import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
 import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
 import com.olympus.uga.domain.calendar.domain.Schedule;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
@@ -44,6 +46,8 @@ public class UserService {
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
     private final LetterJpaRepo letterJpaRepo;
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
+    private final PostJpaRepo postJpaRepo;
+    private final CommentJpaRepo commentJpaRepo;
 
     public ResponseData<UserInfoRes> getMe() {
         User user = userSessionHolder.getUser();
@@ -121,6 +125,12 @@ public class UserService {
         for (Schedule schedule : schedules) {
             schedule.getParticipants().removeIf(p -> p.getUserId().equals(userId));
         }
+
+        // 4-6. 앨범 댓글 삭제 (게시글보다 먼저 삭제해야 함)
+        commentJpaRepo.deleteAllByWriter(user);
+
+        // 4-7. 앨범 포스트 삭제
+        postJpaRepo.deleteAllByWriter(user);
 
         // 5. 유저 삭제
         userJpaRepo.delete(user);
