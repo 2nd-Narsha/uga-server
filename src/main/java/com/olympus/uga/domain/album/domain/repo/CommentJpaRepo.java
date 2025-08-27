@@ -14,9 +14,8 @@ public interface CommentJpaRepo extends JpaRepository<Comment, Long> {
     @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.postId = :postId")
     Long countByPostId(@Param("postId") Long postId);
 
-    @Query("SELECT c FROM Comment c JOIN FETCH c.writer WHERE c.commentId = :commentId AND c.writer.id IN " +
-            "(SELECT u.id FROM User u JOIN u.family f WHERE f.familyCode = :familyCode)")
-    Optional<Comment> findByIdAndFamilyCode(@Param("commentId") Long commentId, @Param("familyCode") String familyCode);
+    @Query("SELECT c FROM Comment c JOIN FETCH c.writer WHERE c.commentId = :commentId AND c.writer.id = :writerId")
+    Optional<Comment> findByIdAndWriterId(@Param("commentId") Long commentId, @Param("writerId") Long writerId);
 
     List<Comment> findByPostPostIdOrderByCreatedAtAsc(Long postId);
 }

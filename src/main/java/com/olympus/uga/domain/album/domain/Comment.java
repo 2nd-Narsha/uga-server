@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Getter
 @Entity
 @SuperBuilder
@@ -34,4 +36,7 @@ public class Comment {
 
     @Column(nullable = false)
     private String content;
+
+    @Column(nullable = false)
+    private LocalDate createdAt;
 }

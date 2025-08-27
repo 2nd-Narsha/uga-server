@@ -2,7 +2,7 @@ package com.olympus.uga.domain.album.presentation;
 
 import com.olympus.uga.domain.album.presentation.dto.request.CommentReq;
 import com.olympus.uga.domain.album.presentation.dto.request.PostReq;
-import com.olympus.uga.domain.album.presentation.dto.response.CommentRes;
+import com.olympus.uga.domain.album.presentation.dto.request.PostUpdateReq;
 import com.olympus.uga.domain.album.presentation.dto.response.GalleryRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostListRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostRes;
@@ -11,6 +11,7 @@ import com.olympus.uga.global.common.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +40,11 @@ public class AlbumController {
     @PostMapping("/post/create")
     public Response createPost(@RequestBody PostReq req) {
         return albumService.createPost(req);
+    }
+
+    @PatchMapping("/post/update/{postId}")
+    public Response updatePost(@PathVariable("postId") Long postId, @RequestBody PostUpdateReq req) {
+        return albumService.updatePost(postId, req);
     }
 
     @DeleteMapping("/post/delete/{postId}")

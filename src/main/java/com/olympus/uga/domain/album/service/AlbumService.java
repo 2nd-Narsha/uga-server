@@ -9,6 +9,7 @@ import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
 import com.olympus.uga.domain.album.error.AlbumErrorCode;
 import com.olympus.uga.domain.album.presentation.dto.request.CommentReq;
 import com.olympus.uga.domain.album.presentation.dto.request.PostReq;
+import com.olympus.uga.domain.album.presentation.dto.request.PostUpdateReq;
 import com.olympus.uga.domain.album.presentation.dto.response.CommentRes;
 import com.olympus.uga.domain.album.presentation.dto.response.GalleryRes;
 import com.olympus.uga.domain.album.presentation.dto.response.PostListRes;
@@ -25,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -83,28 +84,60 @@ public class AlbumService {
     public Response createPost(PostReq req) {
         User user = userSessionHolder.getUser();
 
+        Family family = familyJpaRepo.findByMemberListContaining(user.getId())
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
+
         // 이미지 개수 검증
         if (req.imageUrls() != null && req.imageUrls().size() > 5) {
             throw new CustomException(AlbumErrorCode.TOO_MANY_IMAGES);
         }
 
-        postJpaRepo.save(PostReq.fromPostReq(user, req));
+        postJpaRepo.save(PostReq.fromPostReq(user, family, req));
 
         return Response.created("게시글이 생성되었습니다.");
     }
 
     @Transactional
+    public Response updatePost(Long postId, PostUpdateReq req) {
+        User user = userSessionHolder.getUser();
+
+        // 본인이 작성한 게시글만 수정 가능
+        Post post = postJpaRepo.findByIdAndWriterId(postId, user.getId())
+                .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
+
+        // 이미지 개수 검증
+        if (req.imageUrls() != null && req.imageUrls().size() > 5) {
+            throw new CustomException(AlbumErrorCode.TOO_MANY_IMAGES);
+        }
+
+        // 게시글 내용 수정
+        post.updateContent(req.content());
+
+        // 기존 이미지 삭제 후 새 이미지 추가
+        postImageJpaRepo.deleteByPostPostId(postId);
+
+        if (req.imageUrls() != null && !req.imageUrls().isEmpty()) {
+            List<PostImage> newImages = new ArrayList<>();
+            for (int i = 0; i < req.imageUrls().size(); i++) {
+                PostImage image = PostImage.builder()
+                        .post(post)
+                        .imageUrl(req.imageUrls().get(i))
+                        .imageOrder(i + 1)
+                        .build();
+                newImages.add(image);
+            }
+            postImageJpaRepo.saveAll(newImages);
+        }
+
+        return Response.ok("게시글이 수정되었습니다.");
+    }
+
+    @Transactional
     public Response deletePost(Long postId) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Post post = postJpaRepo.findByIdAndFamilyCode(postId, userFamilyCode)
-                        .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
-
-        // 본인 확인
-        if (!Objects.equals(post.getWriter().getId(), user.getId())) {
-            throw new CustomException(AlbumErrorCode.UNAUTHORIZED_POST_ACCESS);
-        }
+        Post post = postJpaRepo.findByIdAndWriterId(postId, user.getId())
+                .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
 
         postJpaRepo.delete(post);
 
@@ -128,15 +161,9 @@ public class AlbumService {
     @Transactional
     public Response deleteComment(Long commentId) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Comment comment = commentJpaRepo.findByIdAndFamilyCode(commentId, userFamilyCode)
+        Comment comment = commentJpaRepo.findByIdAndWriterId(commentId, user.getId())
                 .orElseThrow(() -> new CustomException(AlbumErrorCode.COMMENT_NOT_FOUND));
-
-        // 본인 확인
-        if (!Objects.equals(comment.getWriter().getId(), user.getId())) {
-            throw new CustomException(AlbumErrorCode.UNAUTHORIZED_COMMENT_ACCESS);
-        }
 
         commentJpaRepo.delete(comment);
 
