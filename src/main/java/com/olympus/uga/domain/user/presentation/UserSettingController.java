@@ -3,6 +3,7 @@ package com.olympus.uga.domain.user.presentation;
 import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.presentation.dto.request.InterestReq;
 import com.olympus.uga.domain.user.presentation.dto.request.MbtiReq;
+import com.olympus.uga.domain.user.presentation.dto.request.TutorialReq;
 import com.olympus.uga.domain.user.presentation.dto.request.UsernameBirthGenderReq;
 import com.olympus.uga.domain.user.service.UserSettingService;
 import com.olympus.uga.global.common.Response;
@@ -44,4 +45,8 @@ public class UserSettingController {
     public Response setMbti(@RequestBody MbtiReq req) {
         return userSettingService.setMbti(req);
     }
+
+    @PostMapping("/5")
+    @Operation(summary = "tutorial")
+    public Response setTutorial(@RequestBody TutorialReq req) { return userSettingService.setTutorial(req); }
 }
