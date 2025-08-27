@@ -15,7 +15,7 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
     List<Post> findByFamilyCodeOrderByCreatedAtDesc(@Param("familyCode") String familyCode);
 
     @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.postId = :id AND p.family.familyCode = :familyCode")
-    Optional<Post> findByIdAndFamilyCode(Long id, String familyCode);
+    Optional<Post> findByIdAndFamilyCode(@Param("id") Long id, @Param("familyCode") String familyCode);
 
     // 갤러리용 쿼리 - 이미지가 있는 게시글만 조회
     @Query("SELECT DISTINCT p FROM Post p " +

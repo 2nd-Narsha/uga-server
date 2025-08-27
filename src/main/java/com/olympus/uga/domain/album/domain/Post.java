@@ -32,7 +32,7 @@ public class Post {
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "family_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Family family;
 
     @ManyToOne(fetch = FetchType.LAZY)
