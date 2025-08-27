@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://uga-db.cfiymiwi4n93.ap-northeast-2.rds.amazonaws.com:5432/uga_database
+    url: jdbc:postgresql://uga-db.cfiymiwi4n93.ap-northeast-2.rds.amazonaws.com:5432/uga_database?sslmode=require
     driver-class-name: org.postgresql.Driver
     username: olympus
     password: uga1234567890
