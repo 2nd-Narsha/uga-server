@@ -18,6 +18,9 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p JOIN FETCH p.writer WHERE p.postId = :id AND p.family.familyCode = :familyCode")
     Optional<Post> findByIdAndFamilyCode(@Param("id") Long id, @Param("familyCode") String familyCode);
 
+    @Query("SELECT p FROM Post p WHERE p.postId = :id AND p.writer.id = :writerId")
+    Optional<Post> findByIdAndWriterId(@Param("id") Long id, @Param("writerId") Long writerId);
+
     // 갤러리용 쿼리 - 이미지가 있는 게시글만 조회
     @Query("SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.writer " +
@@ -26,7 +29,6 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
             "ORDER BY p.createdAt DESC")
     List<Post> findPostsWithImagesByFamilyCode(@Param("familyCode") String familyCode);
 
-    // 회원 탈퇴 시 사용자가 작성한 게시글 조회
-    // NOTE: This method is intentionally left for future use (e.g., when retrieving posts written by a user upon account withdrawal).
-    List<Post> findAllByWriter(User writer);
+    void deleteAllByWriter(User writer);
 }
+
