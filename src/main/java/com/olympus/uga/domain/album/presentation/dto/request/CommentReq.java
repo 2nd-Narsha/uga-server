@@ -4,12 +4,15 @@ import com.olympus.uga.domain.album.domain.Comment;
 import com.olympus.uga.domain.album.domain.Post;
 import com.olympus.uga.domain.user.domain.User;
 
+import java.time.LocalDate;
+
 public record CommentReq(String content) {
     public static Comment fromCommentReq(User writer, Post post, CommentReq req) {
         return Comment.builder()
                 .post(post)
                 .writer(writer)
                 .content(req.content())
+                .createdAt(LocalDate.now())
                 .build();
     }
 }

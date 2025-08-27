@@ -1,5 +1,6 @@
 package com.olympus.uga.domain.album.domain;
 
+import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,6 +32,10 @@ public class Post {
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "family_id", nullable = false)
+    private Family family;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", nullable = false)
     private User writer;
 
@@ -45,4 +50,8 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
