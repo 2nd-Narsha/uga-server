@@ -31,7 +31,7 @@ public class Attend {
     private User user;
 
     @Column(nullable = false)
-    private Integer currentStreak; // 현재 연속 출석일수 (1~7)
+    private Integer currentStreak; // 현재 연속 출석일수
 
     @Column(nullable = false)
     private LocalDate lastAttendDate; // 마지막 출석일
