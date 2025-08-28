@@ -63,7 +63,7 @@ public class UserSettingService {
     public Response setTutorial(TutorialReq req) {
         User user = userSessionHolder.getUser();
 
-        user.updateTutorial(req.tutorial());
+        user.updateTutorial(req.content());
         userJpaRepo.save(user);
 
         return Response.ok("사용자 튜토리얼 진행도를 저장하였습니다.");

@@ -1,4 +1,4 @@
 package com.olympus.uga.domain.user.presentation.dto.request;
 
-public record TutorialReq(String tutorial) {
+public record TutorialReq(String content) {
 }
