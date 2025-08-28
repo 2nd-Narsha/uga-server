@@ -53,8 +53,4 @@ public class MemoService {
                 ))
                 .orElseThrow();
     }
-
-    public Boolean checked(Long userId) {
-        User user = userSessionHolder.getUser();
-    }
 }
