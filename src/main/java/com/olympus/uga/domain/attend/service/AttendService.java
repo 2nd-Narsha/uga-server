@@ -16,7 +16,6 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AttendService {
     private final AttendJpaRepo attendJpaRepo;
     private final UserJpaRepo userJpaRepo;
