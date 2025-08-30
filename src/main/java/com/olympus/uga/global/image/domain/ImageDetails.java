@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "image_details")
+@Table(name = "tb_image_details")
 public class ImageDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
