@@ -75,6 +75,8 @@ public class MemoService {
     // 특정 유저의 메모 조회
     public MemoInfoRes getOne(Long userId) {
 
+        userSessionHolder.getUser().addWatcher(userId);
+
         User targetUser = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
