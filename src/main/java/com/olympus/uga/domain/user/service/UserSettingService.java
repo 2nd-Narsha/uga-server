@@ -5,6 +5,7 @@ import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.presentation.dto.request.InterestReq;
 import com.olympus.uga.domain.user.presentation.dto.request.MbtiReq;
+import com.olympus.uga.domain.user.presentation.dto.request.TutorialReq;
 import com.olympus.uga.domain.user.presentation.dto.request.UsernameBirthGenderReq;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
@@ -56,5 +57,15 @@ public class UserSettingService {
         userJpaRepo.save(user);
 
         return Response.ok("사용자 mbti를 저장하였습니다.");
+    }
+
+    @Transactional
+    public Response setTutorial(TutorialReq req) {
+        User user = userSessionHolder.getUser();
+
+        user.updateTutorial(req.tutorial());
+        userJpaRepo.save(user);
+
+        return Response.ok("사용자 튜토리얼 진행도를 저장하였습니다.");
     }
 }
