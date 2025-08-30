@@ -64,12 +64,15 @@ public class User {
     @Column(name = "point", nullable = false)
     private int point = 0;
 
-    @Column
+    @Column(name = "profile_image")
     private String profileImage;
 
     @ElementCollection
     @CollectionTable(name = "tb_watcher")
     private List<Long> watcher = new ArrayList<>();
+  
+    @Column(name = "tutorial")
+    private String tutorial;
 
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
@@ -95,6 +98,8 @@ public class User {
     public void updateProfile(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void updateTutorial(String tutorial) { this.tutorial = tutorial; }
 
     // point
     public void earnPoint(int amount) {

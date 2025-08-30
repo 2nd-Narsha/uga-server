@@ -42,9 +42,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// MySQL Connector
-	runtimeOnly 'com.mysql:mysql-connector-j'
-
+	// PostgreSQL Driver
 	implementation 'org.postgresql:postgresql:42.7.3'
 
 	//S3 bucket
