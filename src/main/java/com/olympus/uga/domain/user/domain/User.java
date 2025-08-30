@@ -5,20 +5,13 @@ import com.olympus.uga.domain.user.domain.enums.UserCharacter;
 import com.olympus.uga.domain.user.domain.enums.Gender;
 import com.olympus.uga.domain.user.domain.enums.LoginType;
 import com.olympus.uga.global.exception.CustomException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -74,6 +67,10 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
+    @ElementCollection
+    @CollectionTable(name = "tb_watcher")
+    private List<Long> watcher = new ArrayList<>();
+  
     @Column(name = "tutorial")
     private String tutorial;
 
@@ -113,6 +110,15 @@ public class User {
             throw new CustomException(PointErrorCode.INSUFFICIENT_POINT);
         }
         this.point -= amount;
+    }
+
+    // memo checked member
+    public void addWatcher(Long userId) {
+        watcher.add(userId);
+    }
+
+    public void resetWatcher() {
+        watcher.clear();
     }
 }
 
