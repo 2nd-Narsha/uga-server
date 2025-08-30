@@ -43,7 +43,6 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        // 기존 메모 있으면 삭제
         memoJpaRepo.findByWriter(user).ifPresent(memoJpaRepo::delete);
 
         memoJpaRepo.save(MemoCreateReq.fromMemoCreateReq(user, req));
