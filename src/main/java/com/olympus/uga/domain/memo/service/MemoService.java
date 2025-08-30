@@ -21,6 +21,7 @@ import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.olympus.uga.global.exception.CustomException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class MemoService {
     private final FamilyJpaRepo familyJpaRepo;
 
     // 메모 생성
+    @Transactional
     public Response save(MemoCreateReq req) {
         User user = userSessionHolder.getUser();
         if (user == null) {
@@ -52,6 +54,7 @@ public class MemoService {
     }
 
     // 위치 갱신
+    @Transactional
     public Response updateLocation(LocationUpdateReq req) {
         User user = userSessionHolder.getUser();
         if (user == null) {
