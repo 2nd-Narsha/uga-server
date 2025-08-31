@@ -74,6 +74,9 @@ public class User {
     @Column(name = "tutorial")
     private String tutorial;
 
+    @Column(name = "is_checked_mailbox")
+    private Boolean isCheckedMailbox = true;
+
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
         this.username = username;
@@ -119,6 +122,10 @@ public class User {
 
     public void resetWatcher() {
         watcher.clear();
+    }
+
+    public void updateMailBox(boolean isCheckedMailbox) {
+        this.isCheckedMailbox = isCheckedMailbox;
     }
 }
 
