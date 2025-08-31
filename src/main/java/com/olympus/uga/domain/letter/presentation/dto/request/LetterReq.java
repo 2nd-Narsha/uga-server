@@ -6,7 +6,7 @@ import com.olympus.uga.domain.user.domain.User;
 
 import java.time.LocalDate;
 
-public record LetterReq(Long receiverId, PaperType paperType, String content) {
+public record LetterReq(Long receiverId, PaperType paperType, String content, int point) {
     public static Letter fromLetterReq(User sender, User receiver, LetterReq req) {
         return Letter.builder()
                 .sender(sender)
@@ -15,6 +15,7 @@ public record LetterReq(Long receiverId, PaperType paperType, String content) {
                 .content(req.content)
                 .sentAt(LocalDate.now())
                 .isRead(false)
+                .point(req.point)
                 .build();
     }
 }
