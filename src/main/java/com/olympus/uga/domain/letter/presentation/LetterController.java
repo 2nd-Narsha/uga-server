@@ -40,4 +40,10 @@ public class LetterController {
     public LetterRes getLetter(@PathVariable("letterId") Long letterId) {
         return letterService.getLetter(letterId);
     }
+
+    @GetMapping("/ischecked")
+    @Operation(summary = "편지함 확인 여부")
+    public Boolean isChecked() {
+        return letterService.isCheckedLetterBox();
+    }
 }

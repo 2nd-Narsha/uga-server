@@ -32,6 +32,10 @@ public class LetterService {
         User receiver = userJpaRepo.findById(req.receiverId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
+        receiver.updateMailBox(false);
+        receiver.earnPoint(req.point());
+        sender.usePoint(req.point());
+
         letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
 
         return Response.created(receiver.getUsername() + "에게 편지를 보냈습니다.");
@@ -41,6 +45,8 @@ public class LetterService {
         User user = userSessionHolder.getUser();
 
         List<Letter> receivedLetters = letterJpaRepo.findByReceiver(user);
+
+        user.updateMailBox(true);
 
         return receivedLetters.stream()
                 .map(LetterListRes::from)
@@ -60,5 +66,9 @@ public class LetterService {
         }
 
         return LetterRes.from(letter);
+    }
+
+    public Boolean isCheckedLetterBox() {
+        return userSessionHolder.getUser().getIsCheckedMailbox();
     }
 }
