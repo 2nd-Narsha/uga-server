@@ -5,13 +5,13 @@ import com.olympus.uga.domain.user.domain.User;
 
 import java.time.LocalDateTime;
 
-public record MemoCreateReq(String content, String location) {
+public record MemoCreateReq(String content) {
     public static Memo fromMemoCreateReq(User writer, MemoCreateReq req) {
         return Memo.builder()
                 .content(req.content)
                 .createdAt(LocalDateTime.now())
                 .writer(writer)
-                .location(req.location)
+                .location("위치 없음")
                 .build();
     }
 }
