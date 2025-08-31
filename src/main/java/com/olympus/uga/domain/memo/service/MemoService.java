@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +84,12 @@ public class MemoService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         Memo memo = memoJpaRepo.findByWriter(targetUser)
-                .orElseThrow(() -> new CustomException(MemoErrorCode.MEMO_NOT_FOUND));
+                .orElseGet(() -> memoJpaRepo.save(
+                        MemoCreateReq.fromMemoCreateReq(
+                                targetUser,
+                                new MemoCreateReq("메모가 아직 없습니다.")
+                        )
+                ));
 
         // 만료 여부 검사
         if (memo.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
