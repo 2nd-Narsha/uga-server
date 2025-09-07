@@ -45,4 +45,10 @@ public class FamilyController {
     public Response changeLeader(@RequestBody LeaderChangeReq req) {
         return familyService.changeLeader(req);
     }
+
+    @DeleteMapping("/remove")
+    @Operation(summary = "가족 삭제")
+    public Response removeFamily() {
+        return familyService.deleteFamily();
+    }
 }

@@ -67,12 +67,15 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tb_watcher")
     private List<Long> watcher = new ArrayList<>();
   
     @Column(name = "tutorial")
     private String tutorial;
+
+    @Column(name = "is_checked_mailbox")
+    private Boolean isCheckedMailbox = true;
 
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
@@ -119,6 +122,10 @@ public class User {
 
     public void resetWatcher() {
         watcher.clear();
+    }
+
+    public void updateMailBox(boolean isCheckedMailbox) {
+        this.isCheckedMailbox = isCheckedMailbox;
     }
 }
 

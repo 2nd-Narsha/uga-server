@@ -21,9 +21,11 @@ import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.olympus.uga.global.exception.CustomException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,13 +39,13 @@ public class MemoService {
     private final FamilyJpaRepo familyJpaRepo;
 
     // 메모 생성
+    @Transactional
     public Response save(MemoCreateReq req) {
         User user = userSessionHolder.getUser();
         if (user == null) {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        // 기존 메모 있으면 삭제
         memoJpaRepo.findByWriter(user).ifPresent(memoJpaRepo::delete);
 
         memoJpaRepo.save(MemoCreateReq.fromMemoCreateReq(user, req));
@@ -53,6 +55,7 @@ public class MemoService {
     }
 
     // 위치 갱신
+    @Transactional
     public Response updateLocation(LocationUpdateReq req) {
         User user = userSessionHolder.getUser();
         if (user == null) {
@@ -75,11 +78,18 @@ public class MemoService {
     // 특정 유저의 메모 조회
     public MemoInfoRes getOne(Long userId) {
 
+        userSessionHolder.getUser().addWatcher(userId);
+
         User targetUser = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         Memo memo = memoJpaRepo.findByWriter(targetUser)
-                .orElseThrow(() -> new CustomException(MemoErrorCode.MEMO_NOT_FOUND));
+                .orElseGet(() -> memoJpaRepo.save(
+                        MemoCreateReq.fromMemoCreateReq(
+                                targetUser,
+                                new MemoCreateReq("메모가 아직 없습니다.")
+                        )
+                ));
 
         // 만료 여부 검사
         if (memo.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1))) {

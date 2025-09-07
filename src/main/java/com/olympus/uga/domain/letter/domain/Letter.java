@@ -50,6 +50,9 @@ public class Letter {
     @Column(nullable = false)
     private Boolean isRead = false;
 
+    @Column(nullable = false)
+    private int point;
+
     // 편지 읽음 처리 메서드
     public void markAsRead() {
         this.isRead = true;
