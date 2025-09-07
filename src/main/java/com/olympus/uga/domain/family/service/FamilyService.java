@@ -122,4 +122,15 @@ public class FamilyService {
 
         return Response.ok(userJpaRepo.findById(req.id()) + "님에게 리더를 넘겼습니다.");
     }
+
+    public Response deleteFamily() {
+        User currentUser = userSessionHolder.getUser();
+
+        Family family = familyJpaRepo.findByMemberListContaining(currentUser.getId())
+                .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
+
+        familyJpaRepo.delete(family);
+
+        return Response.ok("가족 " + family.getFamilyName() + "이/가 성공적으로 삭제되었습니다");
+    }
 }
