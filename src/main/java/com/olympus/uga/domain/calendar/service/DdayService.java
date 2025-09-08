@@ -14,11 +14,15 @@ import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DdayService {
@@ -71,6 +75,18 @@ public class DdayService {
         ddayJpaRepo.delete(dday);
 
         return Response.ok("디데이를 삭제하였습니다.");
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    @Transactional
+    public void deleteExpiredDdays() {
+        LocalDate today = LocalDate.now();
+        List<Dday> expiredDdays = ddayJpaRepo.findByDateBefore(today);
+
+        if (!expiredDdays.isEmpty()) {
+            ddayJpaRepo.deleteAll(expiredDdays);
+            log.info("만료된 디데이 {}개를 삭제했습니다.", expiredDdays.size());
+        }
     }
 
     private String getUserFamilyCode(Long userId) {
