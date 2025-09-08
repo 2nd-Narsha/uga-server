@@ -1,5 +1,7 @@
 package com.olympus.uga.domain.uga.domain;
 
+import com.olympus.uga.domain.uga.domain.enums.CharacterType;
+import com.olympus.uga.domain.uga.domain.enums.ColorType;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +49,14 @@ public class Uga {
     @Column(nullable = false)
     private String familyCode;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ColorType colorType; // 우가 색상
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CharacterType characterType;  // 우가 캐릭터
+
     // 성장도 업데이트 메서드
     public void updateGrowth(int additionalDays) {
         this.totalGrowthDays += additionalDays;
@@ -81,5 +91,13 @@ public class Uga {
     public void makeIndependence() {
         this.growth = UgaGrowth.INDEPENDENCE;
         this.completeGrowthDate = LocalDate.now();
+    }
+
+    // 우가 꾸미기
+    public void updateCharacter(CharacterType characterType) {
+        this.characterType = characterType;
+    }
+    public void updateColor(ColorType colorType) {
+        this.colorType = colorType;
     }
 }
