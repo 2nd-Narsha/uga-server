@@ -7,6 +7,8 @@ import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.request.LeaderChangeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.uga.domain.UgaAsset;
+import com.olympus.uga.domain.uga.domain.repo.UgaAssetJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
@@ -29,6 +31,7 @@ public class FamilyService {
     private final CodeGenerator codeGenerator;
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
+    private final UgaAssetJpaRepo ugaAssetJpaRepo;
 
     //가족 생성
     @Transactional
@@ -41,6 +44,10 @@ public class FamilyService {
         }
 
         familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), req.getFileUrl()));
+
+        // 가족 자산 초기화 (우가 꾸미기 아이템)
+        UgaAsset ugaAsset = UgaAsset.createDefault(code);
+        ugaAssetJpaRepo.save(ugaAsset);
 
         return ResponseData.created("가족 생성에 성공했습니다.", code);
     }
