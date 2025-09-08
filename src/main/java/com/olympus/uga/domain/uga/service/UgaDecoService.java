@@ -10,10 +10,6 @@ import com.olympus.uga.domain.uga.domain.enums.ColorType;
 import com.olympus.uga.domain.uga.domain.repo.UgaAssetJpaRepo;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
-import com.olympus.uga.domain.uga.presentation.dto.request.UgaChangeCharacterReq;
-import com.olympus.uga.domain.uga.presentation.dto.request.UgaChangeColorReq;
-import com.olympus.uga.domain.uga.presentation.dto.request.UgaPurchaseCharacterReq;
-import com.olympus.uga.domain.uga.presentation.dto.request.UgaPurchaseColorReq;
 import com.olympus.uga.domain.uga.presentation.dto.response.UgaDecoRes;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
@@ -34,11 +30,11 @@ public class UgaDecoService {
     private final UgaJpaRepo ugaJpaRepo;
 
     @Transactional
-    public Response purchaseColor(UgaPurchaseColorReq req) {
+    public Response purchaseColor(ColorType req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
 
-        if (req.colorType() == ColorType.DEFAULT) {
+        if (req == ColorType.DEFAULT) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
@@ -46,46 +42,46 @@ public class UgaDecoService {
         UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
                 .orElse(UgaAsset.createDefault(userFamilyCode));
 
-        if (ugaAsset.hasColor(req.colorType())) {
+        if (ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
         }
 
         user.usePoint(20);
         userJpaRepo.save(user);
 
-        ugaAsset.addColor(req.colorType());
+        ugaAsset.addColor(req);
         ugaAssetJpaRepo.save(ugaAsset);
 
         return Response.ok("색상을 성공적으로 구매했습니다.");
     }
 
     @Transactional
-    public Response purchaseCharacter(UgaPurchaseCharacterReq req) {
+    public Response purchaseCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
 
-        if (req.characterType() == CharacterType.UGA) {
+        if (req== CharacterType.UGA) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
         UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
                 .orElse(UgaAsset.createDefault(userFamilyCode));
 
-        if (ugaAsset.hasCharacter(req.characterType())) {
+        if (ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
         }
 
         user.usePoint(200);
         userJpaRepo.save(user);
 
-        ugaAsset.addCharacter(req.characterType());
+        ugaAsset.addCharacter(req);
         ugaAssetJpaRepo.save(ugaAsset);
 
         return Response.ok("캐릭터를 성공적으로 구매했습니다.");
     }
 
     @Transactional
-    public Response changeColor(UgaChangeColorReq req) {
+    public Response changeColor(ColorType req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
 
@@ -103,18 +99,18 @@ public class UgaDecoService {
         UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
                 .orElse(UgaAsset.createDefault(userFamilyCode));
 
-        if (!ugaAsset.hasColor(req.colorType())) {
+        if (!ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
         }
 
-        currentUga.updateColor(req.colorType());
+        currentUga.updateColor(req);
         ugaJpaRepo.save(currentUga);
 
         return Response.ok("우가 색상이 성공적으로 변경되었습니다.");
     }
 
     @Transactional
-    public Response changeCharacter(UgaChangeCharacterReq req) {
+    public Response changeCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
         String userFamilyCode = getUserFamilyCode(user.getId());
 
@@ -133,11 +129,11 @@ public class UgaDecoService {
         UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
                 .orElse(UgaAsset.createDefault(userFamilyCode));
 
-        if (!ugaAsset.hasCharacter(req.characterType())) {
+        if (!ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
         }
 
-        currentUga.updateCharacter(req.characterType());
+        currentUga.updateCharacter(req);
         ugaJpaRepo.save(currentUga);
 
         return Response.ok("우가 캐릭터가 성공적으로 변경되었습니다.");
