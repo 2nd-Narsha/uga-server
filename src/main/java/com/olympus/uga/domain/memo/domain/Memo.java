@@ -1,5 +1,6 @@
 package com.olympus.uga.domain.memo.domain;
 
+import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
 import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,9 +32,15 @@ public class Memo {
     private User writer;
 
     @Column
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public void updateLocation(String location) {
         this.location = location;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
     }
 }

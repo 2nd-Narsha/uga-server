@@ -2,6 +2,7 @@ package com.olympus.uga.domain.memo.presentation;
 
 import com.olympus.uga.domain.memo.presentation.dto.req.LocationUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
+import com.olympus.uga.domain.memo.presentation.dto.req.MemoUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.res.MemoInfoRes;
 import com.olympus.uga.domain.memo.service.MemoService;
 import com.olympus.uga.global.common.Response;
@@ -18,8 +19,8 @@ public class MemoController {
     private final MemoService memoService;
 
     @PostMapping("/create")
-    public Response create(MemoCreateReq req) {
-        return memoService.save(req);
+    public Response create(MemoUpdateReq req) {
+        return memoService.updateMemo(req);
     }
 
     @PostMapping("/location/update")
