@@ -17,7 +17,7 @@ public class SwaggerConfig {
                 .info(
                         new Info().title("Uga")
                                 .description("Uga API")
-                                .version("1.0.5")
+                                .version("1.0.6")
                 )
                 .addServersItem(new Server().url("https://uga.r-e.kr"))
                 .addServersItem(new Server().url("http://localhost:8080"))
