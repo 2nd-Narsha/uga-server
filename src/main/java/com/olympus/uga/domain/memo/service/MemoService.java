@@ -8,6 +8,7 @@ import com.olympus.uga.domain.memo.domain.repo.MemoJpaRepo;
 import com.olympus.uga.domain.memo.error.MemoErrorCode;
 import com.olympus.uga.domain.memo.presentation.dto.req.LocationUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
+import com.olympus.uga.domain.memo.presentation.dto.req.MemoUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.res.MemoInfoRes;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
@@ -38,20 +39,25 @@ public class MemoService {
     private final UgaJpaRepo ugaJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
 
-    // 메모 생성
+    // 메모 업데이트
     @Transactional
-    public Response save(MemoCreateReq req) {
+    public Response updateMemo(MemoUpdateReq req) {
+
         User user = userSessionHolder.getUser();
+
         if (user == null) {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        memoJpaRepo.findByWriter(user).ifPresent(memoJpaRepo::delete);
+        if (req == null || req.content() == null) {
+            throw new CustomException(MemoErrorCode.INVALID_CONTENT);
+        }
 
-        memoJpaRepo.save(MemoCreateReq.fromMemoCreateReq(user, req));
+        findByWriter(user).updateContent(req.content());
+
         user.resetWatcher();
 
-        return Response.created("메모가 성공적으로 생성되었습니다.");
+        return Response.ok("메모가 성공적으로 저장되었습니다.");
     }
 
     // 위치 갱신
@@ -62,14 +68,12 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        Memo memo = memoJpaRepo.findByWriter(user)
-                .orElseThrow(() -> new CustomException(MemoErrorCode.MEMO_NOT_FOUND));
-
         if (req == null || req.location() == null) {
             throw new CustomException(MemoErrorCode.INVALID_LOCATION);
         }
 
-        memo.updateLocation(req.location());
+        findByWriter(user).updateLocation(req.location());
+
         user.resetWatcher();
 
         return Response.ok("위치가 성공적으로 저장되었습니다.");
@@ -85,14 +89,11 @@ public class MemoService {
 
         Memo memo = memoJpaRepo.findByWriter(targetUser)
                 .orElseGet(() -> memoJpaRepo.save(
-                        MemoCreateReq.fromMemoCreateReq(
-                                targetUser,
-                                new MemoCreateReq("메모가 아직 없습니다.")
-                        )
+                        MemoCreateReq.fromMemoCreateReq(targetUser)
                 ));
 
         // 만료 여부 검사
-        if (memo.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
+        if (memo.getUpdatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
             memoJpaRepo.delete(memo);
             throw new CustomException(MemoErrorCode.MEMO_EXPIRED);
         }
@@ -123,5 +124,12 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
         return user.getWatcher();
+    }
+
+    private Memo findByWriter(User writer) {
+        return memoJpaRepo.findByWriter(writer)
+                .orElseGet(() -> memoJpaRepo.save(
+                        MemoCreateReq.fromMemoCreateReq(writer)
+                ));
     }
 }
