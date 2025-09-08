@@ -5,13 +5,13 @@ import com.olympus.uga.domain.user.domain.User;
 
 import java.time.LocalDateTime;
 
-public record MemoCreateReq(String content) {
-    public static Memo fromMemoCreateReq(User writer, MemoCreateReq req) {
+public record MemoCreateReq() {
+    public static Memo fromMemoCreateReq(User writer) {
         return Memo.builder()
-                .content(req.content)
-                .createdAt(LocalDateTime.now())
+                .content("메모가 아직 없습니다.")
+                .updatedAt(LocalDateTime.now())
                 .writer(writer)
-                .location("위치 없음")
+                .location("위치가 아직 없습니다.")
                 .build();
     }
 }
