@@ -13,7 +13,10 @@ public enum UgaErrorCode implements CustomErrorCode {
     UGA_FULLY_GROWN(HttpStatus.BAD_REQUEST, "이미 다 자란 우가입니다. 먹이를 줄 수 없습니다."),
     UGA_ALREADY_INDEPENDENCE(HttpStatus.BAD_REQUEST, "이미 독립한 우가입니다."),
     INVALID_FOOD_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 먹이 타입입니다."),
-    UGA_NOT_FULLY_GROWN(HttpStatus.BAD_REQUEST, "아직 다 자라지 않은 우가입니다.");
+    UGA_NOT_FULLY_GROWN(HttpStatus.BAD_REQUEST, "아직 다 자라지 않은 우가입니다."),
+    CANNOT_PURCHASE_DEFAULT_ITEM(HttpStatus.BAD_REQUEST, "기본 아이템은 구매할 수 없습니다."),
+    ALREADY_OWNED_ITEM(HttpStatus.BAD_REQUEST, "이미 보유한 아이템입니다."),
+    NOT_OWNED_ITEM(HttpStatus.BAD_REQUEST, "보유하지 않은 아이템입니다.");
 
     private final HttpStatus status;
     private final String message;
