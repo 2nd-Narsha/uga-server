@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface MemoJpaRepo extends JpaRepository<Memo, Long> {
     Optional<Memo> findByWriter(User user);
 
-    @Query("DELETE FROM Memo m WHERE m.family.familyCode = :familyCode")
     @Modifying
+    @Query("DELETE FROM Memo m WHERE m.familyCode = :familyCode")
     void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }
