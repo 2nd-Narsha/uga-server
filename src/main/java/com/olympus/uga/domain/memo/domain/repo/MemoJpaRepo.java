@@ -17,4 +17,8 @@ public interface MemoJpaRepo extends JpaRepository<Memo, Long> {
     @Modifying
     @Query("DELETE FROM Memo m WHERE m.familyCode = :familyCode")
     void deleteByFamilyCode(@Param("familyCode") String familyCode);
+
+    @Modifying
+    @Query("DELETE FROM Memo m WHERE m.writer = :writer")
+    void deleteAllByWriter(@Param("writer") User writer);
 }
