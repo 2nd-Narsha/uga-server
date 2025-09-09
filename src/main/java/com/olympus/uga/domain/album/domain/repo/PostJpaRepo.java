@@ -32,3 +32,4 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
     void deleteAllByWriter(User writer);
 }
 
+
