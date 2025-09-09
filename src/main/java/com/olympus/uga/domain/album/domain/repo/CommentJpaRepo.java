@@ -20,7 +20,7 @@ public interface CommentJpaRepo extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c WHERE c.commentId = :commentId AND c.writer.id = :writerId")
     Optional<Comment> findByIdAndWriterId(@Param("commentId") Long commentId, @Param("writerId") Long writerId);
 
-    @Query("DELETE FROM Comment c WHERE c.post.family.familyCode = :familyCode")
     @Modifying
+    @Query("DELETE FROM Comment c WHERE c.post.family.familyCode = :familyCode")
     void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }

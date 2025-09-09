@@ -30,8 +30,8 @@ public interface LetterJpaRepo extends JpaRepository<Letter, Long> {
     // 유저가 보낸/받은 편지 모두 삭제
     void deleteAllBySenderOrReceiver(User sender, User receiver);
 
-    // 가족 코드로 편지 삭제
-    @Query("DELETE FROM Letter l WHERE l.family.familyCode = :familyCode")
+    // 가족 구성원들이 보내거나 받은 편지 모두 삭제
     @Modifying
-    void deleteByFamilyCode(@Param("familyCode") String familyCode);
+    @Query("DELETE FROM Letter l WHERE l.sender.id IN :memberIds OR l.receiver.id IN :memberIds")
+    void deleteByFamilyMemberIds(@Param("memberIds") List<Long> memberIds);
 }

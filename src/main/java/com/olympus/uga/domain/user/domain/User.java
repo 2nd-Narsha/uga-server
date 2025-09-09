@@ -77,6 +77,9 @@ public class User {
     @Column(name = "is_checked_mailbox")
     private Boolean isCheckedMailbox = true;
 
+    @Column(name = "family_code")
+    private String familyCode;
+
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
         this.username = username;
@@ -104,6 +107,15 @@ public class User {
 
     public void updateTutorial(String tutorial) { this.tutorial = tutorial; }
 
+    // family
+    public void resetFamily() {
+        this.familyCode = null;
+    }
+
+    public void setFamilyCode(String familyCode) {
+        this.familyCode = familyCode;
+    }
+
     // point
     public void earnPoint(int amount) {
         this.point += amount;
@@ -128,4 +140,3 @@ public class User {
         this.isCheckedMailbox = isCheckedMailbox;
     }
 }
-
