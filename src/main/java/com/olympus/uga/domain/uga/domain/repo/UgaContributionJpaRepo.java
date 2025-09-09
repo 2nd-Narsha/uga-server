@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface UgaContributionJpaRepo extends JpaRepository<UgaContribution, Long> {
     Optional<UgaContribution> findByUgaIdAndUserId(Long ugaId, Long userId);
     void deleteAllByUserId(Long userId);
+    void deleteAllByUgaId(Long ugaId);
 
     @Query("SELECT SUM(uc.contributedDays) FROM UgaContribution uc WHERE uc.ugaId = :ugaId")
     Integer getTotalContributedDaysByUgaId(@Param("ugaId") Long ugaId);

@@ -4,6 +4,7 @@ import com.olympus.uga.domain.answer.domain.Answer;
 import com.olympus.uga.domain.question.domain.Question;
 import com.olympus.uga.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,8 @@ public interface AnswerJpaRepo extends JpaRepository<Answer, Long> {
     List<Long> findAnsweredQuestionIdsByWriter(@Param("writer") User writer);
 
     void deleteAllByWriter(User user);
+
+    @Modifying
+    @Query("DELETE FROM Answer a WHERE a.question.family.familyCode = :familyCode")
+    void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }
