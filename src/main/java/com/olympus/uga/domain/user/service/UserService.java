@@ -94,7 +94,7 @@ public class UserService {
             return Response.ok("로그아웃에 성공하였습니다.");
         } catch (Exception e) { // 토큰이 유효하지 않아도 로그아웃은 성공으로 처리
             SecurityContextHolder.clearContext();
-            return Response.ok("로그���웃에 성공하였습니다.");
+            return Response.ok("로그아웃에 성공하였습니다.");
         }
     }
 
@@ -140,7 +140,7 @@ public class UserService {
         }
 
         // 4-6. 출석체크 데이터 삭제
-        attendJpaRepo.deleteAllByUserId(userId);
+        attendJpaRepo.deleteAllByUser_Id(userId);
 
         // 4-7. 메모 데이터 삭제
         memoJpaRepo.deleteAllByWriter(user);

@@ -11,9 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface AttendJpaRepo extends JpaRepository<Attend, Long> {
-    Optional<Attend> findByUserId(Long userId);
+    Optional<Attend> findByUser_Id(Long userId);
 
     @Modifying
-    @Query("DELETE FROM Attend a WHERE a.userId = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    @Query("DELETE FROM Attend a WHERE a.user.id = :userId")
+    void deleteAllByUser_Id(@Param("userId") Long userId);
 }

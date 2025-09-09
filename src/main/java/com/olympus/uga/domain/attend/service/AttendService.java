@@ -82,7 +82,7 @@ public class AttendService {
     }
 
     private Attend getOrCreateAttend(User user) {
-        return attendJpaRepo.findByUserId(user.getId())
+        return attendJpaRepo.findByUser_Id(user.getId())
                 .orElseGet(() -> {
                     Attend newAttend = Attend.builder()
                             .user(user)
