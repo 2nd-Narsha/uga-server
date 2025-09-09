@@ -27,6 +27,9 @@ public class Memo {
     @Column
     private String location = "위치 없음";
 
+    @Column
+    private String familyCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer")
     private User writer;

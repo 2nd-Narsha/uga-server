@@ -45,4 +45,3 @@ public class Attend {
         this.currentStreak = 0;
     }
 }
-

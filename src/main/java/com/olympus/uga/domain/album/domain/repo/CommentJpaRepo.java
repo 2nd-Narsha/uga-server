@@ -3,6 +3,7 @@ package com.olympus.uga.domain.album.domain.repo;
 import com.olympus.uga.domain.album.domain.Comment;
 import com.olympus.uga.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,8 @@ public interface CommentJpaRepo extends JpaRepository<Comment, Long> {
 
     @Query("SELECT c FROM Comment c WHERE c.commentId = :commentId AND c.writer.id = :writerId")
     Optional<Comment> findByIdAndWriterId(@Param("commentId") Long commentId, @Param("writerId") Long writerId);
+
+    @Modifying
+    @Query("DELETE FROM Comment c WHERE c.post.family.familyCode = :familyCode")
+    void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }
