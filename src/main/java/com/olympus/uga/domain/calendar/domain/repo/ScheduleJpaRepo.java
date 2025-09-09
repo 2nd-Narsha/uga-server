@@ -14,3 +14,4 @@ public interface ScheduleJpaRepo extends JpaRepository<Schedule, Long> {
     List<Schedule> findByFamilyCodeOrderByDateAscStartTimeAsc(String familyCode);
     List<Schedule> findByFamilyCodeAndDateOrderByStartTimeAsc(String familyCode, LocalDate date);
 }
+

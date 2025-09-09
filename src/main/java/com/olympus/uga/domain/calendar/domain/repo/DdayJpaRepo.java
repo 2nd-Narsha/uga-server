@@ -14,3 +14,4 @@ public interface DdayJpaRepo extends JpaRepository<Dday, Long> {
     Optional<Dday> findByIdAndFamilyCode(Long id, String familyCode);
     List<Dday> findByDateBefore(LocalDate date);
 }
+
