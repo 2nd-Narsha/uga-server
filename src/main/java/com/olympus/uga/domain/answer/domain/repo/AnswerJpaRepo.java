@@ -28,7 +28,7 @@ public interface AnswerJpaRepo extends JpaRepository<Answer, Long> {
 
     void deleteAllByWriter(User user);
 
-    @Query("DELETE FROM Answer a WHERE a.question.family.familyCode = :familyCode")
     @Modifying
+    @Query("DELETE FROM Answer a WHERE a.question.family.familyCode = :familyCode")
     void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }

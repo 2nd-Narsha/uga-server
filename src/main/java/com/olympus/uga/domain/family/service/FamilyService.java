@@ -4,7 +4,6 @@ import com.olympus.uga.domain.album.domain.repo.CommentJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostImageJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
 import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
-import com.olympus.uga.domain.attend.domain.repo.AttendJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.DdayJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
 import com.olympus.uga.domain.family.domain.Family;
@@ -58,9 +57,8 @@ public class FamilyService {
     private final QuestionJpaRepo questionJpaRepo;
     private final AnswerJpaRepo answerJpaRepo;
     private final MemoJpaRepo memoJpaRepo;
-    private final AttendJpaRepo attendJpaRepo;
 
-    //가족 생성
+    //가족 ��성
     @Transactional
     public ResponseData<String> createFamily(FamilyCreateReq req) {
         User user = userSessionHolder.getUser();
@@ -161,54 +159,64 @@ public class FamilyService {
     public Response deleteFamily() {
         User currentUser = userSessionHolder.getUser();
 
+        // 가족 정보 조회
         Family family = familyJpaRepo.findByMemberListContaining(currentUser.getId())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
 
         String familyCode = family.getFamilyCode();
 
-        // 1. 출석체크 데이터 삭제
-        attendJpaRepo.deleteByFamilyCode(familyCode);
+        // 리더가 아니면 삭제 권한이 없음
+        if (!family.getLeaderId().equals(currentUser.getId())) {
+            throw new CustomException(FamilyErrorCode.NOT_FAMILY_LEADER);
+        }
 
-        // 2. 우가 관련 데이터 삭제
-        // 2-1. 우가 기여도 삭제
+        // 가족 구성원 ID 리스트
+        List<Long> familyMemberIds = family.getMemberList();
+
+        // 1. ��범 데이터 삭제 (외래키 제약조건 순서대로)
+        // 1-1. 댓글 삭제 (먼저 삭제해야 함)
+        commentJpaRepo.deleteByFamilyCode(familyCode);
+        // 1-2. 이미지 삭제 (그 다음 삭제)
+        postImageJpaRepo.deleteByFamilyCode(familyCode);
+        // 1-3. 게시글 삭제 (마지막에 삭제)
+        postJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 2. 질문/답변 데이터 삭제 (답변부터 먼저 삭제)
+        answerJpaRepo.deleteByFamilyCode(familyCode);
+        questionJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 3. 편지 데이터 삭제 - 가족 구성원들이 보내거나 받은 편지 모두 삭제
+        letterJpaRepo.deleteByFamilyMemberIds(familyMemberIds);
+
+        // 4. 메모 데이터 삭제
+        memoJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 5. 캘린더 데이터 삭제
+        ddayJpaRepo.deleteByFamilyCode(familyCode);
+        scheduleJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 6. 우가 관련 데이터 삭제
+        // 6-1. 우가 기여도 삭제
         List<Uga> familyUgas = ugaJpaRepo.findByFamilyCode(familyCode);
         for (Uga uga : familyUgas) {
             ugaContributionJpaRepo.deleteAllByUgaId(uga.getId());
         }
-        // 2-2. 우가 삭제
+        // 6-2. 우가 삭제
         ugaJpaRepo.deleteByFamilyCode(familyCode);
-        // 2-3. 우가 자산(꾸미기 아이템) 삭제
+        // 6-3. 우가 자산(꾸미기 아이템) 삭제
         ugaAssetJpaRepo.deleteById(familyCode);
 
-        // 3. 앨범 데이터 삭제 (순서 중요)
-        // 3-1. 댓글 삭제
-        commentJpaRepo.deleteByFamilyCode(familyCode);
-        // 3-2. 이미지 삭제
-        postImageJpaRepo.deleteByFamilyCode(familyCode);
-        // 3-3. 게시글 삭제
-        postJpaRepo.deleteByFamilyCode(familyCode);
+        // 7. 가족 구성원 정보 초기화
+        for (Long memberId : family.getMemberList()) {
+            User member = userJpaRepo.findById(memberId)
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+            member.resetFamily();
+            userJpaRepo.save(member);
+        }
 
-        // 4. 캘린더 데이터 삭제
-        // 4-1. 디데이 삭제
-        ddayJpaRepo.deleteByFamilyCode(familyCode);
-        // 4-2. 일정 삭제
-        scheduleJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 5. 편지 삭제
-        letterJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 6. 질문/답변 삭제
-        // 6-1. 답변 먼저 삭제
-        answerJpaRepo.deleteByFamilyCode(familyCode);
-        // 6-2. 질문 삭제
-        questionJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 7. 메모 삭제
-        memoJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 8. 마지막으로 가족 삭제
+        // 8. 가족 삭제 (마지막에 삭제)
         familyJpaRepo.delete(family);
 
-        return Response.ok("가족이 성공적으로 삭제되었습니다");
+        return Response.ok("가족이 삭제되었습니다.");
     }
 }
