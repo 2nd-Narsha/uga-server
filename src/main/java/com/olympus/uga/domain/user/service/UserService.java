@@ -22,6 +22,8 @@ import com.olympus.uga.global.image.service.ImageService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import com.olympus.uga.global.security.jwt.service.JwtTokenService;
 import com.olympus.uga.global.security.jwt.util.JwtExtractor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +50,9 @@ public class UserService {
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
     private final PostJpaRepo postJpaRepo;
     private final CommentJpaRepo commentJpaRepo;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ResponseData<UserInfoRes> getMe() {
         User user = userSessionHolder.getUser();
@@ -130,10 +135,15 @@ public class UserService {
             schedule.getParticipants().removeIf(p -> p.getUserId().equals(userId));
         }
 
-        // 4-6. 앨범 댓글 삭제 (게시글보다 먼저 삭제해야 함)
+        // 4-6. AI 서버의 답변 데이터 삭제
+        entityManager.createNativeQuery("DELETE FROM tb_ai_answers WHERE user_id = :userId")
+                .setParameter("userId", userId)
+                .executeUpdate();
+
+        // 4-7. 앨범 댓글 삭제 (게시글보다 먼저 삭제해야 함)
         commentJpaRepo.deleteAllByWriter(user);
 
-        // 4-7. 앨범 포스트 삭제
+        // 4-8. 앨범 포스트 삭제
         postJpaRepo.deleteAllByWriter(user);
 
         // 5. 유저 삭제
