@@ -1,6 +1,10 @@
 package com.olympus.uga.domain.family.service;
 
+import com.olympus.uga.domain.album.domain.repo.CommentJpaRepo;
+import com.olympus.uga.domain.album.domain.repo.PostImageJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
+import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
+import com.olympus.uga.domain.attend.domain.repo.AttendJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.DdayJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
 import com.olympus.uga.domain.family.domain.Family;
@@ -10,6 +14,9 @@ import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.request.LeaderChangeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.letter.domain.repo.LetterJpaRepo;
+import com.olympus.uga.domain.memo.domain.repo.MemoJpaRepo;
+import com.olympus.uga.domain.question.domain.repo.QuestionJpaRepo;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaAsset;
 import com.olympus.uga.domain.uga.domain.repo.UgaAssetJpaRepo;
@@ -45,6 +52,13 @@ public class FamilyService {
     private final PostJpaRepo postJpaRepo;
     private final DdayJpaRepo ddayJpaRepo;
     private final ScheduleJpaRepo scheduleJpaRepo;
+    private final PostImageJpaRepo postImageJpaRepo;
+    private final CommentJpaRepo commentJpaRepo;
+    private final LetterJpaRepo letterJpaRepo;
+    private final QuestionJpaRepo questionJpaRepo;
+    private final AnswerJpaRepo answerJpaRepo;
+    private final MemoJpaRepo memoJpaRepo;
+    private final AttendJpaRepo attendJpaRepo;
 
     //가족 생성
     @Transactional
@@ -152,30 +166,47 @@ public class FamilyService {
 
         String familyCode = family.getFamilyCode();
 
-        // 1. 우가 관련 데이터 삭제
-        // 1-1. 우가 기여도 삭제
+        // 1. 출석체크 데이터 삭제
+        attendJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 2. 우가 관련 데이터 삭제
+        // 2-1. 우가 기여도 삭제
         List<Uga> familyUgas = ugaJpaRepo.findByFamilyCode(familyCode);
         for (Uga uga : familyUgas) {
             ugaContributionJpaRepo.deleteAllByUgaId(uga.getId());
         }
-
-        // 1-2. 우가 삭제
+        // 2-2. 우가 삭제
         ugaJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 1-3. 우가 자산(꾸미기 아이템) 삭제
+        // 2-3. 우가 자산(꾸미기 아이템) 삭제
         ugaAssetJpaRepo.deleteById(familyCode);
 
-        // 2. 앨범 데이터 삭제
+        // 3. 앨범 데이터 삭제 (순서 중요)
+        // 3-1. 댓글 삭제
+        commentJpaRepo.deleteByFamilyCode(familyCode);
+        // 3-2. 이미지 삭제
+        postImageJpaRepo.deleteByFamilyCode(familyCode);
+        // 3-3. 게시글 삭제
         postJpaRepo.deleteByFamilyCode(familyCode);
 
-        // 3. 캘린더 데이터 삭제
-        // 3-1. 디데이 삭제
+        // 4. 캘린더 데이터 삭제
+        // 4-1. 디데이 삭제
         ddayJpaRepo.deleteByFamilyCode(familyCode);
-
-        // 3-2. 일정 삭제
+        // 4-2. 일정 삭제
         scheduleJpaRepo.deleteByFamilyCode(familyCode);
 
-        // 4. 마지막으로 가족 삭제
+        // 5. 편지 삭제
+        letterJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 6. 질문/답변 삭제
+        // 6-1. 답변 먼저 삭제
+        answerJpaRepo.deleteByFamilyCode(familyCode);
+        // 6-2. 질문 삭제
+        questionJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 7. 메모 삭제
+        memoJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 8. 마지막으로 가족 삭제
         familyJpaRepo.delete(family);
 
         return Response.ok("가족이 성공적으로 삭제되었습니다");
