@@ -3,6 +3,7 @@ package com.olympus.uga.domain.letter.domain.repo;
 import com.olympus.uga.domain.letter.domain.Letter;
 import com.olympus.uga.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -28,4 +29,9 @@ public interface LetterJpaRepo extends JpaRepository<Letter, Long> {
 
     // 유저가 보낸/받은 편지 모두 삭제
     void deleteAllBySenderOrReceiver(User sender, User receiver);
+
+    // 가족 코드로 편지 삭제
+    @Query("DELETE FROM Letter l WHERE l.family.familyCode = :familyCode")
+    @Modifying
+    void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }
