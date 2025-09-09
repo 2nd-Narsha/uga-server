@@ -30,6 +30,5 @@ public interface PostJpaRepo extends JpaRepository<Post, Long> {
     List<Post> findPostsWithImagesByFamilyCode(@Param("familyCode") String familyCode);
 
     void deleteAllByWriter(User writer);
+    void deleteByFamilyCode(String familyCode);
 }
-
-

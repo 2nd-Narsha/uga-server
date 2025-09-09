@@ -1,5 +1,8 @@
 package com.olympus.uga.domain.family.service;
 
+import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
+import com.olympus.uga.domain.calendar.domain.repo.DdayJpaRepo;
+import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
@@ -7,8 +10,11 @@ import com.olympus.uga.domain.family.presentation.dto.request.FamilyCreateReq;
 import com.olympus.uga.domain.family.presentation.dto.request.LeaderChangeReq;
 import com.olympus.uga.domain.family.presentation.dto.response.FamilyInfoRes;
 import com.olympus.uga.domain.family.util.CodeGenerator;
+import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaAsset;
 import com.olympus.uga.domain.uga.domain.repo.UgaAssetJpaRepo;
+import com.olympus.uga.domain.uga.domain.repo.UgaContributionJpaRepo;
+import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
@@ -19,11 +25,13 @@ import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FamilyService {
@@ -32,6 +40,11 @@ public class FamilyService {
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final UgaAssetJpaRepo ugaAssetJpaRepo;
+    private final UgaJpaRepo ugaJpaRepo;
+    private final UgaContributionJpaRepo ugaContributionJpaRepo;
+    private final PostJpaRepo postJpaRepo;
+    private final DdayJpaRepo ddayJpaRepo;
+    private final ScheduleJpaRepo scheduleJpaRepo;
 
     //가족 생성
     @Transactional
@@ -130,14 +143,41 @@ public class FamilyService {
         return Response.ok(userJpaRepo.findById(req.id()) + "님에게 리더를 넘겼습니다.");
     }
 
+    @Transactional
     public Response deleteFamily() {
         User currentUser = userSessionHolder.getUser();
 
         Family family = familyJpaRepo.findByMemberListContaining(currentUser.getId())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.FAMILY_NOT_FOUND));
 
+        String familyCode = family.getFamilyCode();
+
+        // 1. 우가 관련 데이터 삭제
+        // 1-1. 우가 기여도 삭제
+        List<Uga> familyUgas = ugaJpaRepo.findByFamilyCode(familyCode);
+        for (Uga uga : familyUgas) {
+            ugaContributionJpaRepo.deleteAllByUgaId(uga.getId());
+        }
+
+        // 1-2. 우가 삭제
+        ugaJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 1-3. 우가 자산(꾸미기 아이템) 삭제
+        ugaAssetJpaRepo.deleteById(familyCode);
+
+        // 2. 앨범 데이터 삭제
+        postJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 3. 캘린더 데이터 삭제
+        // 3-1. 디데이 삭제
+        ddayJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 3-2. 일정 삭제
+        scheduleJpaRepo.deleteByFamilyCode(familyCode);
+
+        // 4. 마지막으로 가족 삭제
         familyJpaRepo.delete(family);
 
-        return Response.ok("가족 " + family.getFamilyName() + "이/가 성공적으로 삭제되었습니다");
+        return Response.ok("가족이 성공적으로 삭제되었습니다");
     }
 }
