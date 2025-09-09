@@ -3,6 +3,7 @@ package com.olympus.uga.domain.user.service;
 import com.olympus.uga.domain.album.domain.repo.CommentJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
 import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
+import com.olympus.uga.domain.attend.domain.repo.AttendJpaRepo;
 import com.olympus.uga.domain.calendar.domain.Schedule;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleParticipantJpaRepo;
@@ -10,6 +11,7 @@ import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.letter.domain.repo.LetterJpaRepo;
+import com.olympus.uga.domain.memo.domain.repo.MemoJpaRepo;
 import com.olympus.uga.domain.question.domain.repo.QuestionJpaRepo;
 import com.olympus.uga.domain.uga.domain.repo.UgaContributionJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
@@ -50,6 +52,8 @@ public class UserService {
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
     private final PostJpaRepo postJpaRepo;
     private final CommentJpaRepo commentJpaRepo;
+    private final MemoJpaRepo memoJpaRepo;
+    private final AttendJpaRepo attendJpaRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -135,15 +139,21 @@ public class UserService {
             schedule.getParticipants().removeIf(p -> p.getUserId().equals(userId));
         }
 
-        // 4-6. AI 서버의 답변 데이터 삭제
+        // 4-6. 출석체크 데이터 삭제
+        attendJpaRepo.deleteAllByUser_Id(userId);
+
+        // 4-7. 메모 데이터 삭제
+        memoJpaRepo.deleteAllByWriter(user);
+
+        // 4-8. AI 서버의 답변 데이터 삭제
         entityManager.createNativeQuery("DELETE FROM tb_ai_answers WHERE user_id = :userId")
                 .setParameter("userId", userId)
                 .executeUpdate();
 
-        // 4-7. 앨범 댓글 삭제 (게시글보다 먼저 삭제해야 함)
+        // 4-9. 앨범 댓글 삭제 (게시글보다 먼저 삭제해야 함)
         commentJpaRepo.deleteAllByWriter(user);
 
-        // 4-8. 앨범 포스트 삭제
+        // 4-10. 앨범 포스트 삭제
         postJpaRepo.deleteAllByWriter(user);
 
         // 5. 유저 삭제
