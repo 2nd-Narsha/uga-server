@@ -32,7 +32,7 @@ public class Memo {
     private User writer;
 
     @Column
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     public void updateLocation(String location) {
         this.location = location;
