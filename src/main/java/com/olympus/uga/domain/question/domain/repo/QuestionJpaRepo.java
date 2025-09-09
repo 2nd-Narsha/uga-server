@@ -4,6 +4,7 @@ import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.question.domain.Question;
 import com.olympus.uga.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,4 +26,8 @@ public interface QuestionJpaRepo extends JpaRepository<Question, Long> {
     Optional<Long> findMaxId();
 
     void deleteAllByWriter(User user);
+
+    @Modifying
+    @Query("DELETE FROM Question q WHERE q.family.familyCode = :familyCode")
+    void deleteByFamilyCode(@Param("familyCode") String familyCode);
 }

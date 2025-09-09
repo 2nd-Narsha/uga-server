@@ -2,7 +2,6 @@ package com.olympus.uga.domain.point.presentation;
 
 import com.olympus.uga.domain.point.domain.enums.ActivityType;
 import com.olympus.uga.domain.point.service.PointService;
-import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.global.common.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,4 @@ public class PointController {
     public Response earnPoint(@RequestParam ActivityType activityType) {
         return pointService.earnPoint(activityType);
     }
-
-//    @PostMapping("/use")
-//    @Operation(summary = "포인트 사용")
-//    public Response usePoint(@RequestParam FoodType food) {
-//        return pointService.usePoint(food);
-//    }
 }
