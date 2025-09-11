@@ -19,7 +19,7 @@ public record ScheduleListRes(
                 .map(user -> new ParticipantInfo(
                         user.getId(),
                         user.getUsername(),
-                        user.getProfileImage()
+                        user.getCharacter().getImageUrl()
                 ))
                 .toList();
 
