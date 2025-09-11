@@ -36,8 +36,7 @@ public class PointController {
 
     @PostMapping("/purchase/confirm")
     @Operation(summary = "결제 확인", description = "결제 완료 후 포인트 충전")
-    public Response confirmPayment(@RequestParam String paymentId,
-                                   @RequestParam String paymentKey) {
+    public Response confirmPayment(@RequestParam String paymentId, @RequestParam String paymentKey) {
         return pointService.confirmPayment(paymentId, paymentKey);
     }
 }
