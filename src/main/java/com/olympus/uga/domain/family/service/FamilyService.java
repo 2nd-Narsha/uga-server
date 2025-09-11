@@ -113,6 +113,7 @@ public class FamilyService {
                             memberUser.getId(),
                             memberUser.getUsername(),
                             memberUser.getProfileImage(),
+                            memberUser.getCharacter().getImageUrl(),
                             memberUser.getBirth(),
                             interestList,
                             memberUser.getCharacter(),
