@@ -112,7 +112,7 @@ public class FamilyService {
                     return new FamilyInfoRes.FamilyMemberInfo(
                             memberUser.getId(),
                             memberUser.getUsername(),
-                            memberUser.getProfileImage(),
+                            memberUser.getCharacter().getImageUrl(),
                             memberUser.getBirth(),
                             interestList,
                             memberUser.getCharacter(),
