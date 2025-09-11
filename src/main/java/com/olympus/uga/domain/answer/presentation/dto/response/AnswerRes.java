@@ -9,7 +9,7 @@ public record AnswerRes(Long answerId, String answer, Long writerId, String writ
                 answer.getAnswer(),
                 answer.getWriter().getId(),
                 answer.getWriter().getUsername(),
-                answer.getWriter().getProfileImage()
+                answer.getWriter().getCharacter().getImageUrl()
         );
     }
 }
