@@ -15,6 +15,7 @@ public record FamilyInfoRes(
             Long id,
             String username,
             String profileImage,
+            String imageUrl,
             String birth,
             List<String> interests,
             UserCharacter character,
