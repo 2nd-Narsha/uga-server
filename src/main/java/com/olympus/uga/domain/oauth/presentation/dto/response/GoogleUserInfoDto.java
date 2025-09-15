@@ -9,6 +9,7 @@ public record GoogleUserInfoDto(String id, String email) {
                 .email(userInfo.email)
                 .loginType(LoginType.GOOGLE)
                 .oauthId(userInfo.id)
+                .point(500)
                 .build();
     }
 }
