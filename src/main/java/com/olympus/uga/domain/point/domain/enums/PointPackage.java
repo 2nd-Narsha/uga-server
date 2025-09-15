@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PointPackage {
-    PACKAGE_100(100, 1000),
-    PACKAGE_550(550, 5000),
-    PACKAGE_1200(1200, 10000);
+    UGA_100_COIN(100, 1000),
+    UGA_550_COIN(550, 5000),
+    UGA_1200_COIN(1200, 10000);
 
     private final int points;
     private final int price;
