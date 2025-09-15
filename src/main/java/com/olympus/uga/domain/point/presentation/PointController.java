@@ -1,8 +1,8 @@
 package com.olympus.uga.domain.point.presentation;
 
 import com.olympus.uga.domain.point.domain.enums.ActivityType;
-import com.olympus.uga.domain.point.presentation.dto.request.PaymentReq;
-import com.olympus.uga.domain.point.presentation.dto.response.PaymentRes;
+import com.olympus.uga.domain.point.presentation.dto.request.PurchaseReq;
+import com.olympus.uga.domain.point.presentation.dto.response.PointRewardRes;
 import com.olympus.uga.domain.point.service.PointService;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
@@ -28,15 +28,9 @@ public class PointController {
         return pointService.earnPoint(activityType);
     }
 
-    @PostMapping("/purchase")
-    @Operation(summary = "포인트 구매")
-    public ResponseData<PaymentRes> purchasePoint(@RequestBody PaymentReq request) {
-        return Response.ok(pointService.initiatePayment(request));
-    }
-
-    @PostMapping("/purchase/confirm")
-    @Operation(summary = "결제 확인", description = "결제 완료 후 포인트 충전")
-    public Response confirmPayment(@RequestParam String paymentId, @RequestParam String paymentKey) {
-        return pointService.confirmPayment(paymentId, paymentKey);
+    @PostMapping("/reward")
+    @Operation(summary = "인앱결제 포인트 지급")
+    public ResponseData<PointRewardRes> rewardPointsFromPurchase(@RequestBody PurchaseReq req) {
+        return pointService.rewardPointsFromPurchase(req);
     }
 }
