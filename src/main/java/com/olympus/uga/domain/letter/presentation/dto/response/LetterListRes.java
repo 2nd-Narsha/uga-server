@@ -15,7 +15,7 @@ public record LetterListRes(
     public static LetterListRes from(Letter letter) {
         return new LetterListRes(
                 letter.getLetterId(),
-                letter.getSender().getProfileImage(),
+                letter.getSender().getCharacter().getImageUrl(),
                 letter.getSender().getUsername(),
                 letter.getSentAt(),
                 letter.getIsRead()
