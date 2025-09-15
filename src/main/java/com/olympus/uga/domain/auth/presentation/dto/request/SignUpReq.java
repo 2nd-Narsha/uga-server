@@ -11,6 +11,7 @@ public record SignUpReq(
                 .phoneNum(req.phoneNum)
                 .password(password)
                 .loginType(LoginType.LOCAL)
+                .point(500)
                 .build();
     }
 }
