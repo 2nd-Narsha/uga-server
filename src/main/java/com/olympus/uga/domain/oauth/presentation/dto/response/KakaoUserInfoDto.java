@@ -9,6 +9,7 @@ public record KakaoUserInfoDto(String id, String email) {
                 .email(userInfo.email)
                 .loginType(LoginType.KAKAO)
                 .oauthId(userInfo.id)
+                .point(500)
                 .build();
     }
 }
