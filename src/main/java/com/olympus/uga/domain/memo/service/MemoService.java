@@ -83,7 +83,9 @@ public class MemoService {
     @Transactional
     public MemoInfoRes getOne(Long userId) {
 
-        userSessionHolder.getUser().addWatcher(userId);
+        userJpaRepo.findById(userSessionHolder.getUser().getId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND))
+                .addWatcher(userId);
 
         User targetUser = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
