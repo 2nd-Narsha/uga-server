@@ -80,6 +80,7 @@ public class MemoService {
     }
 
     // 특정 유저의 메모 조회
+    @Transactional
     public MemoInfoRes getOne(Long userId) {
 
         userSessionHolder.getUser().addWatcher(userId);
