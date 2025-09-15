@@ -62,7 +62,7 @@ public class User {
     private String oauthId;
 
     @Column(name = "point", nullable = false)
-    private int point = 0;
+    private int point = 500;
 
     @Column(name = "profile_image")
     private String profileImage;
