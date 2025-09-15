@@ -1,8 +1,11 @@
 package com.olympus.uga.domain.point.presentation;
 
 import com.olympus.uga.domain.point.domain.enums.ActivityType;
+import com.olympus.uga.domain.point.presentation.dto.request.PurchaseReq;
+import com.olympus.uga.domain.point.presentation.dto.response.PointRewardRes;
 import com.olympus.uga.domain.point.service.PointService;
 import com.olympus.uga.global.common.Response;
+import com.olympus.uga.global.common.ResponseData;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,5 +26,11 @@ public class PointController {
     @Operation(summary = "포인트 얻기", description = "SIGN_UP(회원가입), LETTER(편지작성), ATTENDANCE(하루출석), SEVENTH_ATTENDANCE(7일출석), ANSWER(답변), BIRTHDAY(생일)")
     public Response earnPoint(@RequestParam ActivityType activityType) {
         return pointService.earnPoint(activityType);
+    }
+
+    @PostMapping("/reward")
+    @Operation(summary = "인앱결제 포인트 지급")
+    public ResponseData<PointRewardRes> rewardPointsFromPurchase(@RequestBody PurchaseReq req) {
+        return pointService.rewardPointsFromPurchase(req);
     }
 }
