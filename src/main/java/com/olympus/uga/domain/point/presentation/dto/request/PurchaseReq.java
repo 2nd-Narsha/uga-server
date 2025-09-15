@@ -1,5 +1,6 @@
 package com.olympus.uga.domain.point.presentation.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.olympus.uga.domain.point.domain.Purchase;
 import com.olympus.uga.domain.point.domain.enums.PointPackage;
 import com.olympus.uga.domain.user.domain.User;
@@ -20,6 +21,7 @@ public record PurchaseReq(String purchaseToken, // 인앱결제 완료 후 받�
                 .build();
     }
 
+    @JsonIgnore
     public String getHashedToken() {
         return hashToken(this.purchaseToken);
     }
