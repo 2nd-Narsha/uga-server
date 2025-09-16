@@ -132,7 +132,7 @@ public class PushNotificationService {
      * Firebase 메시징 예외 처리
      */
     private void handleFirebaseMessagingException(FirebaseMessagingException e, String fcmToken) {
-        String errorCode = e.getErrorCode();
+        String errorCode = e.getErrorCode().name();
         switch (errorCode) {
             case "UNREGISTERED":
             case "INVALID_REGISTRATION":

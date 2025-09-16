@@ -18,7 +18,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class NotificationScheduler {
-
     private final DDayJpaRepo dDayJpaRepo;
     private final UserJpaRepo userJpaRepo;
     private final PushNotificationService pushNotificationService;
