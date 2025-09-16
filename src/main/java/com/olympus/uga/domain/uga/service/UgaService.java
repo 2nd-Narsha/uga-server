@@ -55,6 +55,7 @@ public class UgaService {
         return Response.created("우가가 성공적으로 생성되었습니다.");
     }
 
+    @Transactional(readOnly = true)
     public CurrentUgaRes getCurrentUga() {
         User user = userSessionHolder.getUser();
 
@@ -85,6 +86,7 @@ public class UgaService {
         return ugaUseCase.setIndependence(req, user);
     }
 
+    @Transactional(readOnly = true)
     public List<UgaListRes> getDictionary() {
         User user = userSessionHolder.getUser();
 

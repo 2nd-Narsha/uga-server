@@ -135,6 +135,7 @@ public class UgaDecoService {
         return Response.ok("우가 캐릭터가 성공적으로 변경되었습니다.");
     }
 
+    @Transactional(readOnly = true)
     public UgaDecoRes getDecoItems() {
         User user = userSessionHolder.getUser();
 
