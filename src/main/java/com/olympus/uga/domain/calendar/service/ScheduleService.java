@@ -35,6 +35,7 @@ public class ScheduleService {
     private final UserJpaRepo userJpaRepo;
     private final PushNotificationService pushNotificationService;
 
+    @Transactional(readOnly = true)
     public List<ScheduleListRes> getList(){
         User user = userSessionHolder.getUser();
         List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(user.getFamilyCode());
@@ -44,6 +45,7 @@ public class ScheduleService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ScheduleListRes> getListByDate(LocalDate date) {
         User user = userSessionHolder.getUser();
         List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(user.getFamilyCode(), date);

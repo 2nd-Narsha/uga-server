@@ -42,6 +42,7 @@ public class AlbumService {
     private final PostImageJpaRepo postImageJpaRepo;
 
     // 게시글 서비스 메서드
+    @Transactional(readOnly = true)
     public List<PostListRes> getPosts() {
         User user = userSessionHolder.getUser();
 
@@ -59,6 +60,7 @@ public class AlbumService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public PostRes getPost(Long postId) {
         User user = userSessionHolder.getUser();
 

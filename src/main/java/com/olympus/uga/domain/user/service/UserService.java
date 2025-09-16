@@ -58,6 +58,7 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Transactional(readOnly = true)
     public ResponseData<UserInfoRes> getMe() {
         User user = userSessionHolder.getUser();
 

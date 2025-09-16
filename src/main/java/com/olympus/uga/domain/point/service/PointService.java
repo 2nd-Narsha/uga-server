@@ -32,6 +32,7 @@ public class PointService {
             ActivityType.BIRTHDAY, 10
     );
 
+    @Transactional(readOnly = true)
     public int getPoint() {
         User user = userSessionHolder.getUser();
 

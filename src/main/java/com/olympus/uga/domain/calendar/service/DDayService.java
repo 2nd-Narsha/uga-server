@@ -33,6 +33,7 @@ public class DDayService {
     private final FamilyJpaRepo familyJpaRepo;
     private final PushNotificationService pushNotificationService;
 
+    @Transactional(readOnly = true)
     public List<DDayListRes> getList() {
         User user = userSessionHolder.getUser();
         List<DDay> ddays = dDayJpaRepo.findByFamilyCodeOrderByDateAsc(user.getFamilyCode());
