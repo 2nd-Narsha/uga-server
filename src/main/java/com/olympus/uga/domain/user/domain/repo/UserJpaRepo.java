@@ -15,27 +15,18 @@ public interface UserJpaRepo extends JpaRepository<User, Long> {
     Optional<User> findByPhoneNum(String email);
     Optional<User> findByOauthIdAndLoginType(String oauthId, LoginType loginType);
     List<User> findAllByFamilyCode(String familyCode);
-    
-    /**
-     * 가족 코드로 사용자 목록 조회 (별칭 메소드)
-     */
+    // 가족 코드로 사용자 목록 조회 (별칭 메소드)
     List<User> findByFamilyCode(String familyCode);
 
-    /**
-     * 지정된 기간 동안 비활성 사용자 조회
-     */
+    // 지정된 기간 동안 비활성 사용자 조회
     @Query("SELECT u FROM User u WHERE u.lastActivityAt < :threshold AND u.fcmToken IS NOT NULL")
     List<User> findUsersInactiveForDays(@Param("threshold") LocalDateTime threshold);
-    
-    /**
-     * 가족별 FCM 토큰이 있는 사용자 조회
-     */
+
+    // 가족별 FCM 토큰이 있는 사용자 조회
     @Query("SELECT u FROM User u WHERE u.familyCode = :familyCode AND u.fcmToken IS NOT NULL")
     List<User> findByFamilyCodeWithFcmToken(@Param("familyCode") String familyCode);
 
-    /**
-     * FCM 토큰이 있는 사용자만 조회
-     */
+    // FCM 토큰이 있는 사용자만 조회
     @Query("SELECT u FROM User u WHERE u.fcmToken IS NOT NULL")
     List<User> findAllWithFcmToken();
 }

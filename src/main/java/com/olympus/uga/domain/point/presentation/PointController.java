@@ -24,7 +24,7 @@ public class PointController {
 
     @PostMapping("/earn")
     @Operation(summary = "포인트 얻기", description = "LETTER(편지작성), ANSWER(답변), BIRTHDAY(생일)")
-    public Response earnPoint(@RequestParam ActivityType activityType) {
+    public Response earnPoint(@RequestParam("activityType") ActivityType activityType) {
         return pointService.earnPoint(activityType);
     }
 

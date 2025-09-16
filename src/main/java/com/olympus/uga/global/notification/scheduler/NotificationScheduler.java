@@ -51,9 +51,7 @@ public class NotificationScheduler {
         }
     }
 
-    /**
-     * 비활성 사용자 알림 스케줄러 (매일 오전 9시에 실행)
-     */
+    // 비활성 사용자 알림 스케줄러 (매일 오전 9시에 실행)
     @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
     public void sendInactivityNotifications() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);

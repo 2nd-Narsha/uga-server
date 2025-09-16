@@ -14,14 +14,17 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -30,6 +33,7 @@ public class ScheduleService {
     private final UserSessionHolder userSessionHolder;
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
     private final UserJpaRepo userJpaRepo;
+    private final PushNotificationService pushNotificationService;
 
     public List<ScheduleListRes> getList(){
         User user = userSessionHolder.getUser();
@@ -70,6 +74,9 @@ public class ScheduleService {
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
             req.participantIds().forEach(savedSchedule::addParticipant);
         }
+
+        // 가족들에게 스케줄 추가 푸시 알림 전송 (자신 제외)
+        sendScheduleAddedNotification(user, req.title());
 
         return Response.created(req.title() + "의 일정을 생성하였습니다.");
     }
@@ -141,5 +148,34 @@ public class ScheduleService {
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         return family.getFamilyCode();
+    }
+
+
+    // 스케줄 추가 시 가족들에게 푸시 알림 전송
+    private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
+        try {
+            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
+                    .orElse(null);
+
+            if (family == null) {
+                return;
+            }
+
+            // 가족 구성원들의 FCM 토큰 가져오기 (작성자 제외)
+            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+
+            for (User member : familyMembers) {
+                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                    pushNotificationService.sendScheduleAddedNotification(
+                            member.getFcmToken(),
+                            writer.getUsername(),
+                            scheduleTitle
+                    );
+                }
+            }
+        } catch (Exception e) {
+            // 푸시 알림 실패해도 스케줄 저장은 성공으로 처리
+            log.warn("스케줄 추가 푸시 알림 전송 실패: {}", e.getMessage());
+        }
     }
 }

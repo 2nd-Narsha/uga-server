@@ -16,11 +16,16 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UgaUseCase {
@@ -29,6 +34,7 @@ public class UgaUseCase {
     private final FamilyJpaRepo familyJpaRepo;
     private final UserJpaRepo userJpaRepo;
     private final WebSocketService webSocketService;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public Response feedUga(UgaFeedReq req, User user) {
@@ -77,6 +83,9 @@ public class UgaUseCase {
         // 우가 성장도 변경 알림
         if (!previousGrowth.equals(uga.getGrowth())) {
             webSocketService.notifyUgaGrowthUpdate(userFamilyCode, uga);
+
+            // 가족들에게 우가 성장 푸시 알림 전송
+            sendUgaGrowthNotification(family, uga);
         }
         
         // 포인트 변경 알림
@@ -136,5 +145,41 @@ public class UgaUseCase {
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         return family.getFamilyCode();
+    }
+
+    // 우가 성장 시 가족들에게 푸시 알림 전송
+    private void sendUgaGrowthNotification(Family family, Uga uga) {
+        try {
+            // 가족 구성원들의 FCM 토큰 가져오기
+            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+
+            // 우가 성장 단계를 숫자로 변환
+            int growthLevel = getGrowthLevel(uga.getGrowth());
+
+            for (User member : familyMembers) {
+                if (member.getFcmToken() != null) {
+                    pushNotificationService.sendUgaGrowthNotification(
+                        member.getFcmToken(),
+                        growthLevel,
+                        uga.getUgaName()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            // 푸시 알림 실패해도 우가 성장은 성공으로 처리
+            log.warn("우가 성장 푸시 알림 전송 실패: {}", e.getMessage());
+        }
+    }
+
+    private int getGrowthLevel(UgaGrowth growth) {
+        return switch (growth) {
+            case BABY -> 1;
+            case CHILD -> 2;
+            case TEENAGER -> 3;
+            case ADULT -> 4;
+            case ALL_GROWTH -> 5;
+            case INDEPENDENCE -> 6;
+            default -> 1;
+        };
     }
 }
