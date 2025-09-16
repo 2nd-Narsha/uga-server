@@ -38,15 +38,13 @@ public class NotificationScheduler {
             // startTime의 30분 전인지 확인
             if (shouldSendNotification(dDay.getStartTime(), now)) {
                 // familyCode로 가족 구성원들 찾기
-                List<User> familyMembers = userJpaRepo.findByFamilyCode(dDay.getFamilyCode());
+                List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(dDay.getFamilyCode());
 
                 for (User user : familyMembers) {
-                    if (user.getFcmToken() != null) {
-                        pushNotificationService.sendDdayReminderNotification(
-                            user.getFcmToken(),
-                            dDay.getTitle()
-                        );
-                    }
+                    pushNotificationService.sendDdayReminderNotification(
+                        user.getFcmToken(),
+                        dDay.getTitle()
+                    );
                 }
 
                 dDay.markNotificationSent();
@@ -89,13 +87,11 @@ public class NotificationScheduler {
         List<User> inactiveUsers = userJpaRepo.findUsersInactiveForDays(sevenDaysAgo);
 
         for (User user : inactiveUsers) {
-            if (user.getFcmToken() != null) {
-                pushNotificationService.sendInactivityNotification(
-                    user.getFcmToken(),
-                    user.getUsername()
-                );
-                log.info("비활성 사용자 알림 전송 - 사용자: {}", user.getId());
-            }
+            pushNotificationService.sendInactivityNotification(
+                user.getFcmToken(),
+                user.getUsername()
+            );
+            log.info("비활성 사용자 알림 전송 - 사용자: {}", user.getId());
         }
     }
 }

@@ -51,9 +51,9 @@ public class PointService {
         // 웹소켓으로 실시간 포인트 변경 알림
         if (user.getFamilyCode() != null) {
             webSocketService.notifyPointUpdate(
-                user.getFamilyCode(), 
-                user.getId(), 
-                user.getPoint(), 
+                user.getFamilyCode(),
+                user.getId(),
+                user.getPoint(),
                 activityType.name()
             );
         }

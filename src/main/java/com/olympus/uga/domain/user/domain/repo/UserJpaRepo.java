@@ -32,4 +32,10 @@ public interface UserJpaRepo extends JpaRepository<User, Long> {
      */
     @Query("SELECT u FROM User u WHERE u.familyCode = :familyCode AND u.fcmToken IS NOT NULL")
     List<User> findByFamilyCodeWithFcmToken(@Param("familyCode") String familyCode);
+
+    /**
+     * FCM 토큰이 있는 사용자만 조회
+     */
+    @Query("SELECT u FROM User u WHERE u.fcmToken IS NOT NULL")
+    List<User> findAllWithFcmToken();
 }
