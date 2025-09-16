@@ -7,6 +7,7 @@ import com.olympus.uga.domain.calendar.presentation.dto.request.DDayReq;
 import com.olympus.uga.domain.calendar.presentation.dto.request.DDayUpdateReq;
 import com.olympus.uga.domain.calendar.presentation.dto.response.DDayListRes;
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
@@ -25,6 +26,7 @@ import java.util.List;
 public class DDayService {
     private final DDayJpaRepo dDayJpaRepo;
     private final UserSessionHolder userSessionHolder;
+    private final UserJpaRepo userJpaRepo;
 
     public List<DDayListRes> getList() {
         User user = userSessionHolder.getUser();
@@ -38,15 +40,17 @@ public class DDayService {
     @Transactional
     public Response createDday(DDayReq req) {
         User user = userSessionHolder.getUser();
+        user.updateLastActivityAt();
+        userJpaRepo.save(user);
 
         dDayJpaRepo.save(DDayReq.fromDdayReq(user.getFamilyCode(), req));
-
         return Response.created("디데이가 생성되었습니다.");
     }
 
     @Transactional
     public Response updateDday(DDayUpdateReq req) {
         User user = userSessionHolder.getUser();
+        user.updateLastActivityAt();
 
         DDay dday = dDayJpaRepo.findById(req.id())
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.DDAY_NOT_FOUND));
@@ -56,6 +60,7 @@ public class DDayService {
         }
 
         dday.updateDday(req.title(), req.date(), req.startTime(), req.endTime(), req.isHighlight());
+        userJpaRepo.save(user);
 
         return Response.ok("디데이가 수정되었습니다.");
     }
@@ -63,6 +68,7 @@ public class DDayService {
     @Transactional
     public Response deleteDday(Long ddayId) {
         User user = userSessionHolder.getUser();
+        user.updateLastActivityAt();
 
         DDay dday = dDayJpaRepo.findById(ddayId)
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.DDAY_NOT_FOUND));
@@ -72,11 +78,12 @@ public class DDayService {
         }
 
         dDayJpaRepo.delete(dday);
+        userJpaRepo.save(user);
+
         return Response.ok("디데이가 삭제되었습니다.");
     }
 
-    // 매일 자정에 만료된 디데이를 삭제하는 스케줄러
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void deleteExpiredDdays() {
         LocalDate today = LocalDate.now();

@@ -21,7 +21,7 @@ public class UgaNaturalGrowthScheduler {
      * 매일 자정에 실행되는 자연 성장 스케줄러
      * 독립하지 않은 모든 우가들의 자연 성장을 처리
      */
-    @Scheduled(cron = "0 0 0 * * *") // 매일 자정 (00:00:00)
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
     @Transactional
     public void processNaturalGrowth() {
         log.info("우가 자연 성장 스케줄러 시작");
