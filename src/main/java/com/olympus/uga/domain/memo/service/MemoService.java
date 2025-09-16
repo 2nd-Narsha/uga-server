@@ -80,7 +80,6 @@ public class MemoService {
     }
 
     // 특정 유저의 메모 조회
-    // 그
     @Transactional
     public MemoInfoRes getOne(Long userId) {
 
