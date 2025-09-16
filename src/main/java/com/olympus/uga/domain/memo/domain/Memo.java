@@ -23,7 +23,7 @@ public class Memo {
     private String content;
 
     @Column
-    private String location = "위치 없음";
+    private String location;
 
     @Column
     private String familyCode;
@@ -33,15 +33,17 @@ public class Memo {
     private User writer;
 
     @Column
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime contentUpdatedAt = LocalDateTime.now();
+
+    @Column LocalDateTime locationUpdatedAt = LocalDateTime.now();
 
     public void updateLocation(String location) {
         this.location = location;
-        this.updatedAt = LocalDateTime.now();
+        this.locationUpdatedAt = LocalDateTime.now();
     }
 
     public void updateContent(String content) {
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
+        this.contentUpdatedAt = LocalDateTime.now();
     }
 }
