@@ -18,9 +18,11 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.olympus.uga.global.exception.CustomException;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemoService {
@@ -38,6 +41,7 @@ public class MemoService {
     private final UgaJpaRepo ugaJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
     private final WebSocketService webSocketService;
+    private final PushNotificationService pushNotificationService;
 
     // 메모 업데이트
     @Transactional
@@ -65,6 +69,9 @@ public class MemoService {
         // 웹소켓으로 메모 업데이트 알림 (가족에게)
         if (user.getFamilyCode() != null) {
             webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
+
+            // 가족들에게 푸시 알림 전송 (자신 제외)
+            sendMemoUpdateNotification(user, memo.getContent());
         }
 
         return Response.ok("메모가 성공적으로 저장되었습니다.");
@@ -157,5 +164,32 @@ public class MemoService {
                 .orElseGet(() -> memoJpaRepo.save(
                         MemoCreateReq.fromMemoCreateReq(writer)
                 ));
+    }
+
+    // 메모 업데이트 시 가족들에게 푸시 알림 전송
+    private void sendMemoUpdateNotification(User author, String memoContent) {
+        try {
+            Family family = familyJpaRepo.findByMemberListContaining(author.getId())
+                    .orElse(null);
+
+            if (family == null) {
+                return;
+            }
+
+            // 가족 구성원들의 FCM 토큰 가져오기 (작성자 제외)
+            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+
+            for (User member : familyMembers) {
+                if (!member.getId().equals(author.getId()) && member.getFcmToken() != null) {
+                    pushNotificationService.sendMemoAddedNotification(
+                        member.getFcmToken(),
+                        author.getUsername()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            // 푸시 알림 실패해도 메모 저장은 성공으로 처리
+            log.warn("메모 업데이트 푸시 알림 전송 실패: {}", e.getMessage());
+        }
     }
 }
