@@ -57,7 +57,8 @@ public class LetterService {
         }
 
         // 웹소켓으로 편지 도착 알림
-        webSocketService.notifyLetterReceived(receiver.getId(), savedLetter);
+        LetterRes letterRes = LetterRes.from(savedLetter);
+        webSocketService.notifyLetterReceived(receiver.getId(), letterRes);
 
         return Response.created(receiver.getUsername() + "에게 편지를 보냈습니다.");
     }

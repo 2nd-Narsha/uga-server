@@ -17,16 +17,20 @@ import com.olympus.uga.domain.uga.presentation.dto.response.UgaListRes;
 import com.olympus.uga.domain.uga.service.helper.UgaContributionCalculator;
 import com.olympus.uga.domain.uga.usecase.UgaUseCase;
 import com.olympus.uga.domain.user.domain.User;
+import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UgaService {
@@ -36,6 +40,8 @@ public class UgaService {
     private final UserSessionHolder userSessionHolder;
     private final UgaContributionCalculator contributionCalculator;
     private final UgaUseCase ugaUseCase;
+    private final UserJpaRepo userJpaRepo;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public Response createUga(UgaCreateReq req) {
