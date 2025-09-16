@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @RequiredArgsConstructor
 public class ActivityTrackingInterceptor implements HandlerInterceptor {
-
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
 
