@@ -118,12 +118,16 @@ public class User {
     public void updateTutorial(String tutorial) { this.tutorial = tutorial; }
 
     // family
-    public void resetFamily() {
-        this.familyCode = null;
-    }
-
     public void setFamilyCode(String familyCode) {
         this.familyCode = familyCode;
+    }
+
+    public void updateFamilyCode(String familyCode) {
+        this.familyCode = familyCode;
+    }
+
+    public void resetFamily() {
+        this.familyCode = null;
     }
 
     // point
