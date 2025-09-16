@@ -80,6 +80,7 @@ public class MemoService {
     }
 
     // 특정 유저의 메모 조회
+    // 그
     @Transactional
     public MemoInfoRes getOne(Long userId) {
 
@@ -90,15 +91,15 @@ public class MemoService {
         User targetUser = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        Memo memo = memoJpaRepo.findByWriter(targetUser)
-                .orElseGet(() -> memoJpaRepo.save(
-                        MemoCreateReq.fromMemoCreateReq(targetUser)
-                ));
+        Memo memo = findByWriter(targetUser);
 
         // 만료 여부 검사
-        if (memo.getUpdatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
-            memoJpaRepo.delete(memo);
-            throw new CustomException(MemoErrorCode.MEMO_EXPIRED);
+        if (memo.getContentUpdatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
+            memo.updateContent("메모가 아직 없습니다.");
+        }
+
+        if (memo.getLocationUpdatedAt().isBefore(LocalDateTime.now().minusDays(1))) {
+            memo.updateLocation("위치 정보가 아직 없습니다.");
         }
 
         Family family = familyJpaRepo.findByMemberListContaining(userId)
