@@ -67,7 +67,7 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tb_watcher")
     private List<Long> watcher = new ArrayList<>();
   
