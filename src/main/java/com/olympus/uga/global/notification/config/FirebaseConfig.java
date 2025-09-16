@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import jakarta.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Configuration
@@ -21,10 +23,22 @@ public class FirebaseConfig {
     public void initialize() {
         try {
             if (FirebaseApp.getApps().isEmpty()) {
-                ClassPathResource resource = new ClassPathResource(firebaseConfigPath);
+                GoogleCredentials credentials;
+
+                // GitHub Actions 환경에서는 환경 변수로 Firebase 키를 주입
+                String firebaseKey = System.getenv("FIREBASE_SERVICE_ACCOUNT_KEY");
+                if (firebaseKey != null && !firebaseKey.isEmpty()) {
+                    credentials = GoogleCredentials.fromStream(
+                        new ByteArrayInputStream(firebaseKey.getBytes(StandardCharsets.UTF_8))
+                    );
+                } else {
+                    // 로컬 환경에서는 파일에서 읽기
+                    ClassPathResource resource = new ClassPathResource(firebaseConfigPath);
+                    credentials = GoogleCredentials.fromStream(resource.getInputStream());
+                }
 
                 FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
+                        .setCredentials(credentials)
                         .build();
 
                 FirebaseApp.initializeApp(options);
