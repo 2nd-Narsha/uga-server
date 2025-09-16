@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class User {
     @Column(name = "phone_num", unique = true)
     private String phoneNum;
 
-    @Column(name = "email", unique = false)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "password")
@@ -79,6 +80,15 @@ public class User {
 
     @Column(name = "family_code")
     private String familyCode;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
+    @Column(name = "last_activity_at")
+    private LocalDateTime lastActivityAt;
 
     // user setting
     public void updateUsernameBirthGender(String username, String birth, Gender gender) {
@@ -134,6 +144,21 @@ public class User {
 
     public void resetWatcher() {
         watcher.clear();
+    }
+
+    // login tracking
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
+    // FCM 토큰 관리
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    // 활동 시간 업데이트
+    public void updateLastActivityAt() {
+        this.lastActivityAt = LocalDateTime.now();
     }
 
     public void updateMailBox(boolean isCheckedMailbox) {

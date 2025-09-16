@@ -11,7 +11,9 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ public class LetterService {
     private final LetterJpaRepo letterJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
+    private final PushNotificationService pushNotificationService;
+    private final WebSocketService webSocketService;
 
     @Transactional
     public Response writeLetter(LetterReq req) {
@@ -36,11 +40,29 @@ public class LetterService {
         receiver.earnPoint(req.point());
         sender.usePoint(req.point());
 
-        letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
+        // 활동 시간 업데이트
+        receiver.updateLastActivityAt();
+        sender.updateLastActivityAt();
+
+        Letter savedLetter = letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
+        userJpaRepo.save(receiver);
+        userJpaRepo.save(sender);
+
+        // 편지 도착 푸시 알림
+        if (receiver.getFcmToken() != null) {
+            pushNotificationService.sendLetterNotification(
+                receiver.getFcmToken(),
+                sender.getUsername()
+            );
+        }
+
+        // 웹소켓으로 편지 도착 알림
+        webSocketService.notifyLetterReceived(receiver.getId(), savedLetter);
 
         return Response.created(receiver.getUsername() + "에게 편지를 보냈습니다.");
     }
 
+    // 편지함
     public List<LetterListRes> getInbox() {
         User user = userSessionHolder.getUser();
 

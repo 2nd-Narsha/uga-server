@@ -4,7 +4,7 @@ import com.olympus.uga.domain.album.domain.repo.CommentJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostImageJpaRepo;
 import com.olympus.uga.domain.album.domain.repo.PostJpaRepo;
 import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
-import com.olympus.uga.domain.calendar.domain.repo.DdayJpaRepo;
+import com.olympus.uga.domain.calendar.domain.repo.DDayJpaRepo;
 import com.olympus.uga.domain.calendar.domain.repo.ScheduleJpaRepo;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
@@ -49,7 +49,7 @@ public class FamilyService {
     private final UgaJpaRepo ugaJpaRepo;
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
     private final PostJpaRepo postJpaRepo;
-    private final DdayJpaRepo ddayJpaRepo;
+    private final DDayJpaRepo dDayJpaRepo;
     private final ScheduleJpaRepo scheduleJpaRepo;
     private final PostImageJpaRepo postImageJpaRepo;
     private final CommentJpaRepo commentJpaRepo;
@@ -58,7 +58,6 @@ public class FamilyService {
     private final AnswerJpaRepo answerJpaRepo;
     private final MemoJpaRepo memoJpaRepo;
 
-    //가족 ��성
     @Transactional
     public ResponseData<String> createFamily(FamilyCreateReq req) {
         User user = userSessionHolder.getUser();
@@ -77,7 +76,6 @@ public class FamilyService {
         return ResponseData.created("가족 생성에 성공했습니다.", code);
     }
 
-    //가족 가입
     @Transactional
     public Response joinFamily(String familyCode) {
         Family family = familyJpaRepo.findById(familyCode)
@@ -93,7 +91,6 @@ public class FamilyService {
         return Response.ok("가족 " + family.getFamilyName() + "에 가입이 되었습니다.");
     }
 
-    //가족 조회
     public ResponseData<FamilyInfoRes> getFamily() {
         User user = userSessionHolder.getUser();
 
@@ -192,7 +189,7 @@ public class FamilyService {
         memoJpaRepo.deleteByFamilyCode(familyCode);
 
         // 5. 캘린더 데이터 삭제
-        ddayJpaRepo.deleteByFamilyCode(familyCode);
+        dDayJpaRepo.deleteByFamilyCode(familyCode);
         scheduleJpaRepo.deleteByFamilyCode(familyCode);
 
         // 6. 우가 관련 데이터 삭제
