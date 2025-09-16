@@ -11,7 +11,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // 메시지 브로커 설정
