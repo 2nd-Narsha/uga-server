@@ -41,11 +41,10 @@ public class UgaService {
     @Transactional
     public Response createUga(UgaCreateReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Uga uga = ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, userFamilyCode));
+        Uga uga = ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, user.getFamilyCode()));
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
         family.updatePresentUgaId(uga.getId());
         familyJpaRepo.save(family);
@@ -58,9 +57,8 @@ public class UgaService {
 
     public CurrentUgaRes getCurrentUga() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -89,20 +87,12 @@ public class UgaService {
 
     public List<UgaListRes> getDictionary() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        List<Uga> independenceUgas = ugaJpaRepo.findByFamilyCodeAndGrowth(userFamilyCode, UgaGrowth.INDEPENDENCE);
+        List<Uga> independenceUgas = ugaJpaRepo.findByFamilyCodeAndGrowth(user.getFamilyCode(), UgaGrowth.INDEPENDENCE);
 
         return independenceUgas.stream()
                 .map(UgaListRes::from)
                 .toList();
-    }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
     }
 
     private void initializeContributions(Long ugaId, List<Long> memberList) {

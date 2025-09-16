@@ -46,7 +46,6 @@ public class MemoService {
     // 메모 업데이트
     @Transactional
     public Response updateMemo(MemoUpdateReq req) {
-
         User user = userSessionHolder.getUser();
 
         if (user == null) {
@@ -109,7 +108,6 @@ public class MemoService {
     // 특정 유저의 메모 조회
     @Transactional
     public MemoInfoRes getOne(Long userId) {
-
         User user = userJpaRepo.findById(userSessionHolder.getUser().getId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
@@ -167,9 +165,9 @@ public class MemoService {
     }
 
     // 메모 업데이트 시 가족들에게 푸시 알림 전송
-    private void sendMemoUpdateNotification(User author, String memoContent) {
+    private void sendMemoUpdateNotification(User writer, String memoContent) {
         try {
-            Family family = familyJpaRepo.findByMemberListContaining(author.getId())
+            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
                     .orElse(null);
 
             if (family == null) {
@@ -180,10 +178,10 @@ public class MemoService {
             List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
 
             for (User member : familyMembers) {
-                if (!member.getId().equals(author.getId()) && member.getFcmToken() != null) {
+                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
                     pushNotificationService.sendMemoAddedNotification(
                         member.getFcmToken(),
-                        author.getUsername()
+                        writer.getUsername()
                     );
                 }
             }
