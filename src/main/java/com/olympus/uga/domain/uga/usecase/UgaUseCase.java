@@ -16,6 +16,7 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class UgaUseCase {
     private final UgaContributionJpaRepo ugaContributionJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
     private final UserJpaRepo userJpaRepo;
+    private final WebSocketService webSocketService;
 
     @Transactional
     public Response feedUga(UgaFeedReq req, User user) {
@@ -58,15 +60,34 @@ public class UgaUseCase {
         // 포인트 차감
         int totalCost = UgaFeedUtil.calculateTotalCost(req.foodType(), family.getMemberList().size());
         user.usePoint(totalCost);
+        user.updateLastActivityAt(); // 활동 시간 업데이트
         userJpaRepo.save(user);
 
         // 우가 성장 처리
         int growthDays = UgaFeedUtil.getGrowthDays(req.foodType());
+        UgaGrowth previousGrowth = uga.getGrowth();
         uga.updateGrowth(growthDays);
         ugaJpaRepo.save(uga);
 
         // 기여도 업데이트
         updateContribution(uga.getId(), user.getId(), growthDays);
+
+        // 웹소켓으로 실시간 업데이트 알림 (이미 선언된 userFamilyCode 변수 사용)
+
+        // 우가 성장도 변경 알림
+        if (!previousGrowth.equals(uga.getGrowth())) {
+            webSocketService.notifyUgaGrowthUpdate(userFamilyCode, uga);
+        }
+        
+        // 포인트 변경 알림
+        webSocketService.notifyPointUpdate(userFamilyCode, user.getId(), user.getPoint(), "UGA_FEED");
+        
+        // 기여도 변경 알림
+        UgaContribution contribution = ugaContributionJpaRepo.findByUgaIdAndUserId(uga.getId(), user.getId())
+            .orElse(null);
+        if (contribution != null) {
+            webSocketService.notifyContributionUpdate(userFamilyCode, user.getId(), contribution);
+        }
 
         return Response.ok("먹이를 성공적으로 주었습니다. 현재 포인트: " + user.getPoint());
     }

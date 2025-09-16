@@ -11,6 +11,7 @@ import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.common.ResponseData;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +24,9 @@ public class PointService {
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final PurchaseJpaRepo purchaseJpaRepo;
+    private final WebSocketService webSocketService;
 
     private static final Map<ActivityType, Integer> ACTIVITY_POINTS = Map.of(
-            ActivityType.SIGN_UP, 50,
             ActivityType.LETTER, 2,
             ActivityType.ANSWER, 3,
             ActivityType.BIRTHDAY, 10
@@ -43,8 +44,19 @@ public class PointService {
 
         int earnedPoints = ACTIVITY_POINTS.getOrDefault(activityType, 0);
         user.earnPoint(earnedPoints);
+        user.updateLastActivityAt(); // 활동 시간 업데이트
 
         userJpaRepo.save(user);
+
+        // 웹소켓으로 실시간 포인트 변경 알림
+        if (user.getFamilyCode() != null) {
+            webSocketService.notifyPointUpdate(
+                user.getFamilyCode(), 
+                user.getId(), 
+                user.getPoint(), 
+                activityType.name()
+            );
+        }
 
         return Response.ok("현재 포인트: " + user.getPoint());
     }

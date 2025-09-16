@@ -5,7 +5,6 @@ import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaContribution;
-import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import com.olympus.uga.domain.uga.domain.repo.UgaContributionJpaRepo;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
@@ -21,12 +20,12 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
