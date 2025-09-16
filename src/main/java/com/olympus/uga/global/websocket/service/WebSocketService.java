@@ -19,34 +19,52 @@ public class WebSocketService {
      * 가족 전체에게 메시지 전송
      */
     public void sendToFamily(String familyCode, WebSocketMessage.MessageType type, Object data) {
-        WebSocketMessage message = WebSocketMessage.builder()
-                .type(type)
-                .familyCode(familyCode)
-                .data(data)
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
+        if (familyCode == null || familyCode.trim().isEmpty()) {
+            log.warn("가족 코드가 없어 웹소켓 메시지를 전송할 수 없습니다.");
+            return;
+        }
 
-        String destination = "/topic/family/" + familyCode;
-        messagingTemplate.convertAndSend(destination, message);
+        try {
+            WebSocketMessage message = WebSocketMessage.builder()
+                    .type(type)
+                    .familyCode(familyCode)
+                    .data(data)
+                    .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                    .build();
 
-        log.info("웹소켓 메시지 전송 - 가족: {}, 타입: {}", familyCode, type);
+            String destination = "/topic/family/" + familyCode;
+            messagingTemplate.convertAndSend(destination, message);
+            log.info("웹소켓 메시지 전송 - 가족: {}, 타입: {}", familyCode, type);
+        } catch (Exception e) {
+            log.error("웹소켓 메시지 전송 실패 - 가족: {}, 타입: {}, 오류: {}",
+                    familyCode, type, e.getMessage());
+        }
     }
 
     /**
      * 특정 사용자에게 메시지 전송
      */
     public void sendToUser(Long userId, WebSocketMessage.MessageType type, Object data) {
-        WebSocketMessage message = WebSocketMessage.builder()
-                .type(type)
-                .userId(userId)
-                .data(data)
-                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
+        if (userId == null) {
+            log.warn("사용자 ID가 없어 웹소켓 메시지를 전송할 수 없습니다.");
+            return;
+        }
 
-        String destination = "/queue/user/" + userId;
-        messagingTemplate.convertAndSend(destination, message);
+        try {
+            WebSocketMessage message = WebSocketMessage.builder()
+                    .type(type)
+                    .userId(userId)
+                    .data(data)
+                    .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                    .build();
 
-        log.info("웹소켓 메시지 전송 - 사용자: {}, 타입: {}", userId, type);
+            String destination = "/queue/user/" + userId;
+            messagingTemplate.convertAndSend(destination, message);
+            log.info("웹소켓 메시지 전송 - 사용자: {}, 타입: {}", userId, type);
+        } catch (Exception e) {
+            log.error("웹소켓 메시지 전송 실패 - 사용자: {}, 타입: {}, 오류: {}",
+                    userId, type, e.getMessage());
+        }
     }
 
     /**
@@ -86,7 +104,6 @@ public class WebSocketService {
         sendToUser(userId, WebSocketMessage.MessageType.LETTER_RECEIVED, letterData);
     }
 
-    // 내부 데이터 클래스들
     public record PointUpdateData(Long userId, Integer newPoints, String reason) {}
     public record ContributionUpdateData(Long userId, Object contributionData) {}
 }
