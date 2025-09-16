@@ -14,9 +14,6 @@ public class NotificationController {
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
 
-    /**
-     * FCM 토큰 등록/업데이트
-     */
     @PostMapping("/fcm-token")
     public Response updateFcmToken(@RequestBody FcmTokenRequest request) {
         User user = userSessionHolder.getUser();
@@ -27,13 +24,11 @@ public class NotificationController {
         return Response.ok("FCM 토큰이 성공적으로 등록되었습니다.");
     }
 
-    /**
-     * FCM 토큰 삭제 (로그아웃 시)
-     */
     @DeleteMapping("/fcm-token")
     public Response deleteFcmToken() {
         User user = userSessionHolder.getUser();
         user.updateFcmToken(null);
+        user.updateLastActivityAt();
         userJpaRepo.save(user);
 
         return Response.ok("FCM 토큰이 삭제되었습니다.");
