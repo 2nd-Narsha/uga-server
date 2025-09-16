@@ -12,7 +12,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class PushNotificationService {
-
     // 단일 사용자에게 푸시 알림 전송
     public void sendNotification(String fcmToken, String title, String body, Map<String, String> data) {
         if (fcmToken == null || fcmToken.trim().isEmpty()) {
@@ -121,20 +120,20 @@ public class PushNotificationService {
     }
 
     // 메모 추가 알림
-    public void sendMemoAddedNotification(String fcmToken, String authorName) {
+    public void sendMemoAddedNotification(String fcmToken, String writerName) {
         Map<String, String> data = Map.of(
                 "type", "MEMO_ADDED",
-                "author", authorName
+                "writer", writerName
         );
         sendNotification(fcmToken, "새로운 메모가 추가되었어요! 📝",
-                authorName + "님이 메모를 업데이트했습니다.", data);
+                writerName + "님이 메모를 업데이트했습니다.", data);
     }
 
     // 디데이 추가 알림
     public void sendDdayAddedNotification(String fcmToken, String writerName, String ddayTitle) {
         Map<String, String> data = Map.of(
                 "type", "DDAY_ADDED",
-                "author", writerName,
+                "writer", writerName,
                 "ddayTitle", ddayTitle
         );
         sendNotification(fcmToken, "새로운 디데이가 추가되었어요! 🎯",
@@ -145,7 +144,7 @@ public class PushNotificationService {
     public void sendScheduleAddedNotification(String fcmToken, String writerName, String scheduleTitle) {
         Map<String, String> data = Map.of(
                 "type", "SCHEDULE_ADDED",
-                "author", writerName,
+                "writer", writerName,
                 "scheduleTitle", scheduleTitle
         );
         sendNotification(fcmToken, "새로운 일정이 추가되었어요! 📅",
@@ -156,11 +155,11 @@ public class PushNotificationService {
     public void sendUgaGrowthNotification(String fcmToken, int currentLevel, String ugaName) {
         String growthMessage = getGrowthMessage(currentLevel);
         Map<String, String> data = Map.of(
-        String growthMessage = getUgaGrowthMessage(ugaGrowth);
-    public void sendUgaGrowthNotification(String fcmToken, String ugaGrowth, String ugaName) {
-                "growth", ugaGrowth,
                 "type", "UGA_GROWTH",
                 "level", String.valueOf(currentLevel),
+                "ugaName", ugaName
+        );
+        sendNotification(fcmToken, "우가가 성장했어요! 🌱✨",
                 ugaName + "가 " + growthMessage, data);
     }
 
@@ -170,18 +169,6 @@ public class PushNotificationService {
             case 1 -> "아기 우가로 첫 성장했어요!";
             case 2 -> "어린이 우가로 자랐어요!";
             case 3 -> "청소년 우가로 성장했어요!";
-                "ugaName", ugaName
-        );
-        sendNotificatio=n(fcmToken, "우가가 성장했어요! 🌱✨",
-            case "INDEPENDENCE" -> "우가가 독립했어요! 우가 사전에서 확인하세요!";
-            case "ALL_GROWTH" -> "완전히 자란 우가가 되었어요!";
-            case "ADULT" -> "어른 우가로 성장했어요!";
-            case "TEENAGER" -> "청소년 우가로 성장했어요!";
-            case "CHILD" -> "어린이 우가로 자랐어요!";
-            case "BABY" -> "아기 우가로 태어났어요!";
-        return switch (ugaGrowth) {
-    private String getUgaGrowthMessage(String ugaGrowth) {
-    // 우가 성장 단계별 메시지 반환
             case 4 -> "어른 우가로 성장했어요!";
             case 5 -> "완전히 자란 우가가 되었어요!";
             case 6 -> "우가가 독립했어요!, 우가 사전에서 확인하세요!";

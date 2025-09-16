@@ -32,15 +32,14 @@ public class UgaDecoService {
     @Transactional
     public Response purchaseColor(ColorType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         if (req == ColorType.DEFAULT) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
         // 가족 자산 조회 또는 생성
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
@@ -58,14 +57,13 @@ public class UgaDecoService {
     @Transactional
     public Response purchaseCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         if (req== CharacterType.UGA) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
@@ -83,9 +81,8 @@ public class UgaDecoService {
     @Transactional
     public Response changeColor(ColorType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -96,8 +93,8 @@ public class UgaDecoService {
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
         // 가족 자산 확인
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (!ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
@@ -112,10 +109,9 @@ public class UgaDecoService {
     @Transactional
     public Response changeCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 현재 우가 조회
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -126,8 +122,8 @@ public class UgaDecoService {
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
         // 가족 자산 확인
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (!ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
@@ -141,19 +137,11 @@ public class UgaDecoService {
 
     public UgaDecoRes getDecoItems() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 가족 자산 조회 또는 기본값 생성
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         return UgaDecoRes.from(ugaAsset);
-    }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
     }
 }
