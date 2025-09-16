@@ -41,8 +41,7 @@ public class UgaUseCase {
         Uga uga = ugaJpaRepo.findById(req.ugaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        String userFamilyCode = getUserFamilyCode(user.getId());
-        if (!uga.getFamilyCode().equals(userFamilyCode)) {
+        if (!uga.getFamilyCode().equals(uga.getFamilyCode())) {
             throw new CustomException(UgaErrorCode.NOT_FAMILY_UGA);
         }
 
@@ -60,7 +59,7 @@ public class UgaUseCase {
             throw new CustomException(UgaErrorCode.INVALID_FOOD_TYPE);
         }
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(uga.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         // 포인트 차감
@@ -82,20 +81,20 @@ public class UgaUseCase {
 
         // 우가 성장도 변경 알림
         if (!previousGrowth.equals(uga.getGrowth())) {
-            webSocketService.notifyUgaGrowthUpdate(userFamilyCode, uga);
+            webSocketService.notifyUgaGrowthUpdate(user.getFamilyCode(), uga);
 
             // 가족들에게 우가 성장 푸시 알림 전송
             sendUgaGrowthNotification(family, uga);
         }
         
         // 포인트 변경 알림
-        webSocketService.notifyPointUpdate(userFamilyCode, user.getId(), user.getPoint(), "UGA_FEED");
+        webSocketService.notifyPointUpdate(uga.getFamilyCode(), user.getId(), user.getPoint(), "UGA_FEED");
         
         // 기여도 변경 알림
         UgaContribution contribution = ugaContributionJpaRepo.findByUgaIdAndUserId(uga.getId(), user.getId())
             .orElse(null);
         if (contribution != null) {
-            webSocketService.notifyContributionUpdate(userFamilyCode, user.getId(), contribution);
+            webSocketService.notifyContributionUpdate(user.getFamilyCode(), user.getId(), contribution);
         }
 
         return Response.ok("먹이를 성공적으로 주었습니다. 현재 포인트: " + user.getPoint());
@@ -106,8 +105,7 @@ public class UgaUseCase {
         Uga uga = ugaJpaRepo.findById(req.ugaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        String userFamilyCode = getUserFamilyCode(user.getId());
-        if (!uga.getFamilyCode().equals(userFamilyCode)) {
+        if (!uga.getFamilyCode().equals(user.getFamilyCode())) {
             throw new CustomException(UgaErrorCode.NOT_FAMILY_UGA);
         }
 
@@ -121,7 +119,7 @@ public class UgaUseCase {
             ugaJpaRepo.save(uga);
 
             // 가족의 현재 우가를 null로 설정
-            Family family = familyJpaRepo.findById(userFamilyCode)
+            Family family = familyJpaRepo.findById(user.getFamilyCode())
                     .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
             family.updatePresentUgaId(null);
             familyJpaRepo.save(family);
@@ -140,12 +138,6 @@ public class UgaUseCase {
         ugaContributionJpaRepo.save(contribution);
     }
 
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
-    }
 
     // 우가 성장 시 가족들에게 푸시 알림 전송
     private void sendUgaGrowthNotification(Family family, Uga uga) {

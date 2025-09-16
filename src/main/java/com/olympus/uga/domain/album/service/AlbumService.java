@@ -44,9 +44,8 @@ public class AlbumService {
     // 게시글 서비스 메서드
     public List<PostListRes> getPosts() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        List<Post> postList = postJpaRepo.findByFamilyCodeOrderByCreatedAtDesc(userFamilyCode);
+        List<Post> postList = postJpaRepo.findByFamilyCodeOrderByCreatedAtDesc(user.getFamilyCode());
 
         return postList.stream()
                 .map(post -> {
@@ -62,9 +61,8 @@ public class AlbumService {
 
     public PostRes getPost(Long postId) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Post post = postJpaRepo.findByIdAndFamilyCode(postId, userFamilyCode)
+        Post post = postJpaRepo.findByIdAndFamilyCode(postId, user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
 
         List<CommentRes> comments = commentJpaRepo.findByPostPostIdOrderByCreatedAtAsc(postId)
@@ -148,9 +146,8 @@ public class AlbumService {
     @Transactional
     public Response createComment(Long postId, CommentReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Post post = postJpaRepo.findByIdAndFamilyCode(postId, userFamilyCode)
+        Post post = postJpaRepo.findByIdAndFamilyCode(postId, user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(AlbumErrorCode.POST_NOT_FOUND));
 
         commentJpaRepo.save(CommentReq.fromCommentReq(user, post, req));
@@ -173,10 +170,9 @@ public class AlbumService {
     // 갤러리 서비스 메서드
     public List<GalleryRes> getGallery() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 이미지가 있는 게시글들만 가져오기
-        List<Post> postsWithImages = postJpaRepo.findPostsWithImagesByFamilyCode(userFamilyCode);
+        List<Post> postsWithImages = postJpaRepo.findPostsWithImagesByFamilyCode(user.getFamilyCode());
 
         // 날짜별로 그룹핑
         Map<LocalDate, List<PostImage>> imagesByDate = postsWithImages.stream()
@@ -192,12 +188,5 @@ public class AlbumService {
                 .sorted(Map.Entry.<LocalDate, List<PostImage>>comparingByKey().reversed()) // 최신 날짜부터
                 .map(entry -> GalleryRes.from(entry.getKey(), entry.getValue()))
                 .toList();
-    }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
     }
 }
