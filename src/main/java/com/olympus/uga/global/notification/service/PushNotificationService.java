@@ -156,11 +156,11 @@ public class PushNotificationService {
     public void sendUgaGrowthNotification(String fcmToken, int currentLevel, String ugaName) {
         String growthMessage = getGrowthMessage(currentLevel);
         Map<String, String> data = Map.of(
+        String growthMessage = getUgaGrowthMessage(ugaGrowth);
+    public void sendUgaGrowthNotification(String fcmToken, String ugaGrowth, String ugaName) {
+                "growth", ugaGrowth,
                 "type", "UGA_GROWTH",
                 "level", String.valueOf(currentLevel),
-                "ugaName", ugaName
-        );
-        sendNotification(fcmToken, "우가가 성장했어요! 🌱✨",
                 ugaName + "가 " + growthMessage, data);
     }
 
@@ -170,6 +170,18 @@ public class PushNotificationService {
             case 1 -> "아기 우가로 첫 성장했어요!";
             case 2 -> "어린이 우가로 자랐어요!";
             case 3 -> "청소년 우가로 성장했어요!";
+                "ugaName", ugaName
+        );
+        sendNotificatio=n(fcmToken, "우가가 성장했어요! 🌱✨",
+            case "INDEPENDENCE" -> "우가가 독립했어요! 우가 사전에서 확인하세요!";
+            case "ALL_GROWTH" -> "완전히 자란 우가가 되었어요!";
+            case "ADULT" -> "어른 우가로 성장했어요!";
+            case "TEENAGER" -> "청소년 우가로 성장했어요!";
+            case "CHILD" -> "어린이 우가로 자랐어요!";
+            case "BABY" -> "아기 우가로 태어났어요!";
+        return switch (ugaGrowth) {
+    private String getUgaGrowthMessage(String ugaGrowth) {
+    // 우가 성장 단계별 메시지 반환
             case 4 -> "어른 우가로 성장했어요!";
             case 5 -> "완전히 자란 우가가 되었어요!";
             case 6 -> "우가가 독립했어요!, 우가 사전에서 확인하세요!";

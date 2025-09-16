@@ -69,6 +69,10 @@ public class FamilyService {
 
         familyJpaRepo.save(FamilyCreateReq.fromFamilyCreateReq(code, req, user.getId(), req.getFileUrl()));
 
+        // 사용자의 familyCode 업데이트
+        user.updateFamilyCode(code);
+        userJpaRepo.save(user);
+
         // 가족 자산 초기화 (우가 꾸미기 아이템)
         UgaAsset ugaAsset = UgaAsset.createDefault(code);
         ugaAssetJpaRepo.save(ugaAsset);
@@ -87,6 +91,10 @@ public class FamilyService {
         }
 
         family.getMemberList().add(user.getId());
+
+        // 사용자의 familyCode 업데이트
+        user.updateFamilyCode(familyCode);
+        userJpaRepo.save(user);
 
         return Response.ok("가족 " + family.getFamilyName() + "에 가입이 되었습니다.");
     }
@@ -138,6 +146,10 @@ public class FamilyService {
 
         family.getMemberList().remove(user.getId());
 
+        // 사용자의 familyCode 초기화
+        user.resetFamily();
+        userJpaRepo.save(user);
+
         return Response.ok("가족 " + family.getFamilyName() + "을/를 떠나셨습니다.");
     }
 
@@ -170,7 +182,7 @@ public class FamilyService {
         // 가족 구성원 ID 리스트
         List<Long> familyMemberIds = family.getMemberList();
 
-        // 1. ��범 데이터 삭제 (외래키 제약조건 순서대로)
+        // 1. 앨범 데이터 삭제 (외래키 제약조건 순서대로)
         // 1-1. 댓글 삭제 (먼저 삭제해야 함)
         commentJpaRepo.deleteByFamilyCode(familyCode);
         // 1-2. 이미지 삭제 (그 다음 삭제)

@@ -37,9 +37,7 @@ public class ScheduleService {
 
     public List<ScheduleListRes> getList(){
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
-
-        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(userFamilyCode);
+        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(user.getFamilyCode());
 
         return scheduleList.stream()
                 .map(this::convertToScheduleListRes)
@@ -48,9 +46,7 @@ public class ScheduleService {
 
     public List<ScheduleListRes> getListByDate(LocalDate date) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
-
-        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(userFamilyCode, date);
+        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(user.getFamilyCode(), date);
 
         return scheduleList.stream()
                 .map(this::convertToScheduleListRes)
@@ -60,14 +56,13 @@ public class ScheduleService {
     @Transactional
     public Response createSchedule(ScheduleReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 참여자 유효성 검사
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
-            validateParticipants(req.participantIds(), userFamilyCode);
+            validateParticipants(req.participantIds(), user.getFamilyCode());
         }
 
-        Schedule schedule = ScheduleReq.fromScheduleReq(userFamilyCode, req);
+        Schedule schedule = ScheduleReq.fromScheduleReq(user.getFamilyCode(), req);
         Schedule savedSchedule = scheduleJpaRepo.save(schedule);
 
         // 참여자 추가
@@ -84,14 +79,13 @@ public class ScheduleService {
     @Transactional
     public Response updateSchedule(ScheduleUpdateReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(req.scheduleId(), userFamilyCode)
+        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(req.scheduleId(), user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.SCHEDULE_NOT_FOUND));
 
         // 참여자 유효성 검사
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
-            validateParticipants(req.participantIds(), userFamilyCode);
+            validateParticipants(req.participantIds(), user.getFamilyCode());
         }
 
         schedule.updateSchedule(
@@ -115,9 +109,8 @@ public class ScheduleService {
     @Transactional
     public Response deleteSchedule(Long scheduleId) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(scheduleId, userFamilyCode)
+        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(scheduleId, user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.SCHEDULE_NOT_FOUND));
 
         scheduleJpaRepo.delete(schedule);
@@ -142,14 +135,6 @@ public class ScheduleService {
             }
         }
     }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
-    }
-
 
     // 스케줄 추가 시 가족들에게 푸시 알림 전송
     private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
