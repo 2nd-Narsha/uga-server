@@ -6,10 +6,10 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.memo.domain.Memo;
 import com.olympus.uga.domain.memo.domain.repo.MemoJpaRepo;
 import com.olympus.uga.domain.memo.error.MemoErrorCode;
-import com.olympus.uga.domain.memo.presentation.dto.req.LocationUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.res.MemoInfoRes;
+import com.olympus.uga.domain.memo.presentation.dto.request.LocationUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.request.MemoCreateReq;
+import com.olympus.uga.domain.memo.presentation.dto.request.MemoUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.response.MemoInfoRes;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
@@ -19,6 +19,7 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.olympus.uga.global.exception.CustomException;
@@ -26,18 +27,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MemoService {
-
     private final MemoJpaRepo memoJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
     private final UgaContributionCalculator ugaContributionCalculator;
     private final UgaJpaRepo ugaJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
+    private final WebSocketService webSocketService;
 
     // 메모 업데이트
     @Transactional
@@ -49,13 +49,23 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
+        user.updateLastActivityAt(); // 활동 시간 업데이트
+
         if (req == null || req.content() == null) {
             throw new CustomException(MemoErrorCode.INVALID_CONTENT);
         }
 
-        findByWriter(user).updateContent(req.content());
+        Memo memo = findByWriter(user);
+        memo.updateContent(req.content());
+        memoJpaRepo.save(memo);
 
         user.resetWatcher();
+        userJpaRepo.save(user);
+
+        // 웹소켓으로 메모 업데이트 알림 (가족에게)
+        if (user.getFamilyCode() != null) {
+            webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
+        }
 
         return Response.ok("메모가 성공적으로 저장되었습니다.");
     }
@@ -68,13 +78,23 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
+        user.updateLastActivityAt(); // 활동 시간 업데이트
+
         if (req == null || req.location() == null) {
             throw new CustomException(MemoErrorCode.INVALID_LOCATION);
         }
 
-        findByWriter(user).updateLocation(req.location());
+        Memo memo = findByWriter(user);
+        memo.updateLocation(req.location());
+        memoJpaRepo.save(memo);
 
         user.resetWatcher();
+        userJpaRepo.save(user);
+
+        // 웹소켓으로 위치 업데이트 알림 (가족에게)
+        if (user.getFamilyCode() != null) {
+            webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
+        }
 
         return Response.ok("위치가 성공적으로 저장되었습니다.");
     }

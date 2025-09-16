@@ -37,3 +37,6 @@ out/
 .vscode/
 
 .DS_Store
+
+# Firebase service account key
+firebase-service-account.json
