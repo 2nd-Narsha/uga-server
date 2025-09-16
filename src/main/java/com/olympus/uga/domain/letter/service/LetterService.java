@@ -64,6 +64,7 @@ public class LetterService {
     }
 
     // 편지함
+    @Transactional(readOnly = true)
     public List<LetterListRes> getInbox() {
         User user = userSessionHolder.getUser();
 
@@ -76,6 +77,7 @@ public class LetterService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public LetterRes getLetter(Long letterId) {
         User user = userSessionHolder.getUser();
 
