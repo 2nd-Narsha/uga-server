@@ -51,8 +51,8 @@ public class DDayService {
 
         dDayJpaRepo.save(DDayReq.fromDdayReq(user.getFamilyCode(), req));
 
-        // 가족들에게 일정 추가 푸시 알림 전송 (자신 제외)
-        sendScheduleAddedNotification(user, req.title());
+        // 가족들에게 디데이 추가 푸시 알림 전송 (자신 제외)
+        sendDdayAddedNotification(user, req.title());
 
         return Response.created("디데이가 생성되었습니다.");
     }
@@ -105,8 +105,8 @@ public class DDayService {
         }
     }
 
-    // 일정 추가 시 가족들에게 푸시 알림 전송
-    private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
+    // 디데이 추가 시 가족들에게 푸시 알림 전송 (자신 제외)
+    private void sendDdayAddedNotification(User writer, String ddayTitle) {
         try {
             Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
                     .orElse(null);
@@ -115,20 +115,19 @@ public class DDayService {
                 return;
             }
 
-            // 가족 구성원들의 FCM 토큰 가져오기 (작성자 제외)
             List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
 
             for (User member : familyMembers) {
+                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
                 if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
                     pushNotificationService.sendDdayAddedNotification(
-                        member.getFcmToken(),
-                        writer.getUsername(),
-                        scheduleTitle
+                            member.getFcmToken(),
+                            writer.getUsername(),
+                            ddayTitle
                     );
                 }
             }
         } catch (Exception e) {
-            // 푸시 알림 실패해도 일정 저장은 성공으로 처리
             log.warn("디데이 추가 푸시 알림 전송 실패: {}", e.getMessage());
         }
     }

@@ -16,6 +16,7 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class UgaDecoService {
     private final UserSessionHolder userSessionHolder;
     private final FamilyJpaRepo familyJpaRepo;
     private final UgaJpaRepo ugaJpaRepo;
+    private final WebSocketService webSocketService;
 
     @Transactional
     public Response purchaseColor(ColorType req) {
@@ -51,8 +53,16 @@ public class UgaDecoService {
         ugaAsset.addColor(req);
         ugaAssetJpaRepo.save(ugaAsset);
 
+        // 웹소켓으로 개인 포인트 변경 알림
+        webSocketService.notifyPointUpdate(
+                user.getId(),
+                user.getPoint(),
+                "COLOR_PURCHASE"
+        );
+
         return Response.ok("색상을 성공적으로 구매했습니다.");
     }
+
 
     @Transactional
     public Response purchaseCharacter(CharacterType req) {
@@ -74,6 +84,13 @@ public class UgaDecoService {
 
         ugaAsset.addCharacter(req);
         ugaAssetJpaRepo.save(ugaAsset);
+
+        // 웹소켓으로 개인 포인트 변경 알림
+        webSocketService.notifyPointUpdate(
+                user.getId(),
+                user.getPoint(),
+                "CHARACTER_PURCHASE"
+        );
 
         return Response.ok("캐릭터를 성공적으로 구매했습니다.");
     }
