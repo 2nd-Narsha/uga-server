@@ -1,9 +1,8 @@
 package com.olympus.uga.domain.memo.presentation;
 
-import com.olympus.uga.domain.memo.presentation.dto.req.LocationUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.res.MemoInfoRes;
+import com.olympus.uga.domain.memo.presentation.dto.request.LocationUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.request.MemoUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.response.MemoInfoRes;
 import com.olympus.uga.domain.memo.service.MemoService;
 import com.olympus.uga.global.common.Response;
 import lombok.RequiredArgsConstructor;

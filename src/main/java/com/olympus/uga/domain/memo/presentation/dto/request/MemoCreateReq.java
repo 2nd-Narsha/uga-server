@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.memo.presentation.dto.req;
+package com.olympus.uga.domain.memo.presentation.dto.request;
 
 import com.olympus.uga.domain.memo.domain.Memo;
 import com.olympus.uga.domain.user.domain.User;

@@ -1,4 +1,4 @@
-package com.olympus.uga.domain.memo.presentation.dto.res;
+package com.olympus.uga.domain.memo.presentation.dto.response;
 
 import com.olympus.uga.domain.user.domain.User;
 import lombok.Builder;

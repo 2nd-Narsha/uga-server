@@ -6,10 +6,10 @@ import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.memo.domain.Memo;
 import com.olympus.uga.domain.memo.domain.repo.MemoJpaRepo;
 import com.olympus.uga.domain.memo.error.MemoErrorCode;
-import com.olympus.uga.domain.memo.presentation.dto.req.LocationUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoUpdateReq;
-import com.olympus.uga.domain.memo.presentation.dto.res.MemoInfoRes;
+import com.olympus.uga.domain.memo.presentation.dto.request.LocationUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.request.MemoCreateReq;
+import com.olympus.uga.domain.memo.presentation.dto.request.MemoUpdateReq;
+import com.olympus.uga.domain.memo.presentation.dto.response.MemoInfoRes;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
@@ -18,44 +18,59 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
 import com.olympus.uga.global.common.Response;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.olympus.uga.global.exception.CustomException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemoService {
-
     private final MemoJpaRepo memoJpaRepo;
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
     private final UgaContributionCalculator ugaContributionCalculator;
     private final UgaJpaRepo ugaJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
+    private final WebSocketService webSocketService;
+    private final PushNotificationService pushNotificationService;
 
     // 메모 업데이트
-    @Transactional
     public Response updateMemo(MemoUpdateReq req) {
-
         User user = userSessionHolder.getUser();
 
         if (user == null) {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
+        user.updateLastActivityAt();
+
         if (req == null || req.content() == null) {
             throw new CustomException(MemoErrorCode.INVALID_CONTENT);
         }
 
-        findByWriter(user).updateContent(req.content());
+        Memo memo = findByWriter(user);
+        memo.updateContent(req.content());
+        memoJpaRepo.save(memo);
 
         user.resetWatcher();
+        userJpaRepo.save(user);
+
+        // 웹소켓으로 메모 업데이트 알림 (가족에게)
+        if (user.getFamilyCode() != null) {
+            webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
+
+            // 가족들에게 푸시 알림 전송 (자신 제외)
+            sendMemoUpdateNotification(user);
+        }
 
         return Response.ok("메모가 성공적으로 저장되었습니다.");
     }
@@ -68,13 +83,23 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
+        user.updateLastActivityAt();
+
         if (req == null || req.location() == null) {
             throw new CustomException(MemoErrorCode.INVALID_LOCATION);
         }
 
-        findByWriter(user).updateLocation(req.location());
+        Memo memo = findByWriter(user);
+        memo.updateLocation(req.location());
+        memoJpaRepo.save(memo);
 
         user.resetWatcher();
+        userJpaRepo.save(user);
+
+        // 웹소켓으로 위치 업데이트 알림 (가족에게)
+        if (user.getFamilyCode() != null) {
+            webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
+        }
 
         return Response.ok("위치가 성공적으로 저장되었습니다.");
     }
@@ -82,7 +107,6 @@ public class MemoService {
     // 특정 유저의 메모 조회
     @Transactional
     public MemoInfoRes getOne(Long userId) {
-
         User user = userJpaRepo.findById(userSessionHolder.getUser().getId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
@@ -137,5 +161,31 @@ public class MemoService {
                 .orElseGet(() -> memoJpaRepo.save(
                         MemoCreateReq.fromMemoCreateReq(writer)
                 ));
+    }
+
+    // 메모 업데이트 시 가족들에게 푸시 알림 전송 (자신 제외)
+    private void sendMemoUpdateNotification(User writer) {
+        try {
+            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
+                    .orElse(null);
+
+            if (family == null) {
+                return;
+            }
+
+            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+
+            for (User member : familyMembers) {
+                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
+                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                    pushNotificationService.sendMemoAddedNotification(
+                            member.getFcmToken(),
+                            writer.getUsername()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            log.warn("메모 업데이트 푸시 알림 전송 실패: {}", e.getMessage());
+        }
     }
 }
