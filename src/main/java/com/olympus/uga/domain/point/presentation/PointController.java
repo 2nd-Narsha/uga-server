@@ -23,8 +23,8 @@ public class PointController {
     }
 
     @PostMapping("/earn")
-    @Operation(summary = "포인트 얻기", description = "SIGN_UP(회원가입), LETTER(편지작성), ATTENDANCE(하루출석), SEVENTH_ATTENDANCE(7일출석), ANSWER(답변), BIRTHDAY(생일)")
-    public Response earnPoint(@RequestParam ActivityType activityType) {
+    @Operation(summary = "포인트 얻기", description = "LETTER(편지작성), ANSWER(답변), BIRTHDAY(생일)")
+    public Response earnPoint(@RequestParam("activityType") ActivityType activityType) {
         return pointService.earnPoint(activityType);
     }
 

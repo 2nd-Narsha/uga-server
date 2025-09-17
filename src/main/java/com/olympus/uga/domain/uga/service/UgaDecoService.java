@@ -16,6 +16,7 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +29,19 @@ public class UgaDecoService {
     private final UserSessionHolder userSessionHolder;
     private final FamilyJpaRepo familyJpaRepo;
     private final UgaJpaRepo ugaJpaRepo;
+    private final WebSocketService webSocketService;
 
     @Transactional
     public Response purchaseColor(ColorType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         if (req == ColorType.DEFAULT) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
         // 가족 자산 조회 또는 생성
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
@@ -52,20 +53,27 @@ public class UgaDecoService {
         ugaAsset.addColor(req);
         ugaAssetJpaRepo.save(ugaAsset);
 
+        // 웹소켓으로 개인 포인트 변경 알림
+        webSocketService.notifyPointUpdate(
+                user.getId(),
+                user.getPoint(),
+                "COLOR_PURCHASE"
+        );
+
         return Response.ok("색상을 성공적으로 구매했습니다.");
     }
+
 
     @Transactional
     public Response purchaseCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         if (req== CharacterType.UGA) {
             throw new CustomException(UgaErrorCode.CANNOT_PURCHASE_DEFAULT_ITEM);
         }
 
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.ALREADY_OWNED_ITEM);
@@ -77,15 +85,21 @@ public class UgaDecoService {
         ugaAsset.addCharacter(req);
         ugaAssetJpaRepo.save(ugaAsset);
 
+        // 웹소켓으로 개인 포인트 변경 알림
+        webSocketService.notifyPointUpdate(
+                user.getId(),
+                user.getPoint(),
+                "CHARACTER_PURCHASE"
+        );
+
         return Response.ok("캐릭터를 성공적으로 구매했습니다.");
     }
 
     @Transactional
     public Response changeColor(ColorType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -96,8 +110,8 @@ public class UgaDecoService {
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
         // 가족 자산 확인
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (!ugaAsset.hasColor(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
@@ -112,10 +126,9 @@ public class UgaDecoService {
     @Transactional
     public Response changeCharacter(CharacterType req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 현재 우가 조회
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -126,8 +139,8 @@ public class UgaDecoService {
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
         // 가족 자산 확인
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         if (!ugaAsset.hasCharacter(req)) {
             throw new CustomException(UgaErrorCode.NOT_OWNED_ITEM);
@@ -139,21 +152,14 @@ public class UgaDecoService {
         return Response.ok("우가 캐릭터가 성공적으로 변경되었습니다.");
     }
 
+    @Transactional(readOnly = true)
     public UgaDecoRes getDecoItems() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
         // 가족 자산 조회 또는 기본값 생성
-        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(userFamilyCode)
-                .orElse(UgaAsset.createDefault(userFamilyCode));
+        UgaAsset ugaAsset = ugaAssetJpaRepo.findById(user.getFamilyCode())
+                .orElse(UgaAsset.createDefault(user.getFamilyCode()));
 
         return UgaDecoRes.from(ugaAsset);
-    }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
     }
 }

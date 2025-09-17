@@ -5,7 +5,6 @@ import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaContribution;
-import com.olympus.uga.domain.uga.domain.enums.FoodType;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
 import com.olympus.uga.domain.uga.domain.repo.UgaContributionJpaRepo;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
@@ -22,12 +21,13 @@ import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UgaService {
@@ -41,11 +41,10 @@ public class UgaService {
     @Transactional
     public Response createUga(UgaCreateReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Uga uga = ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, userFamilyCode));
+        Uga uga = ugaJpaRepo.save(UgaCreateReq.fromUgaCreateReq(req, user.getFamilyCode()));
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
         family.updatePresentUgaId(uga.getId());
         familyJpaRepo.save(family);
@@ -56,11 +55,11 @@ public class UgaService {
         return Response.created("우가가 성공적으로 생성되었습니다.");
     }
 
+    @Transactional(readOnly = true)
     public CurrentUgaRes getCurrentUga() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Family family = familyJpaRepo.findById(userFamilyCode)
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         if (family.getPresentUgaId() == null) {
@@ -87,22 +86,15 @@ public class UgaService {
         return ugaUseCase.setIndependence(req, user);
     }
 
+    @Transactional(readOnly = true)
     public List<UgaListRes> getDictionary() {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        List<Uga> independenceUgas = ugaJpaRepo.findByFamilyCodeAndGrowth(userFamilyCode, UgaGrowth.INDEPENDENCE);
+        List<Uga> independenceUgas = ugaJpaRepo.findByFamilyCodeAndGrowth(user.getFamilyCode(), UgaGrowth.INDEPENDENCE);
 
         return independenceUgas.stream()
                 .map(UgaListRes::from)
                 .toList();
-    }
-
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
-
-        return family.getFamilyCode();
     }
 
     private void initializeContributions(Long ugaId, List<Long> memberList) {
