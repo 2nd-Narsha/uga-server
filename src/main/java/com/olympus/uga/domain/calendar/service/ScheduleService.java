@@ -14,14 +14,17 @@ import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
+import com.olympus.uga.global.notification.service.PushNotificationService;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -30,23 +33,22 @@ public class ScheduleService {
     private final UserSessionHolder userSessionHolder;
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
     private final UserJpaRepo userJpaRepo;
+    private final PushNotificationService pushNotificationService;
 
+    @Transactional(readOnly = true)
     public List<ScheduleListRes> getList(){
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
-
-        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(userFamilyCode);
+        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeOrderByDateAscStartTimeAsc(user.getFamilyCode());
 
         return scheduleList.stream()
                 .map(this::convertToScheduleListRes)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ScheduleListRes> getListByDate(LocalDate date) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
-
-        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(userFamilyCode, date);
+        List<Schedule> scheduleList = scheduleJpaRepo.findByFamilyCodeAndDateOrderByStartTimeAsc(user.getFamilyCode(), date);
 
         return scheduleList.stream()
                 .map(this::convertToScheduleListRes)
@@ -56,20 +58,20 @@ public class ScheduleService {
     @Transactional
     public Response createSchedule(ScheduleReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        // 참여자 유효성 검사
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
-            validateParticipants(req.participantIds(), userFamilyCode);
+            validateParticipants(req.participantIds(), user.getFamilyCode());
         }
 
-        Schedule schedule = ScheduleReq.fromScheduleReq(userFamilyCode, req);
+        Schedule schedule = ScheduleReq.fromScheduleReq(user.getFamilyCode(), req);
         Schedule savedSchedule = scheduleJpaRepo.save(schedule);
 
-        // 참여자 추가
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
             req.participantIds().forEach(savedSchedule::addParticipant);
         }
+
+        // 가족들에게 스케줄 추가 푸시 알림 전송 (자신 제외)
+        sendScheduleAddedNotification(user, req.title());
 
         return Response.created(req.title() + "의 일정을 생성하였습니다.");
     }
@@ -77,14 +79,13 @@ public class ScheduleService {
     @Transactional
     public Response updateSchedule(ScheduleUpdateReq req) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(req.scheduleId(), userFamilyCode)
+        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(req.scheduleId(), user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.SCHEDULE_NOT_FOUND));
 
         // 참여자 유효성 검사
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
-            validateParticipants(req.participantIds(), userFamilyCode);
+            validateParticipants(req.participantIds(), user.getFamilyCode());
         }
 
         schedule.updateSchedule(
@@ -108,9 +109,8 @@ public class ScheduleService {
     @Transactional
     public Response deleteSchedule(Long scheduleId) {
         User user = userSessionHolder.getUser();
-        String userFamilyCode = getUserFamilyCode(user.getId());
 
-        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(scheduleId, userFamilyCode)
+        Schedule schedule = scheduleJpaRepo.findByIdAndFamilyCode(scheduleId, user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(CalendarErrorCode.SCHEDULE_NOT_FOUND));
 
         scheduleJpaRepo.delete(schedule);
@@ -136,10 +136,30 @@ public class ScheduleService {
         }
     }
 
-    private String getUserFamilyCode(Long userId) {
-        Family family = familyJpaRepo.findByMemberListContaining(userId)
-                .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
+    // 스케줄 추가 시 가족들에게 푸시 알림 전송 (자신 제외)
+    private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
+        try {
+            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
+                    .orElse(null);
 
-        return family.getFamilyCode();
+            if (family == null) {
+                return;
+            }
+
+            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+
+            for (User member : familyMembers) {
+                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
+                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                    pushNotificationService.sendScheduleAddedNotification(
+                            member.getFcmToken(),
+                            writer.getUsername(),
+                            scheduleTitle
+                    );
+                }
+            }
+        } catch (Exception e) {
+            log.warn("스케줄 추가 푸시 알림 전송 실패: {}", e.getMessage());
+        }
     }
 }

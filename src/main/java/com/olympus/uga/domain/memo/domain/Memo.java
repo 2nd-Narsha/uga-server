@@ -1,6 +1,5 @@
 package com.olympus.uga.domain.memo.domain;
 
-import com.olympus.uga.domain.memo.presentation.dto.req.MemoCreateReq;
 import com.olympus.uga.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Entity

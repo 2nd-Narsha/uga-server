@@ -11,18 +11,30 @@ public class Response {
     private String message;
 
     public static Response of(HttpStatus status, String message) {
-        return new Response(status.value(), message);
+        return Response.builder()
+                .status(status.value())
+                .message(message)
+                .build();
     }
 
     public static Response ok(String message) {
-        return new Response(HttpStatus.OK.value(), message);
+        return Response.builder()
+                .status(HttpStatus.OK.value())
+                .message(message)
+                .build();
     }
 
     public static Response created(String message) {
-        return new Response(HttpStatus.CREATED.value(), message);
+        return Response.builder()
+                .status(HttpStatus.CREATED.value())
+                .message(message)
+                .build();
     }
 
     public static Response noContent(String message) {
-        return new Response(HttpStatus.NO_CONTENT.value(), message);
+        return Response.builder()
+                .status(HttpStatus.NO_CONTENT.value())
+                .message(message)
+                .build();
     }
 }
