@@ -22,21 +22,37 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
-      # 2. Gradle clean build로 최신 JAR 생성 (캐시 제거)
-      - name: Clean and Build with Gradle
-        run: ./gradlew clean bootJar -x test
+      # 2. Gradle 캐시 (의존성 빠른 복원)
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      # 3. 빌드된 JAR 파일 확인 (시간, 용량 체크)
+      # 3. Gradle build (조건적으로 테스트 실행)
+      - name: Build with Gradle
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            ./gradlew clean bootJar -x test
+          else
+            ./gradlew clean build
+          fi
+
+      # 4. 빌드된 JAR 확인
       - name: Check built JAR
         run: ls -lh build/libs
 
-      # 👇 아래 작업들은 push일 때만 실행됨
-      # 4. Docker 이미지 빌드 (캐시 없이 강제 새로 빌드)
-      - name: Docker Image Build (no cache)
+      # 👇 push일 때만 실행
+      # 5. Docker 이미지 빌드 (캐시 활용)
+      - name: Docker Image Build
         if: github.event_name == 'push'
-        run: docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/uga:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/uga:latest .
 
-      # 5. DockerHub 로그인
+      # 6. DockerHub 로그인
       - name: Docker Login
         if: github.event_name == 'push'
         uses: docker/login-action@v2
@@ -44,12 +60,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 6. Docker 이미지 푸시
+      # 7. Docker 이미지 푸시
       - name: Docker Hub Push
         if: github.event_name == 'push'
         run: docker push ${{ secrets.DOCKER_USERNAME }}/uga:latest
 
-      # 7. EC2에 배포 (기존 컨테이너 제거 → 이미지 pull → 컨테이너 실행)
+      # 8. EC2에 배포
       - name: Deploy to EC2 via SSH
         if: github.event_name == 'push'
         uses: appleboy/ssh-action@v0.1.8
@@ -65,20 +81,18 @@ jobs:
             echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
             if [ "$(sudo docker ps -aq -f name=$CONTAINER_NAME)" ]; then
-              echo "컨테이너 존재함! 중지 후 삭제할게요"
+              echo "컨테이너 존재함! 중지 후 삭제"
               sudo docker stop $CONTAINER_NAME
               sudo docker rm $CONTAINER_NAME
-            else
-              echo "삭제할 컨테이너 없음!"
             fi
 
             if sudo docker images | grep -q "$IMAGE_NAME"; then
-              echo "이전 이미지 삭제할게요"
+              echo "이전 이미지 삭제"
               sudo docker rmi $IMAGE_NAME
             fi
 
-            echo "안 쓰는 도커 리소스 정리할게요"
-            sudo docker system prune -af --volumes
+            echo "불필요한 도커 리소스 정리"
+            sudo docker system prune -af   # --volumes 제거
 
             sudo docker pull $IMAGE_NAME
             sudo docker run -d -p 8080:8080 --name $CONTAINER_NAME $IMAGE_NAME
