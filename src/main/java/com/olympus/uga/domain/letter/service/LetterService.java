@@ -48,17 +48,23 @@ public class LetterService {
         userJpaRepo.save(receiver);
         userJpaRepo.save(sender);
 
-        // 편지 도착 푸시 알림
+        // 편지 도착 푸시 알림 (받는 사람에게만)
         if (receiver.getFcmToken() != null) {
             pushNotificationService.sendLetterNotification(
-                receiver.getFcmToken(),
-                sender.getUsername()
+                    receiver.getFcmToken(),
+                    sender.getUsername()
             );
         }
 
-        // 웹소켓으로 편지 도착 알림
+        // 웹소켓으로 편지 도착 알림 (받는 사람에게만)
         LetterRes letterRes = LetterRes.from(savedLetter);
         webSocketService.notifyLetterReceived(receiver.getId(), letterRes);
+
+        // 발신자 포인트 변경 웹소켓 알림
+        webSocketService.notifyPointUpdate(sender.getId(), sender.getPoint(), "LETTER_SEND");
+
+        // 수신자 포인트 변경 웹소켓 알림
+        webSocketService.notifyPointUpdate(receiver.getId(), receiver.getPoint(), "LETTER_RECEIVE");
 
         return Response.created(receiver.getUsername() + "에게 편지를 보냈습니다.");
     }

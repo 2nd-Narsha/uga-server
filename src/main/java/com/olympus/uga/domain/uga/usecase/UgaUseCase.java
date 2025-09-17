@@ -41,11 +41,11 @@ public class UgaUseCase {
         Uga uga = ugaJpaRepo.findById(req.ugaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        if (!uga.getFamilyCode().equals(uga.getFamilyCode())) {
+        // 가족 코드 검증 수정
+        if (!uga.getFamilyCode().equals(user.getFamilyCode())) {
             throw new CustomException(UgaErrorCode.NOT_FAMILY_UGA);
         }
 
-        // 먹이를 줄 수 있는 상태인지 확인
         if (!UgaFeedUtil.canFeed(uga.getGrowth())) {
             if (uga.getGrowth() == UgaGrowth.ALL_GROWTH) {
                 throw new CustomException(UgaErrorCode.UGA_FULLY_GROWN);
@@ -54,18 +54,17 @@ public class UgaUseCase {
             }
         }
 
-        // 유효한 먹이 타입인지 확인
         if (!UgaFeedUtil.isValidFoodType(req.foodType())) {
             throw new CustomException(UgaErrorCode.INVALID_FOOD_TYPE);
         }
 
-        Family family = familyJpaRepo.findById(uga.getFamilyCode())
+        Family family = familyJpaRepo.findById(user.getFamilyCode())
                 .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
 
         // 포인트 차감
         int totalCost = UgaFeedUtil.calculateTotalCost(req.foodType(), family.getMemberList().size());
         user.usePoint(totalCost);
-        user.updateLastActivityAt(); // 활동 시간 업데이트
+        user.updateLastActivityAt();
         userJpaRepo.save(user);
 
         // 우가 성장 처리
@@ -77,22 +76,20 @@ public class UgaUseCase {
         // 기여도 업데이트
         updateContribution(uga.getId(), user.getId(), growthDays);
 
-        // 웹소켓으로 실시간 업데이트 알림 (이미 선언된 userFamilyCode 변수 사용)
+        // 웹소켓 알림들
+        // 1. 개인 포인트 변경 알림
+        webSocketService.notifyPointUpdate(user.getId(), user.getPoint(), "UGA_FEED");
 
-        // 우가 성장도 변경 알림
+        // 2. 우가 성장도 변경 알림 (가족 전체)
         if (!previousGrowth.equals(uga.getGrowth())) {
             webSocketService.notifyUgaGrowthUpdate(user.getFamilyCode(), uga);
-
             // 가족들에게 우가 성장 푸시 알림 전송
             sendUgaGrowthNotification(family, uga);
         }
-        
-        // 포인트 변경 알림
-        webSocketService.notifyPointUpdate(uga.getFamilyCode(), user.getId(), user.getPoint(), "UGA_FEED");
-        
-        // 기여도 변경 알림
+
+        // 3. 기여도 변경 알림 (가족 전체)
         UgaContribution contribution = ugaContributionJpaRepo.findByUgaIdAndUserId(uga.getId(), user.getId())
-            .orElse(null);
+                .orElse(null);
         if (contribution != null) {
             webSocketService.notifyContributionUpdate(user.getFamilyCode(), user.getId(), contribution);
         }
@@ -109,7 +106,6 @@ public class UgaUseCase {
             throw new CustomException(UgaErrorCode.NOT_FAMILY_UGA);
         }
 
-        // 다 자란 상태인지 확인
         if (uga.getGrowth() != UgaGrowth.ALL_GROWTH) {
             throw new CustomException(UgaErrorCode.UGA_NOT_FULLY_GROWN);
         }
@@ -118,7 +114,6 @@ public class UgaUseCase {
             uga.makeIndependence();
             ugaJpaRepo.save(uga);
 
-            // 가족의 현재 우가를 null로 설정
             Family family = familyJpaRepo.findById(user.getFamilyCode())
                     .orElseThrow(() -> new CustomException(FamilyErrorCode.NOT_FAMILY_MEMBER));
             family.updatePresentUgaId(null);
@@ -138,27 +133,21 @@ public class UgaUseCase {
         ugaContributionJpaRepo.save(contribution);
     }
 
-
-    // 우가 성장 시 가족들에게 푸시 알림 전송
     private void sendUgaGrowthNotification(Family family, Uga uga) {
         try {
-            // 가족 구성원들의 FCM 토큰 가져오기
             List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
-
-            // 우가 성장 단계를 숫자로 변환
             int growthLevel = getGrowthLevel(uga.getGrowth());
 
             for (User member : familyMembers) {
                 if (member.getFcmToken() != null) {
                     pushNotificationService.sendUgaGrowthNotification(
-                        member.getFcmToken(),
-                        growthLevel,
-                        uga.getUgaName()
+                            member.getFcmToken(),
+                            growthLevel,
+                            uga.getUgaName()
                     );
                 }
             }
         } catch (Exception e) {
-            // 푸시 알림 실패해도 우가 성장은 성공으로 처리
             log.warn("우가 성장 푸시 알림 전송 실패: {}", e.getMessage());
         }
     }

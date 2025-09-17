@@ -63,29 +63,29 @@ public class WebSocketService {
         }
     }
 
-    // 포인트 변경 알림
-    public void notifyPointUpdate(String familyCode, Long userId, Integer newPoints, String reason) {
+    // 포인트 변경 알림 - 개인에게만 전송
+    public void notifyPointUpdate(Long userId, Integer newPoints, String reason) {
         PointUpdateData data = new PointUpdateData(userId, newPoints, reason);
-        sendToFamily(familyCode, WebSocketMessage.MessageType.POINT_UPDATE, data);
+        sendToUser(userId, WebSocketMessage.MessageType.POINT_UPDATE, data);
     }
 
-    // 우가 성장도 변경 알림
+   // 우가 성장도 변경 알림 - 가족 전체에게 전송
     public void notifyUgaGrowthUpdate(String familyCode, Object ugaData) {
         sendToFamily(familyCode, WebSocketMessage.MessageType.UGA_GROWTH_UPDATE, ugaData);
     }
 
-    // 기여도 변경 알림
+   // 기여도 변경 알림 - 가족 전체에게 전송
     public void notifyContributionUpdate(String familyCode, Long userId, Object contributionData) {
         ContributionUpdateData data = new ContributionUpdateData(userId, contributionData);
         sendToFamily(familyCode, WebSocketMessage.MessageType.CONTRIBUTION_UPDATE, data);
     }
 
-    // 메모 업데이트 알림
+    // 메모 업데이트 알림 - 가족 전체에게 전송
     public void notifyMemoUpdate(String familyCode, Object memoData) {
         sendToFamily(familyCode, WebSocketMessage.MessageType.MEMO_UPDATE, memoData);
     }
 
-    // 편지 도착 알림
+    // 편지 도착 알림 - 개인에게만 전송
     public void notifyLetterReceived(Long userId, Object letterData) {
         sendToUser(userId, WebSocketMessage.MessageType.LETTER_RECEIVED, letterData);
     }
