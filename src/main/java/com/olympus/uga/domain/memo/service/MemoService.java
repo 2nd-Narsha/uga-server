@@ -44,7 +44,6 @@ public class MemoService {
     private final PushNotificationService pushNotificationService;
 
     // 메모 업데이트
-    @Transactional
     public Response updateMemo(MemoUpdateReq req) {
         User user = userSessionHolder.getUser();
 
@@ -52,7 +51,7 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        user.updateLastActivityAt(); // 활동 시간 업데이트
+        user.updateLastActivityAt();
 
         if (req == null || req.content() == null) {
             throw new CustomException(MemoErrorCode.INVALID_CONTENT);
@@ -70,7 +69,7 @@ public class MemoService {
             webSocketService.notifyMemoUpdate(user.getFamilyCode(), memo);
 
             // 가족들에게 푸시 알림 전송 (자신 제외)
-            sendMemoUpdateNotification(user, memo.getContent());
+            sendMemoUpdateNotification(user);
         }
 
         return Response.ok("메모가 성공적으로 저장되었습니다.");
@@ -84,7 +83,7 @@ public class MemoService {
             throw new CustomException(UserErrorCode.USER_NOT_FOUND);
         }
 
-        user.updateLastActivityAt(); // 활동 시간 업데이트
+        user.updateLastActivityAt();
 
         if (req == null || req.location() == null) {
             throw new CustomException(MemoErrorCode.INVALID_LOCATION);
@@ -164,8 +163,8 @@ public class MemoService {
                 ));
     }
 
-    // 메모 업데이트 시 가족들에게 푸시 알림 전송
-    private void sendMemoUpdateNotification(User writer, String memoContent) {
+    // 메모 업데이트 시 가족들에게 푸시 알림 전송 (자신 제외)
+    private void sendMemoUpdateNotification(User writer) {
         try {
             Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
                     .orElse(null);
@@ -174,19 +173,18 @@ public class MemoService {
                 return;
             }
 
-            // 가족 구성원들의 FCM 토큰 가져오기 (작성자 제외)
             List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
 
             for (User member : familyMembers) {
+                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
                 if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
                     pushNotificationService.sendMemoAddedNotification(
-                        member.getFcmToken(),
-                        writer.getUsername()
+                            member.getFcmToken(),
+                            writer.getUsername()
                     );
                 }
             }
         } catch (Exception e) {
-            // 푸시 알림 실패해도 메모 저장은 성공으로 처리
             log.warn("메모 업데이트 푸시 알림 전송 실패: {}", e.getMessage());
         }
     }

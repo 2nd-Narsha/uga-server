@@ -59,7 +59,6 @@ public class ScheduleService {
     public Response createSchedule(ScheduleReq req) {
         User user = userSessionHolder.getUser();
 
-        // 참여자 유효성 검사
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
             validateParticipants(req.participantIds(), user.getFamilyCode());
         }
@@ -67,7 +66,6 @@ public class ScheduleService {
         Schedule schedule = ScheduleReq.fromScheduleReq(user.getFamilyCode(), req);
         Schedule savedSchedule = scheduleJpaRepo.save(schedule);
 
-        // 참여자 추가
         if (req.participantIds() != null && !req.participantIds().isEmpty()) {
             req.participantIds().forEach(savedSchedule::addParticipant);
         }
@@ -138,7 +136,7 @@ public class ScheduleService {
         }
     }
 
-    // 스케줄 추가 시 가족들에게 푸시 알림 전송
+    // 스케줄 추가 시 가족들에게 푸시 알림 전송 (자신 제외)
     private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
         try {
             Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
@@ -148,10 +146,10 @@ public class ScheduleService {
                 return;
             }
 
-            // 가족 구성원들의 FCM 토큰 가져오기 (작성자 제외)
             List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
 
             for (User member : familyMembers) {
+                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
                 if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
                     pushNotificationService.sendScheduleAddedNotification(
                             member.getFcmToken(),
@@ -161,7 +159,6 @@ public class ScheduleService {
                 }
             }
         } catch (Exception e) {
-            // 푸시 알림 실패해도 스케줄 저장은 성공으로 처리
             log.warn("스케줄 추가 푸시 알림 전송 실패: {}", e.getMessage());
         }
     }
