@@ -1,6 +1,5 @@
 package com.olympus.uga.domain.mission.error;
 
-
 import com.olympus.uga.global.exception.error.CustomErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,6 @@ public enum MissionErrorCode implements CustomErrorCode {
     MISSION_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 미션입니다."),
     REWARD_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "보상을 받을 수 없는 상태입니다.");
 
-    private final HttpStatus httpStatus;
+    private final HttpStatus status;
     private final String message;
 }
