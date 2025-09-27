@@ -26,15 +26,18 @@ public class MissionList {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "mission_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private MissionType missionType;
 
     @Column(name = "reward_points", nullable = false)
     private int rewardPoints;
+
+    @Column(name = "target_count", nullable = false)
+    private int targetCount = 1; // 목표 수행 횟수 (기본 1회)
+
+    @Column(name = "action_type", nullable = false)
+    private String actionType;  // "LETTER_SEND", "AI_ANSWER", "MEMO_CREATE" 등
 
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = true; // 미션 활성화 여부

@@ -41,11 +41,37 @@ public class UserMission {
     @Enumerated(EnumType.STRING)
     private StatusType status = StatusType.INCOMPLETE;
 
-    public void completeMission() {
-        this.status = StatusType.WAITING_REWARD;
+    @Column(name = "current_count", nullable = false)
+    private int currentCount = 0; // 현재 수행 횟수
+
+    public void incrementCount() {
+        this.currentCount++;
+        if (this.currentCount >= this.missionList.getTargetCount()) {
+            this.status = StatusType.WAITING_REWARD;
+        }
     }
 
     public void claimReward() {
         this.status = StatusType.COMPLETED;
+    }
+
+    public void resetProgress() {
+        this.currentCount = 0;
+        this.status = StatusType.INCOMPLETE;
+    }
+
+    public void setCurrentCount(int count) {
+        this.currentCount = count;
+    }
+
+    public void completeTask() {
+        this.status = StatusType.WAITING_REWARD;
+    }
+    public boolean isCompleted() {
+        return this.currentCount >= this.missionList.getTargetCount();
+    }
+
+    public String getProgressText() {
+        return this.currentCount + " / " + this.missionList.getTargetCount();
     }
 }
