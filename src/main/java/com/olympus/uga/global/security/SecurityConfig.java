@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .requestMatchers("/memo/**").authenticated()
                                 .requestMatchers("/calendar/**").authenticated()
                                 .requestMatchers("/attend/**").authenticated()
+                                .requestMatchers("/mission/**").authenticated()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs").permitAll()
                                 .anyRequest().permitAll()
                 )
