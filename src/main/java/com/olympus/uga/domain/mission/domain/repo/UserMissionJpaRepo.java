@@ -17,8 +17,8 @@ import java.util.Optional;
 public interface UserMissionJpaRepo extends JpaRepository<UserMission, Long> {
     List<UserMission> findByUser(User user);
     List<UserMission> findByUserAndStatus(User user, StatusType status);
-    List<UserMission> findByUserAndMissionTemplateMissionType(User user, MissionType missionType);
-    boolean existsByUserAndMissionTemplate(User user, MissionList missionList);
+    List<UserMission> findByUserAndMissionListMissionType(User user, MissionType missionType);
+    boolean existsByUserAndMissionList(User user, MissionList missionList);
 
     @Query("SELECT um FROM UserMission um WHERE um.user = :user AND um.missionList.actionType = :actionType")
     Optional<UserMission> findByUserAndActionType(@Param("user") User user, @Param("actionType") String actionType);
