@@ -83,7 +83,7 @@ public class LetterService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public LetterRes getLetter(Long letterId) {
         User user = userSessionHolder.getUser();
 
