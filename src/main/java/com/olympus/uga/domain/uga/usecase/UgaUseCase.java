@@ -3,6 +3,7 @@ package com.olympus.uga.domain.uga.usecase;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
+import com.olympus.uga.domain.mission.service.MissionService;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaContribution;
 import com.olympus.uga.domain.uga.domain.enums.UgaGrowth;
@@ -35,6 +36,7 @@ public class UgaUseCase {
     private final UserJpaRepo userJpaRepo;
     private final WebSocketService webSocketService;
     private final PushNotificationService pushNotificationService;
+    private final MissionService missionService;
 
     @Transactional
     public Response feedUga(UgaFeedReq req, User user) {
@@ -93,6 +95,8 @@ public class UgaUseCase {
         if (contribution != null) {
             webSocketService.notifyContributionUpdate(user.getFamilyCode(), user.getId(), contribution);
         }
+
+        missionService.onUgaFeed(user);
 
         return Response.ok("먹이를 성공적으로 주었습니다. 현재 포인트: " + user.getPoint());
     }
