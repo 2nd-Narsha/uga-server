@@ -6,7 +6,8 @@ import com.olympus.uga.domain.answer.presentation.dto.response.AnswerRes;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionAssignService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
 import com.olympus.uga.domain.question.domain.Question;
 import com.olympus.uga.domain.question.domain.repo.QuestionJpaRepo;
 import com.olympus.uga.domain.question.presentation.dto.request.QuestionReq;
@@ -32,7 +33,7 @@ public class QuestionService {
     private final UserSessionHolder userSessionHolder;
     private final FamilyJpaRepo familyJpaRepo;
     private final AnswerJpaRepo answerJpaRepo;
-    private final MissionService missionService;
+    private final MissionProgressService missionProgressService;
 
     @Transactional(readOnly = true)
     public Long getNextQuestionId() {
@@ -49,7 +50,7 @@ public class QuestionService {
         questionJpaRepo.save(QuestionReq.fromQuestionReq(req, userFamily, user));
 
         // 미션 진행도 업데이트 - 질문 생성
-        missionService.onQuestionCreated(user);
+        missionProgressService.onQuestionCreated(user);
 
         return Response.created("질문이 생성되었습니다.");
     }

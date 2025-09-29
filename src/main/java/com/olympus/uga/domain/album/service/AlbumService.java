@@ -17,7 +17,7 @@ import com.olympus.uga.domain.album.presentation.dto.response.PostRes;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
@@ -41,7 +41,7 @@ public class AlbumService {
     private final FamilyJpaRepo familyJpaRepo;
     private final CommentJpaRepo commentJpaRepo;
     private final PostImageJpaRepo postImageJpaRepo;
-    private final MissionService missionService;
+    private final MissionProgressService missionProgressService;
 
     // 게시글 서비스 메서드
     @Transactional(readOnly = true)
@@ -96,7 +96,7 @@ public class AlbumService {
 
         postJpaRepo.save(PostReq.fromPostReq(user, family, req));
 
-        missionService.onAlbumUploaded(user);
+        missionProgressService.onAlbumUploaded(user);
 
         return Response.created("게시글이 생성되었습니다.");
     }
@@ -158,7 +158,7 @@ public class AlbumService {
 
         commentJpaRepo.save(CommentReq.fromCommentReq(user, post, req));
 
-        missionService.onAlbumCommented(user);
+        missionProgressService.onAlbumCommented(user);
 
         return Response.created("댓글이 생성되었습니다.");
     }
