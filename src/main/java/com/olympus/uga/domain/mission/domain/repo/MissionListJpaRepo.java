@@ -17,7 +17,7 @@ public interface MissionListJpaRepo extends JpaRepository<MissionList, Long> {
     List<MissionList> findByMissionTypeAndIsEnabledTrue(MissionType missionType);
 
     // 랜덤 미션 조회 (미션 할당용)
-    @Query(value = "SELECT * FROM tb_mission_list WHERE mission_type = :missionType AND is_enabled = true ORDER BY RAND() LIMIT :count",
+    @Query(value = "SELECT * FROM tb_mission_list WHERE mission_type = :missionType AND is_enabled = true ORDER BY RANDOM() LIMIT :count",
            nativeQuery = true)
     List<MissionList> findRandomMissions(@Param("missionType") String missionType, @Param("count") int count);
 

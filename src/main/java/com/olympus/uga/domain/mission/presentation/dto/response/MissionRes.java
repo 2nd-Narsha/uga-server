@@ -10,7 +10,6 @@ public record MissionRes(
         int rewardPoints,
         StatusType status,
         MissionType missionType,
-        String progressText,  // "1 / 3"
         boolean canClaimReward
 ) {
     public static MissionRes from(UserMission userMission) {
@@ -20,7 +19,6 @@ public record MissionRes(
                 userMission.getMissionList().getRewardPoints(),
                 userMission.getStatus(),
                 userMission.getMissionList().getMissionType(),
-                userMission.getProgressText(),
                 userMission.getStatus() == StatusType.WAITING_REWARD
         );
     }
