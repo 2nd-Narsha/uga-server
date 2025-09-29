@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.mission.domain;
 
 import com.olympus.uga.domain.mission.domain.enums.MissionType;
+import com.olympus.uga.domain.mission.domain.enums.ActionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,7 +38,8 @@ public class MissionList {
     private int targetCount = 1; // 목표 수행 횟수 (기본 1회)
 
     @Column(name = "action_type", nullable = false)
-    private String actionType;  // "LETTER_SEND", "AI_ANSWER", "MEMO_CREATE" 등
+    @Enumerated(EnumType.STRING)
+    private ActionType actionType;  // ActionType enum 사용
 
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = true; // 미션 활성화 여부

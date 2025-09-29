@@ -10,6 +10,7 @@ import com.olympus.uga.domain.memo.presentation.dto.request.LocationUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.request.MemoCreateReq;
 import com.olympus.uga.domain.memo.presentation.dto.request.MemoUpdateReq;
 import com.olympus.uga.domain.memo.presentation.dto.response.MemoInfoRes;
+import com.olympus.uga.domain.mission.service.MissionService;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.repo.UgaJpaRepo;
 import com.olympus.uga.domain.uga.error.UgaErrorCode;
@@ -42,6 +43,7 @@ public class MemoService {
     private final FamilyJpaRepo familyJpaRepo;
     private final WebSocketService webSocketService;
     private final PushNotificationService pushNotificationService;
+    private final MissionService missionService;
 
     // 메모 업데이트
     public Response updateMemo(MemoUpdateReq req) {
@@ -63,6 +65,9 @@ public class MemoService {
 
         user.resetWatcher();
         userJpaRepo.save(user);
+
+        // 미션 진행도 업데이트 - 메모 작성
+        missionService.onMemoCreated(user);
 
         // 웹소켓으로 메모 업데이트 알림 (가족에게)
         if (user.getFamilyCode() != null) {
