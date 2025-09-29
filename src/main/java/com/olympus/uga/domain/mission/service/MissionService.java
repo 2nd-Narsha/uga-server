@@ -2,6 +2,7 @@ package com.olympus.uga.domain.mission.service;
 
 import com.olympus.uga.domain.mission.domain.MissionList;
 import com.olympus.uga.domain.mission.domain.UserMission;
+import com.olympus.uga.domain.mission.domain.enums.ActionType;
 import com.olympus.uga.domain.mission.domain.enums.MissionType;
 import com.olympus.uga.domain.mission.domain.enums.StatusType;
 import com.olympus.uga.domain.mission.domain.repo.MissionListJpaRepo;
@@ -143,14 +144,124 @@ public class MissionService {
 
     // 미션 진행도 업데이트 (다른 서비스에서 호출)
     @Transactional
-    public void updateMissionProgress(User user, String actionType) {
-        userMissionJpaRepo.findByUserAndActionType(user, actionType)
-                .ifPresent(userMission -> {
-                    if (userMission.getStatus() == StatusType.INCOMPLETE) {
-                        userMission.incrementCount();
-                        userMissionJpaRepo.save(userMission);
-                    }
-                });
+    public void updateMissionProgress(User user, ActionType actionType) {
+        // 해당 actionType의 미션들을 모두 업데이트
+        List<UserMission> userMissions = userMissionJpaRepo.findByUser(user).stream()
+                .filter(um -> um.getStatus() == StatusType.INCOMPLETE)
+                .filter(um -> um.getMissionList().getActionType() == actionType)
+                .toList();
+
+        for (UserMission userMission : userMissions) {
+            userMission.incrementCount();
+            userMissionJpaRepo.save(userMission);
+
+            // 미션 완료 체크
+            if (userMission.getCurrentCount() >= userMission.getMissionList().getTargetCount()) {
+                userMission.completeTask(); // WAITING_REWARD 상태로 변경
+                userMissionJpaRepo.save(userMission);
+                log.info("미션 완료: 사용자 {}, 미션 '{}' ({})",
+                        user.getId(), userMission.getMissionList().getTitle(), actionType);
+            }
+        }
+    }
+
+    // 현재 로그인한 사용자의 미션 진행도 업데이트 (편의 메서드)
+    @Transactional
+    public void updateCurrentUserMissionProgress(ActionType actionType) {
+        User user = userSessionHolder.getUser();
+        updateMissionProgress(user, actionType);
+    }
+
+    // 다른 서비스에서 사용할 수 있는 편의 메서드들
+    @Transactional
+    public void onLetterSent(User user) {
+        updateMissionProgress(user, ActionType.LETTER_SEND);
+    }
+
+    @Transactional
+    public void onMemoCreated(User user) {
+        updateMissionProgress(user, ActionType.MEMO_CREATE);
+    }
+
+    @Transactional
+    public void onQuestionCreated(User user) {
+        updateMissionProgress(user, ActionType.QUESTION_CREATE);
+    }
+
+    @Transactional
+    public void onQuestionAnswered(User user) {
+        updateMissionProgress(user, ActionType.QUESTION_ANSWER);
+    }
+
+    @Transactional
+    public void onAlbumUploaded(User user) {
+        updateMissionProgress(user, ActionType.ALBUM_UPLOAD);
+    }
+
+    @Transactional
+    public void onAlbumCommented(User user) {
+        updateMissionProgress(user, ActionType.ALBUM_COMMENT);
+    }
+
+    @Transactional
+    public void onUgaFeed(User user) {
+        updateMissionProgress(user, ActionType.UGA_FEED);
+    }
+
+    @Transactional
+    public void onUgaItemBought(User user) {
+        updateMissionProgress(user, ActionType.UGA_ITEM_BUY);
+    }
+
+    @Transactional
+    public void onScheduleCreated(User user) {
+        updateMissionProgress(user, ActionType.SCHEDULE_CREATE);
+    }
+
+    // 현재 로그인한 사용자 기준 편의 메서드들
+    @Transactional
+    public void onLetterSent() {
+        updateCurrentUserMissionProgress(ActionType.LETTER_SEND);
+    }
+
+    @Transactional
+    public void onMemoCreated() {
+        updateCurrentUserMissionProgress(ActionType.MEMO_CREATE);
+    }
+
+    @Transactional
+    public void onQuestionCreated() {
+        updateCurrentUserMissionProgress(ActionType.QUESTION_CREATE);
+    }
+
+    @Transactional
+    public void onQuestionAnswered() {
+        updateCurrentUserMissionProgress(ActionType.QUESTION_ANSWER);
+    }
+
+    @Transactional
+    public void onAlbumUploaded() {
+        updateCurrentUserMissionProgress(ActionType.ALBUM_UPLOAD);
+    }
+
+    @Transactional
+    public void onAlbumCommented() {
+        updateCurrentUserMissionProgress(ActionType.ALBUM_COMMENT);
+    }
+
+    @Transactional
+    public void onUgaFeed() {
+        updateCurrentUserMissionProgress(ActionType.UGA_FEED);
+    }
+
+    @Transactional
+    public void onUgaItemBought() {
+        updateCurrentUserMissionProgress(ActionType.UGA_ITEM_BUY);
+    }
+
+    @Transactional
+    public void onScheduleCreated() {
+        updateCurrentUserMissionProgress(ActionType.SCHEDULE_CREATE);
     }
 
     // 미션 할당 로직 (스케줄러에서 호출)
@@ -158,99 +269,79 @@ public class MissionService {
     public void assignDailyMissions() {
         log.info("일일 미션 갱신 시작");
         List<User> allUsers = userJpaRepo.findAll();
-        List<MissionList> randomDailyMissions = missionListJpaRepo.findRandomMissions("DAILY", 3);
+        List<MissionList> dailyMissions = missionListJpaRepo.findByMissionTypeAndIsEnabledTrue(MissionType.DAILY);
 
-        if (randomDailyMissions.size() < 3) {
-            log.warn("일일 미션 템플릿이 부족합니다. 현재: {}개", randomDailyMissions.size());
+        if (dailyMissions.size() < 3) {
+            log.warn("일일 미션 템플릿이 부족합니다. 현재: {}개", dailyMissions.size());
             return;
         }
 
         for (User user : allUsers) {
             // 기존 일일 미션 삭제 (보너스 미션 제외)
-            List<UserMission> existingDailyMissions = userMissionJpaRepo.findByUser(user).stream()
-                    .filter(um -> um.getMissionList().getMissionType() == MissionType.DAILY)
-                    .toList();
-            userMissionJpaRepo.deleteAll(existingDailyMissions);
+            userMissionJpaRepo.deleteUserDailyMissions(user);
 
-            // 새로운 일일 미션 할당
-            for (MissionList missionTemplate : randomDailyMissions) {
-                UserMission userMission = UserMission.builder()
-                        .user(user)
-                        .missionList(missionTemplate)
-                        .status(StatusType.INCOMPLETE)
-                        .currentCount(0)
-                        .build();
+            // 랜덤 3개 일일 미션 할당
+            List<MissionList> randomMissions = missionListJpaRepo.findRandomMissions("DAILY", 3);
+            for (MissionList mission : randomMissions) {
+                UserMission userMission = UserMission.assign(user, mission);
                 userMissionJpaRepo.save(userMission);
             }
 
-            // 일일 보너스 미션 초기화 (이미 있으면 currentCount만 0으로)
-            Optional<UserMission> dailyBonusOpt = userMissionJpaRepo.findDailyBonusByUser(user);
-            if (dailyBonusOpt.isPresent()) {
-                UserMission dailyBonus = dailyBonusOpt.get();
-                dailyBonus.resetProgress(); // currentCount = 0, status = INCOMPLETE
-                userMissionJpaRepo.save(dailyBonus);
-            } else {
-                // 보너스 미션이 없으면 생성 (최초 한번만)
-                createDailyBonusMission(user);
+            // 일일 보너스 미션 할당 (없는 경우에만)
+            if (userMissionJpaRepo.findDailyBonusByUser(user).isEmpty()) {
+                List<MissionList> bonusMissions = missionListJpaRepo.findDailyBonusMissions();
+                if (!bonusMissions.isEmpty()) {
+                    UserMission bonusUserMission = UserMission.assign(user, bonusMissions.get(0));
+                    userMissionJpaRepo.save(bonusUserMission);
+                }
             }
         }
         log.info("일일 미션 갱신 완료");
-    }
-
-    private void createDailyBonusMission(User user) {
-        // 일일 보너스 미션 템플릿이 없으면 생성
-        MissionList bonusTemplate = missionListJpaRepo.findByMissionTypeAndIsEnabledTrue(MissionType.DAILY_BONUS)
-                .stream().findFirst()
-                .orElseGet(() -> {
-                    // 보너스 템플릿이 없으면 기본 생성
-                    return MissionList.builder()
-                            .title("일일 미션 완료하기")
-                            .missionType(MissionType.DAILY_BONUS)
-                            .rewardPoints(500)
-                            .targetCount(3)
-                            .actionType("DAILY_COMPLETE")
-                            .isEnabled(true)
-                            .build();
-                });
-
-        UserMission bonusMission = UserMission.builder()
-                .user(user)
-                .missionList(bonusTemplate)
-                .status(StatusType.INCOMPLETE)
-                .currentCount(0)
-                .build();
-        userMissionJpaRepo.save(bonusMission);
     }
 
     @Transactional
     public void assignWeeklyMissions() {
         log.info("주간 미션 갱신 시작");
         List<User> allUsers = userJpaRepo.findAll();
-        List<MissionList> randomWeeklyMissions = missionListJpaRepo.findRandomMissions("WEEKLY", 5);
-
-        if (randomWeeklyMissions.size() < 5) {
-            log.warn("주간 미션 템플릿이 부족합니다. 현재: {}개", randomWeeklyMissions.size());
-            return;
-        }
+        List<MissionList> weeklyMissions = missionListJpaRepo.findByMissionTypeAndIsEnabledTrue(MissionType.WEEKLY);
 
         for (User user : allUsers) {
             // 기존 주간 미션 삭제
-            List<UserMission> existingWeeklyMissions = userMissionJpaRepo.findByUser(user).stream()
-                    .filter(um -> um.getMissionList().getMissionType() == MissionType.WEEKLY)
-                    .toList();
-            userMissionJpaRepo.deleteAll(existingWeeklyMissions);
+            userMissionJpaRepo.deleteUserWeeklyMissions(user);
 
-            // 새로운 주간 미션 할당
-            for (MissionList missionTemplate : randomWeeklyMissions) {
-                UserMission userMission = UserMission.builder()
-                        .user(user)
-                        .missionList(missionTemplate)
-                        .status(StatusType.INCOMPLETE)
-                        .currentCount(0)
-                        .build();
+            // 모든 주간 미션 할당
+            for (MissionList mission : weeklyMissions) {
+                UserMission userMission = UserMission.assign(user, mission);
                 userMissionJpaRepo.save(userMission);
             }
         }
         log.info("주간 미션 갱신 완료");
+    }
+
+    // 특정 사용자에게 미션 할당 (신규 가입자용)
+    @Transactional
+    public void assignMissionsToNewUser(User user) {
+        log.info("신규 사용자 미션 할당: {}", user.getId());
+
+        // 일일 미션 3개 할당
+        List<MissionList> randomDailyMissions = missionListJpaRepo.findRandomMissions("DAILY", 3);
+        for (MissionList mission : randomDailyMissions) {
+            UserMission userMission = UserMission.assign(user, mission);
+            userMissionJpaRepo.save(userMission);
+        }
+
+        // 일일 보너스 미션 할당
+        List<MissionList> bonusMissions = missionListJpaRepo.findDailyBonusMissions();
+        if (!bonusMissions.isEmpty()) {
+            UserMission bonusUserMission = UserMission.assign(user, bonusMissions.get(0));
+            userMissionJpaRepo.save(bonusUserMission);
+        }
+
+        // 주간 미션 모두 할당
+        List<MissionList> weeklyMissions = missionListJpaRepo.findByMissionTypeAndIsEnabledTrue(MissionType.WEEKLY);
+        for (MissionList mission : weeklyMissions) {
+            UserMission userMission = UserMission.assign(user, mission);
+            userMissionJpaRepo.save(userMission);
+        }
     }
 }
