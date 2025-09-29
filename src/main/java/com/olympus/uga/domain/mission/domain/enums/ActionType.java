@@ -6,10 +6,6 @@ public enum ActionType {
 
     // 편지 관련
     LETTER_SEND,
-    WORRY_LETTER_SEND,
-
-    // AI 질문 답변 관련
-    AI_ANSWER,
 
     // 메모 관련
     MEMO_CREATE,
@@ -23,7 +19,6 @@ public enum ActionType {
     ALBUM_COMMENT,
 
     // 우가 관련
-    UGA_CHAT,
     UGA_FEED,
     UGA_ITEM_BUY,
 
