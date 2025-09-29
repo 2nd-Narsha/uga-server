@@ -6,7 +6,7 @@ import com.olympus.uga.domain.letter.error.LetterErrorCode;
 import com.olympus.uga.domain.letter.presentation.dto.request.LetterReq;
 import com.olympus.uga.domain.letter.presentation.dto.response.LetterListRes;
 import com.olympus.uga.domain.letter.presentation.dto.response.LetterRes;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.domain.user.error.UserErrorCode;
@@ -29,7 +29,7 @@ public class LetterService {
     private final UserJpaRepo userJpaRepo;
     private final PushNotificationService pushNotificationService;
     private final WebSocketService webSocketService;
-    private final MissionService missionService;
+    private final MissionProgressService missionProgressService;
 
     @Transactional
     public Response writeLetter(LetterReq req) {
@@ -51,7 +51,7 @@ public class LetterService {
         userJpaRepo.save(sender);
 
         // 미션 진행도 업데이트 - 편지 발송
-        missionService.onLetterSent(sender);
+        missionProgressService.onLetterSent(sender);
 
         // 편지 도착 푸시 알림 (받는 사람에게만)
         if (receiver.getFcmToken() != null) {

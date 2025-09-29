@@ -1,13 +1,12 @@
 package com.olympus.uga.domain.answer.service;
 
-import com.olympus.uga.domain.answer.domain.Answer;
 import com.olympus.uga.domain.answer.domain.repo.AnswerJpaRepo;
 import com.olympus.uga.domain.answer.error.AnswerErrorCode;
 import com.olympus.uga.domain.answer.presentation.dto.request.AnswerReq;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
 import com.olympus.uga.domain.question.domain.Question;
 import com.olympus.uga.domain.question.domain.repo.QuestionJpaRepo;
 import com.olympus.uga.domain.question.error.QuestionErrorCode;
@@ -26,7 +25,7 @@ public class AnswerService {
     private final QuestionJpaRepo questionJpaRepo;
     private final FamilyJpaRepo familyJpaRepo;
     private final UserSessionHolder userSessionHolder;
-    private final MissionService missionService;
+    private final MissionProgressService missionProgressService;
 
     @Transactional
     public Response createAnswer(Long questionId, AnswerReq req) {
@@ -45,7 +44,7 @@ public class AnswerService {
 
         answerJpaRepo.save(AnswerReq.fromAnswerReq(req, question, user));
 
-        missionService.onQuestionAnswered(user);
+        missionProgressService.onQuestionAnswered(user);
 
         return Response.created("답변이 등록되었습니다.");
     }

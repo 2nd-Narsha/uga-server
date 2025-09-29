@@ -42,6 +42,7 @@ public class AuthUseCase {
             throw new CustomException(SmsErrorCode.PHONE_NUM_NOT_VERIFIED);
         }
 
+        // TODO: 미션 할당
         userJpaRepo.save(SignUpReq.fromSignUpReq(req, passwordEncoder.encode(req.password())));
         redisTemplate.delete("sms:verified:" + req.phoneNum());
 

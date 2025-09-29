@@ -3,7 +3,10 @@ package com.olympus.uga.domain.mission.presentation;
 import com.olympus.uga.domain.mission.domain.enums.ActionType;
 import com.olympus.uga.domain.mission.error.MissionErrorCode;
 import com.olympus.uga.domain.mission.presentation.dto.response.MissionListRes;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionAssignService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
+import com.olympus.uga.domain.mission.service.MissionQueryService;
+import com.olympus.uga.domain.mission.service.MissionRewardService;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
@@ -18,33 +21,36 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/mission")
 public class MissionController {
-    private final MissionService missionService;
+    private final MissionRewardService missionRewardService;
+    private final MissionQueryService missionQueryService;
+    private final MissionAssignService missionAssignService;
+    private final MissionProgressService missionProgressService;
     private final UserSessionHolder userSessionHolder;
     private final UserJpaRepo userJpaRepo;
 
     @GetMapping("/list")
     @Operation(summary = "미션 목록 조회")
     public ResponseData<MissionListRes> getMissionList() {
-        return missionService.getMissionList();
+        return missionQueryService.getMissionList();
     }
 
     @PostMapping("/claim-reward/{missionId}")
     @Operation(summary = "미션 보상 수령")
     public Response claimReward(@PathVariable("missionId") Long missionId) {
-        return missionService.claimReward(missionId);
+        return missionRewardService.claimReward(missionId);
     }
 
     @PostMapping("/claim-daily-bonus")
     @Operation(summary = "일일 미션 완주 보너스 수령")
     public Response claimDailyBonus() {
-        return missionService.claimDailyBonus();
+        return missionRewardService.claimDailyBonus();
     }
 
 
     @PostMapping("/progress/{actionType}")
     @Operation(summary = "현재 사용자 미션 진행도 업데이트")
     public Response updateMissionProgress(@PathVariable ActionType actionType) {
-        missionService.updateCurrentUserMissionProgress(actionType);
+        missionProgressService.updateCurrentUserMissionProgress(actionType);
         return Response.ok("미션 진행도가 업데이트되었습니다.");
     }
 
@@ -52,7 +58,7 @@ public class MissionController {
     @Operation(summary = "현재 로그인한 사용자에게 미션 할당 (테스트용)")
     public Response assignMissionsToCurrentUser() {
         User user = userSessionHolder.getUser();
-        missionService.assignMissionsToNewUser(user);
+        missionAssignService.assignMissionsToNewUser(user);
         return Response.ok("미션이 성공적으로 할당되었습니다.");
     }
 
@@ -61,7 +67,7 @@ public class MissionController {
     public Response assignMissionsToUser(@PathVariable Long userId) {
         User user = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(MissionErrorCode.USER_NOT_FOUND));
-        missionService.assignMissionsToNewUser(user);
+        missionAssignService.assignMissionsToNewUser(user);
         return Response.ok("사용자 " + userId + "에게 미션이 성공적으로 할당되었습니다.");
     }
 }

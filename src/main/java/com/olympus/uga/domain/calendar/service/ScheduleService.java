@@ -10,7 +10,7 @@ import com.olympus.uga.domain.calendar.presentation.dto.response.ScheduleListRes
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
-import com.olympus.uga.domain.mission.service.MissionService;
+import com.olympus.uga.domain.mission.service.MissionProgressService;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
@@ -35,7 +35,7 @@ public class ScheduleService {
     private final ScheduleParticipantJpaRepo scheduleParticipantJpaRepo;
     private final UserJpaRepo userJpaRepo;
     private final PushNotificationService pushNotificationService;
-    private final MissionService missionService;
+    private final MissionProgressService missionProgressService;
 
     @Transactional(readOnly = true)
     public List<ScheduleListRes> getList(){
@@ -72,7 +72,7 @@ public class ScheduleService {
             req.participantIds().forEach(savedSchedule::addParticipant);
         }
 
-        missionService.onScheduleCreated(user);
+        missionProgressService.onScheduleCreated(user);
 
         // 가족들에게 스케줄 추가 푸시 알림 전송 (자신 제외)
         sendScheduleAddedNotification(user, req.title());
