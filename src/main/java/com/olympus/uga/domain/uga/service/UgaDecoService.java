@@ -3,6 +3,7 @@ package com.olympus.uga.domain.uga.service;
 import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.family.error.FamilyErrorCode;
+import com.olympus.uga.domain.mission.service.MissionService;
 import com.olympus.uga.domain.uga.domain.Uga;
 import com.olympus.uga.domain.uga.domain.UgaAsset;
 import com.olympus.uga.domain.uga.domain.enums.CharacterType;
@@ -30,6 +31,7 @@ public class UgaDecoService {
     private final FamilyJpaRepo familyJpaRepo;
     private final UgaJpaRepo ugaJpaRepo;
     private final WebSocketService webSocketService;
+    private final MissionService missionService;
 
     @Transactional
     public Response purchaseColor(ColorType req) {
@@ -59,6 +61,8 @@ public class UgaDecoService {
                 user.getPoint(),
                 "COLOR_PURCHASE"
         );
+
+        missionService.onUgaItemBought(user);
 
         return Response.ok("색상을 성공적으로 구매했습니다.");
     }
@@ -91,6 +95,8 @@ public class UgaDecoService {
                 user.getPoint(),
                 "CHARACTER_PURCHASE"
         );
+
+        missionService.onUgaItemBought(user);
 
         return Response.ok("캐릭터를 성공적으로 구매했습니다.");
     }
