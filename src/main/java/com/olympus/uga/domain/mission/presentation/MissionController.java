@@ -30,7 +30,7 @@ public class MissionController {
 
     @PostMapping("/claim-reward/{missionId}")
     @Operation(summary = "미션 보상 수령")
-    public Response claimReward(@PathVariable Long missionId) {
+    public Response claimReward(@PathVariable("missionId") Long missionId) {
         return missionService.claimReward(missionId);
     }
 
