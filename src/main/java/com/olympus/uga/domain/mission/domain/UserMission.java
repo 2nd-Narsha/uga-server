@@ -25,7 +25,7 @@ public class UserMission {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mission_id", nullable = false)
+    @JoinColumn(name = "mission_list_id", nullable = false)
     private MissionList missionList;
 
     @Column(name = "current_count", nullable = false)

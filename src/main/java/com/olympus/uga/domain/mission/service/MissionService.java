@@ -318,10 +318,12 @@ public class MissionService {
         log.info("주간 미션 갱신 완료");
     }
 
-    // 사용자가 처음 가입할 때 미션 할당
+    // 특정 사용자에게 미션 할당 (신규 가입자용)
     @Transactional
-    public void assignInitialMissionsForNewUser(User user) {
-        // 일일 미션 3개 랜덤 할당
+    public void assignMissionsToNewUser(User user) {
+        log.info("신규 사용자 미션 할당: {}", user.getId());
+
+        // 일일 미션 3개 할당
         List<MissionList> randomDailyMissions = missionListJpaRepo.findRandomMissions("DAILY", 3);
         for (MissionList mission : randomDailyMissions) {
             UserMission userMission = UserMission.assign(user, mission);
@@ -335,21 +337,11 @@ public class MissionService {
             userMissionJpaRepo.save(bonusUserMission);
         }
 
-        // 모든 주간 미션 할당
+        // 주간 미션 모두 할당
         List<MissionList> weeklyMissions = missionListJpaRepo.findByMissionTypeAndIsEnabledTrue(MissionType.WEEKLY);
         for (MissionList mission : weeklyMissions) {
             UserMission userMission = UserMission.assign(user, mission);
             userMissionJpaRepo.save(userMission);
         }
-
-        log.info("신규 사용자 {}에게 초기 미션 할당 완료", user.getId());
-    }
-
-    // 현재 로그인한 사용자에게 미션 할당 (테스트용)
-    @Transactional
-    public Response assignMissionsToCurrentUser() {
-        User user = userSessionHolder.getUser();
-        assignInitialMissionsForNewUser(user);
-        return Response.ok("미션이 성공적으로 할당되었습니다.");
     }
 }
