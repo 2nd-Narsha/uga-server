@@ -4,8 +4,8 @@ import com.olympus.uga.domain.user.domain.User;
 import lombok.Builder;
 
 @Builder
-public record MemoInfoRes(Long id, String profileImage, String imageUrl, String username, Double contribution, String memo, String location) {
-    public static MemoInfoRes from(Long id, User user, Double contribution, String memo, String location) {
+public record MemoInfoRes(Long id, String profileImage, String imageUrl, String username, Double contribution, String memo, String location, Boolean isRead) {
+    public static MemoInfoRes from(Long id, User user, Double contribution, String memo, String location, Boolean isRead) {
         return MemoInfoRes.builder()
                 .id(id)
                 .profileImage(user.getProfileImage())
@@ -14,6 +14,7 @@ public record MemoInfoRes(Long id, String profileImage, String imageUrl, String 
                 .contribution(contribution)
                 .memo(memo)
                 .location(location)
+                .isRead(isRead)
                 .build();
     }
 }

@@ -139,6 +139,8 @@ public class MemoService {
         Uga uga = ugaJpaRepo.findById(family.getPresentUgaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
+        boolean isChecked = user.getWatcher().contains(userId);
+
         double contributionRate = ugaContributionCalculator.calculateContributionRate(
                 uga.getId(), userId, uga.getTotalGrowthDays()
         );
@@ -148,17 +150,9 @@ public class MemoService {
                 memo.getWriter(),
                 contributionRate,
                 memo.getContent(),
-                memo.getLocation()
+                memo.getLocation(),
+                isChecked
         );
-    }
-
-    // 체크된 멤버 반환
-    public List<Long> checkedMember() {
-        User user = userSessionHolder.getUser();
-        if (user == null) {
-            throw new CustomException(UserErrorCode.USER_NOT_FOUND);
-        }
-        return user.getWatcher();
     }
 
     private Memo findByWriter(User writer) {
