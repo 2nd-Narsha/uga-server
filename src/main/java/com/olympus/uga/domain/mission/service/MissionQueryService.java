@@ -56,8 +56,8 @@ public class MissionQueryService {
 
         if (dailyBonusOpt.isPresent()) {
             UserMission dailyBonus = dailyBonusOpt.get();
-            updateDailyBonusStatus(dailyBonus, completedCount);
             status = dailyBonus.getStatus();
+            // 상태 변경 로직 제거: 조회만 수행
             canClaimBonus = status == StatusType.WAITING_REWARD;
         }
 
@@ -68,17 +68,7 @@ public class MissionQueryService {
 
     private int countCompletedMissions(List<MissionRes> missions) {
         return (int) missions.stream()
-                .filter(mission -> mission.status() == StatusType.COMPLETED)
+                .filter(mission -> mission.status() == StatusType.COMPLETED || mission.status() == StatusType.WAITING_REWARD)
                 .count();
-    }
-
-    private void updateDailyBonusStatus(UserMission dailyBonus, int completedCount) {
-        if (completedCount >= 3) {
-            dailyBonus.setCurrentCount(3);
-            if (dailyBonus.getStatus() == StatusType.INCOMPLETE) {
-                dailyBonus.completeTask();
-                userMissionJpaRepo.save(dailyBonus);
-            }
-        }
     }
 }
