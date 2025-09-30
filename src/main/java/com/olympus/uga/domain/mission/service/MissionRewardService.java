@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.mission.service;
 
 import com.olympus.uga.domain.mission.domain.UserMission;
+import com.olympus.uga.domain.mission.domain.enums.MissionType;
 import com.olympus.uga.domain.mission.domain.enums.StatusType;
 import com.olympus.uga.domain.mission.domain.repo.UserMissionJpaRepo;
 import com.olympus.uga.domain.mission.error.MissionErrorCode;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -43,6 +46,7 @@ public class MissionRewardService {
         UserMission dailyBonus = findDailyBonusMission(user);
 
         validateRewardAvailability(dailyBonus);
+        validateDailyMissionsCompleted(user); // 추가 검증
 
         giveReward(user, dailyBonus, "일일 미션 완료 보너스");
 
@@ -67,6 +71,22 @@ public class MissionRewardService {
 
     private void validateRewardAvailability(UserMission userMission) {
         if (userMission.getStatus() != StatusType.WAITING_REWARD) {
+            throw new CustomException(MissionErrorCode.REWARD_NOT_AVAILABLE);
+        }
+    }
+
+    private void validateDailyMissionsCompleted(User user) {
+        List<UserMission> dailyMissions = userMissionJpaRepo.findByUserAndMissionType(user, MissionType.DAILY);
+
+        // 일일 미션이 3개 미만이거나 모두 완료되지 않은 경우
+        if (dailyMissions.size() < 3) {
+            throw new CustomException(MissionErrorCode.REWARD_NOT_AVAILABLE);
+        }
+
+        boolean allCompleted = dailyMissions.stream()
+                .allMatch(um -> um.getStatus() == StatusType.WAITING_REWARD || um.getStatus() == StatusType.COMPLETED);
+
+        if (!allCompleted) {
             throw new CustomException(MissionErrorCode.REWARD_NOT_AVAILABLE);
         }
     }
