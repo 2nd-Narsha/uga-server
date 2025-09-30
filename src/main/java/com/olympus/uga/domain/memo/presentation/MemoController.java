@@ -31,9 +31,4 @@ public class MemoController {
     public MemoInfoRes getOne(@PathVariable Long userId) {
         return memoService.getOne(userId);
     }
-
-    @GetMapping("/ischecked")
-    public List<Long> getChecked() {
-        return memoService.checkedMember();
-    }
 }
