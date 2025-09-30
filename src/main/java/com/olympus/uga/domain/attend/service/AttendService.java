@@ -8,6 +8,7 @@ import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.common.Response;
 import com.olympus.uga.global.exception.CustomException;
 import com.olympus.uga.global.security.auth.UserSessionHolder;
+import com.olympus.uga.global.websocket.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class AttendService {
     private final AttendJpaRepo attendJpaRepo;
     private final UserJpaRepo userJpaRepo;
     private final UserSessionHolder userSessionHolder;
+    private final WebSocketService webSocketService;
 
     public AttendStatusRes getAttendStatus() {
         User user = userSessionHolder.getUser();
@@ -70,9 +72,12 @@ public class AttendService {
 
         attendJpaRepo.save(attend);
 
-        // 사용자 포인트 증가
         user.earnPoint(points);
+        user.updateLastActivityAt();
+
         userJpaRepo.save(user);
+
+        webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
 
         String message = (newStreak == 7)
                 ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
