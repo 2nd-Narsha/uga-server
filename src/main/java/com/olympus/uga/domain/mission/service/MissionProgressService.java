@@ -81,6 +81,11 @@ public class MissionProgressService {
         updateMissionProgress(user, ActionType.SCHEDULE_CREATE);
     }
 
+    @Transactional
+    public void onLetterDetailSent(User user) {
+        updateMissionProgress(user, ActionType.LETTER_DETAIL_SEND);
+    }
+
     private List<UserMission> findIncompleteMissionsByAction(User user, ActionType actionType) {
         return userMissionJpaRepo.findByUser(user).stream()
                 .filter(um -> um.getStatus() == StatusType.INCOMPLETE)

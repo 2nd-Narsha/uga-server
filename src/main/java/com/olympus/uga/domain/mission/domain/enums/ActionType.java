@@ -6,6 +6,7 @@ public enum ActionType {
 
     // 편지 관련
     LETTER_SEND,
+    LETTER_DETAIL_SEND,
 
     // 메모 관련
     MEMO_CREATE,
