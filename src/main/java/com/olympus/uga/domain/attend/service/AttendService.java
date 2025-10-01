@@ -131,56 +131,67 @@ public class AttendService {
 
     @Transactional
     public Response checkAttend() {
-        User user = userSessionHolder.getUser();
-        LocalDate today = LocalDate.now();
+        try {
+            User user = userSessionHolder.getUser();
+            LocalDate today = LocalDate.now();
 
-        Attend attend = getOrCreateAttend(user);
+            Attend attend = getOrCreateAttend(user);
 
-        log.info("=== 출석체크 시작 ===");
-        log.info("userId: {}", user.getId());
-        log.info("출석 전 currentStreak: {}", attend.getCurrentStreak());
+            log.info("=== 출석체크 시작 ===");
+            log.info("userId: {}", user.getId());
+            log.info("출석 전 currentStreak: {}", attend.getCurrentStreak());
 
-        if (!canAttendToday(attend, today)) {
-            throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
+            if (!canAttendToday(attend, today)) {
+                throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
+            }
+
+            if (shouldResetStreak(attend, today)) {
+                log.info("연속 출석 초기화!");
+                attend.resetStreak();
+            }
+
+            int newStreak = attend.getCurrentStreak() + 1;
+            log.info("새로운 streak: {}", newStreak);
+
+            int points = (newStreak == 7) ? 7 : 3;
+
+            attend.updateAttend(today, newStreak);
+            log.info("updateAttend 호출 후 currentStreak: {}", attend.getCurrentStreak());
+
+            if (newStreak == 7) {
+                attend.resetStreak();
+            }
+
+            Attend savedAttend = attendJpaRepo.save(attend);
+            attendJpaRepo.flush();
+
+            log.info("flush 후 currentStreak: {}", savedAttend.getCurrentStreak());
+
+            Attend reloadedAttend = attendJpaRepo.findById(savedAttend.getAttendId()).orElseThrow();
+            log.info("DB 재조회 후 currentStreak: {}", reloadedAttend.getCurrentStreak());
+
+            user.earnPoint(points);
+            user.updateLastActivityAt();
+            userJpaRepo.save(user);
+
+            log.info("User 저장 완료");
+
+            webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
+
+            log.info("웹소켓 전송 완료");
+
+            String message = (newStreak == 7)
+                    ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
+                    : "출석체크 완료! (연속 " + newStreak + "일)" + points + "포인트를 획득했습니다.";
+
+            log.info("메서드 종료 직전");
+
+            return Response.ok(message);
+
+        } catch (Exception e) {
+            log.error("출석체크 중 예외 발생!!!", e);
+            throw e;
         }
-
-        if (shouldResetStreak(attend, today)) {
-            log.info("연속 출석 초기화!");
-            attend.resetStreak();
-        }
-
-        int newStreak = attend.getCurrentStreak() + 1;
-        log.info("새로운 streak: {}", newStreak);
-
-        int points = (newStreak == 7) ? 7 : 3;
-
-        attend.updateAttend(today, newStreak);
-        log.info("updateAttend 호출 후 currentStreak: {}", attend.getCurrentStreak());
-
-        if (newStreak == 7) {
-            attend.resetStreak();
-        }
-
-        Attend savedAttend = attendJpaRepo.save(attend);
-        attendJpaRepo.flush(); // 강제 flush 추가!
-
-        log.info("flush 후 currentStreak: {}", savedAttend.getCurrentStreak());
-
-        // DB에서 다시 조회해서 확인
-        Attend reloadedAttend = attendJpaRepo.findById(savedAttend.getAttendId()).orElseThrow();
-        log.info("DB 재조회 후 currentStreak: {}", reloadedAttend.getCurrentStreak());
-
-        user.earnPoint(points);
-        user.updateLastActivityAt();
-        userJpaRepo.save(user);
-
-        webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
-
-        String message = (newStreak == 7)
-                ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
-                : "출석체크 완료! (연속 " + newStreak + "일)" + points + "포인트를 획득했습니다.";
-
-        return Response.ok(message);
     }
 
     private Attend getOrCreateAttend(User user) {
