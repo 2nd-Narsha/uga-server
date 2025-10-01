@@ -39,7 +39,6 @@ public class LetterService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         receiver.updateMailBox(false);
-        receiver.earnPoint(req.point());
         sender.usePoint(req.point());
 
         // 활동 시간 업데이트
@@ -99,6 +98,7 @@ public class LetterService {
         if (!letter.getIsRead()) {
             letter.markAsRead();
             letterJpaRepo.save(letter); // 변경사항 저장
+            user.earnPoint(letter.getPoint());
         }
 
         return LetterRes.from(letter);
