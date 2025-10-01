@@ -52,6 +52,11 @@ public class LetterService {
         // 미션 진행도 업데이트 - 편지 발송
         missionProgressService.onLetterSent(sender);
 
+        //미션 진행도 업데이트 - 장문 편지 발송
+        if (savedLetter.getContent().length() >= 200) {
+            missionProgressService.onLetterDetailSent(sender);
+        }
+
         // 편지 도착 푸시 알림 (받는 사람에게만)
         if (receiver.getFcmToken() != null) {
             pushNotificationService.sendLetterNotification(
