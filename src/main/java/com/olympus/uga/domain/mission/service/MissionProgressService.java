@@ -83,7 +83,7 @@ public class MissionProgressService {
 
     @Transactional
     public void onLetterDetailSent(User user) {
-        updateMissionProgress(user, ActionType.LETTER_DETAIL_SEND);
+        updateMissionProgress(user, ActionType.LETTER_DETAIL);
     }
 
     private List<UserMission> findIncompleteMissionsByAction(User user, ActionType actionType) {
