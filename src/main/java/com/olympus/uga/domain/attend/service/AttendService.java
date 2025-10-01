@@ -42,156 +42,50 @@ public class AttendService {
         return AttendStatusRes.from(attend, canAttendToday);
     }
 
-//    @Transactional
-//    public Response checkAttend() {
-////        User user = userSessionHolder.getUser();
-////        LocalDate today = LocalDate.now();
-////
-////        Attend attend = getOrCreateAttend(user);
-////
-////        // 오늘 출석 여부 확인
-////        if (!canAttendToday(attend, today)) {
-////            throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
-////        }
-////
-////        // 연속성 체크 및 필요시 초기화
-////        if (shouldResetStreak(attend, today)) {
-////            attend.resetStreak();
-////        }
-////
-////        // 연속 출석일수 계산
-////        int newStreak = attend.getCurrentStreak() + 1;
-////
-////        // 포인트 계산 (1-6일: 3포인트, 7일: 7포인트)
-////        int points = (newStreak == 7) ? 7 : 3;
-////
-////        // 출석 정보 업데이트
-////        attend.updateAttend(today, newStreak);
-////
-////        // 7일 달성시 초기화
-////        if (newStreak == 7) {
-////            attend.resetStreak();
-////        }
-////
-////        attendJpaRepo.save(attend);
-//
-//        User user = userSessionHolder.getUser();
-//        LocalDate today = LocalDate.now();
-//
-//        Attend attend = getOrCreateAttend(user);
-//
-//        log.info("=== 출석체크 시작 ===");
-//        log.info("userId: {}", user.getId());
-//        log.info("출석 전 currentStreak: {}", attend.getCurrentStreak());
-//        log.info("출석 전 lastAttendDate: {}", attend.getLastAttendDate());
-//
-//        // 오늘 출석 여부 확인
-//        if (!canAttendToday(attend, today)) {
-//            throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
-//        }
-//
-//        // 연속성 체크 및 필요시 초기화
-//        if (shouldResetStreak(attend, today)) {
-//            log.info("연속 출석 초기화!");
-//            attend.resetStreak();
-//        }
-//
-//        // 연속 출석일수 계산
-//        int newStreak = attend.getCurrentStreak() + 1;
-//        log.info("새로운 streak: {}", newStreak);
-//
-//        // 포인트 계산 (1-6일: 3포인트, 7일: 7포인트)
-//        int points = (newStreak == 7) ? 7 : 3;
-//
-//        // 출석 정보 업데이트
-//        attend.updateAttend(today, newStreak);
-//        log.info("updateAttend 호출 후 currentStreak: {}", attend.getCurrentStreak());
-//
-//        // 7일 달성시 초기화
-//        if (newStreak == 7) {
-//            attend.resetStreak();
-//        }
-//
-//        Attend savedAttend = attendJpaRepo.save(attend);
-//        log.info("save 후 currentStreak: {}", savedAttend.getCurrentStreak());
-//
-//        user.earnPoint(points);
-//        user.updateLastActivityAt();
-//
-//        userJpaRepo.save(user);
-//
-//        webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
-//
-//        String message = (newStreak == 7)
-//                ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
-//                : "출석체크 완료! (연속 " + newStreak + "일)" + points + "포인트를 획득했습니다.";
-//
-//        return Response.ok(message);
-//    }
-
     @Transactional
     public Response checkAttend() {
-        try {
-            User user = userSessionHolder.getUser();
-            LocalDate today = LocalDate.now();
+        User user = userSessionHolder.getUser();
+        LocalDate today = LocalDate.now();
 
-            Attend attend = getOrCreateAttend(user);
+        Attend attend = getOrCreateAttend(user);
 
-            log.info("=== 출석체크 시작 ===");
-            log.info("userId: {}", user.getId());
-            log.info("출석 전 currentStreak: {}", attend.getCurrentStreak());
-
-            if (!canAttendToday(attend, today)) {
-                throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
-            }
-
-            if (shouldResetStreak(attend, today)) {
-                log.info("연속 출석 초기화!");
-                attend.resetStreak();
-            }
-
-            int newStreak = attend.getCurrentStreak() + 1;
-            log.info("새로운 streak: {}", newStreak);
-
-            int points = (newStreak == 7) ? 7 : 3;
-
-            attend.updateAttend(today, newStreak);
-            log.info("updateAttend 호출 후 currentStreak: {}", attend.getCurrentStreak());
-
-            if (newStreak == 7) {
-                attend.resetStreak();
-            }
-
-            Attend savedAttend = attendJpaRepo.save(attend);
-            attendJpaRepo.flush();
-
-            log.info("flush 후 currentStreak: {}", savedAttend.getCurrentStreak());
-
-            Attend reloadedAttend = attendJpaRepo.findById(savedAttend.getAttendId()).orElseThrow();
-            log.info("DB 재조회 후 currentStreak: {}", reloadedAttend.getCurrentStreak());
-
-            user.earnPoint(points);
-            user.updateLastActivityAt();
-            userJpaRepo.save(user);
-
-            log.info("User 저장 완료");
-
-            webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
-
-            log.info("웹소켓 전송 완료");
-
-            String message = (newStreak == 7)
-                    ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
-                    : "출석체크 완료! (연속 " + newStreak + "일)" + points + "포인트를 획득했습니다.";
-
-            log.info("메서드 종료 직전");
-
-            return Response.ok(message);
-
-        } catch (Exception e) {
-            log.error("출석체크 중 예외 발생!!!", e);
-            throw e;
+        // 오늘 출석 여부 확인
+        if (!canAttendToday(attend, today)) {
+            throw new CustomException(AttendErrorCode.ALREADY_CHECKED_TODAY);
         }
+
+        // 연속성 체크 및 필요시 초기화
+        if (shouldResetStreak(attend, today)) {
+            attend.resetStreak();
+        }
+
+        // 연속 출석일수 계산
+        int newStreak = attend.getCurrentStreak() + 1;
+
+        // 포인트 계산 (1-6일: 3포인트, 7일: 7포인트)
+        int points = (newStreak == 7) ? 7 : 3;
+
+        // 출석 정보 업데이트
+        attend.updateAttend(today, newStreak);
+
+        // 7일 달성시 초기화
+        if (newStreak == 7) {
+            attend.resetStreak();
+        }
+
+        attendJpaRepo.save(attend);
+
+        user.earnPoint(points);
+        user.updateLastActivityAt();
+        userJpaRepo.save(user);
+
+        webSocketService.notifyPointUpdate(user.getId(), points, "ATTEND_CHECK");
+
+        String message = (newStreak == 7)
+                ? "7일 연속 출석 완료! " + points + "포인트를 획득했습니다. 출석 카운터가 초기화됩니다."
+                : "출석체크 완료! (연속 " + newStreak + "일)" + points + "포인트를 획득했습니다.";
+
+        return Response.ok(message);
     }
 
     private Attend getOrCreateAttend(User user) {
@@ -212,7 +106,13 @@ public class AttendService {
 
     private boolean shouldResetStreak(Attend attend, LocalDate today) {
         LocalDate lastAttendDate = attend.getLastAttendDate();
-        // 연속성 체크: 마지막 출석일이 어제가 아니고, 현재 연속일수가 0보다 크면 초기화
+
+        // 마지막 출석일이 오늘이면 초기화 안 함 (방금 출석한 경우)
+        if (lastAttendDate.equals(today)) {
+            return false;
+        }
+
+        // 마지막 출석일이 어제가 아니고, 현재 연속일수가 0보다 크면 초기화
         return !lastAttendDate.equals(today.minusDays(1)) && attend.getCurrentStreak() > 0;
     }
 }
