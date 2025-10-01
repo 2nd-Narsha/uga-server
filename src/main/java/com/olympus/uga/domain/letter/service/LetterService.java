@@ -33,7 +33,6 @@ public class LetterService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         receiver.updateMailBox(false);
-        receiver.earnPoint(req.point());
         sender.usePoint(req.point());
 
         letterJpaRepo.save(LetterReq.fromLetterReq(sender, receiver, req));
@@ -63,6 +62,7 @@ public class LetterService {
         if (!letter.getIsRead()) {
             letter.markAsRead();
             letterJpaRepo.save(letter); // 변경사항 저장
+            user.earnPoint(letter.getPoint());
         }
 
         return LetterRes.from(letter);
