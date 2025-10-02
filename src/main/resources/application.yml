@@ -55,7 +55,7 @@ oauth:
     redirect-uri: https://uga.r-e.kr/oauth/google/login
   apple:
     team-id: 688647KH4L
-    client-id: com.olympus.service
+    client-id: com.olympus.uga
     key-id: C9748B2N8F
     private-key: MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg+pVgY8QUGiQNyUpoQknaf3xu2EOSi7tt7b5HfrKXu9CgCgYIKoZIzj0DAQehRANCAARYXpOxGf0/tCWrNrOgfLRyD40fLpoF94aH5ZCU49WELSgCzeELIhueSu6cCf1K1IRDH90cJruX9yIkiSuCzTR6
     redirect-uri: https://uga.r-e.kr/oauth/apple/login
