@@ -5,9 +5,7 @@ import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
 import com.olympus.uga.global.security.jwt.JwtProperties;
 import com.olympus.uga.global.security.jwt.enums.TokenType;
-import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -36,21 +34,21 @@ public class JwtProvider {
 
     public String createAccessToken(Long userId) {
         return Jwts.builder()
-                .setHeaderParam(Header.JWT_TYPE, TokenType.ACCESS)
-                .setSubject(String.valueOf(userId))
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExp()))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .header().add("typ", TokenType.ACCESS.toString()).and()
+                .subject(String.valueOf(userId))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessExp()))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     private String createRefreshToken(Long userId) {
         return Jwts.builder()
-                .setHeaderParam(Header.JWT_TYPE, TokenType.REFRESH)
-                .setSubject(String.valueOf(userId))
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExp()))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .header().add("typ", TokenType.REFRESH.toString()).and()
+                .subject(String.valueOf(userId))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshExp()))
+                .signWith(getSigningKey())
                 .compact();
     }
 
