@@ -33,7 +33,7 @@ public class JwtTokenService {
     private long getRemainingExpiration(String token) {
         try {
             var claims = jwtExtractor.getClaims(token);
-            long expiration = claims.getBody().getExpiration().getTime();
+            long expiration = claims.getPayload().getExpiration().getTime();
             long now = System.currentTimeMillis();
 
             return Math.max(0, expiration - now);
