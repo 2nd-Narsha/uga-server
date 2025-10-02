@@ -3,9 +3,11 @@ package com.olympus.uga.domain.user.domain.repo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.enums.LoginType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,4 +36,10 @@ public interface UserJpaRepo extends JpaRepository<User, Long> {
 
     // FCM 토큰으로 사용자 조회
     Optional<User> findByFcmToken(String fcmToken);
+    
+    // 무효한 FCM 토큰을 null로 업데이트
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.fcmToken = NULL WHERE u.fcmToken = :fcmToken")
+    void updateFcmTokenToNull(@Param("fcmToken") String fcmToken);
 }
