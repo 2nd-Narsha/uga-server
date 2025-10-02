@@ -31,19 +31,25 @@ public class NotificationScheduler {
         LocalDate today = LocalDate.now();
         LocalDateTime now = LocalDateTime.now();
 
-        log.debug("디데이 알림 스케줄러 실행 - 현재시간: {}", now);
+        log.info("디데이 알림 스케줄러 실행 - 현재시간: {}", now);
 
         List<DDay> dDaysToNotify = dDayJpaRepo.findByDateAndStartTimeNotNullAndIsNotificationSentFalse(today);
 
         if (dDaysToNotify.isEmpty()) {
-            log.debug("오늘 알림을 보낼 디데이가 없습니다.");
+            log.info("오늘 알림을 보낼 디데이가 없습니다.");
             return;
         }
 
         log.info("오늘 알림 대상 디데이 개수: {}", dDaysToNotify.size());
 
         for (DDay dDay : dDaysToNotify) {
-            if (shouldSendNotification(dDay.getStartTime(), now)) {
+            log.info("디데이 처리 중 - 제목: {}, 시작시간: {}, 가족코드: {}",
+                    dDay.getTitle(), dDay.getStartTime(), dDay.getFamilyCode());
+
+            boolean shouldSend = shouldSendNotification(dDay.getStartTime(), now);
+            log.info("알림 전송 조건 확인 - 전송여부: {}, 이벤트: {}", shouldSend, dDay.getTitle());
+
+            if (shouldSend) {
                 try {
                     List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(dDay.getFamilyCode());
 
@@ -52,16 +58,19 @@ public class NotificationScheduler {
                         continue;
                     }
 
+                    log.info("알림 전송 대상 가족 구성원 수: {} - 이벤트: {}", familyMembers.size(), dDay.getTitle());
+
                     int successCount = 0;
                     for (User user : familyMembers) {
                         if (user.getFcmToken() != null && !user.getFcmToken().trim().isEmpty()) {
+                            log.info("푸시 알림 전송 시도 - 사용자: {}, 이벤트: {}", user.getUsername(), dDay.getTitle());
                             pushNotificationService.sendDdayReminderNotification(
                                     user.getFcmToken(),
                                     dDay.getTitle()
                             );
                             successCount++;
                         } else {
-                            log.debug("FCM 토큰이 없는 사용자 - ID: {}", user.getId());
+                            log.warn("FCM 토큰이 없는 사용자 - ID: {}, 이름: {}", user.getId(), user.getUsername());
                         }
                     }
 
@@ -73,6 +82,9 @@ public class NotificationScheduler {
                     log.error("디데이 알림 전송 중 오류 발생 - 이벤트: {}, 에러: {}",
                             dDay.getTitle(), e.getMessage(), e);
                 }
+            } else {
+                log.info("알림 전송 조건 미충족 - 이벤트: {}, 시작시간: {}, 현재시간: {}",
+                        dDay.getTitle(), dDay.getStartTime(), now);
             }
         }
     }
@@ -117,43 +129,40 @@ public class NotificationScheduler {
      */
     private boolean shouldSendNotification(String startTime, LocalDateTime now) {
         if (startTime == null || startTime.trim().isEmpty()) {
+            log.warn("시작시간이 설정되지 않음");
             return false;
         }
 
         try {
+            // startTime을 "HH:mm" 형식으로 파싱
             String[] timeParts = startTime.split(":");
-            if (timeParts.length < 2) {
-                log.warn("잘못된 시작시간 형식: {}", startTime);
+            if (timeParts.length != 2) {
+                log.warn("잘못된 시간 형식: {}", startTime);
                 return false;
             }
 
             int hour = Integer.parseInt(timeParts[0]);
             int minute = Integer.parseInt(timeParts[1]);
 
-            // 오늘 날짜의 시작시간
-            LocalDateTime startDateTime = now.toLocalDate().atTime(hour, minute);
-            // 30분 전 시간
-            LocalDateTime thirtyMinutesBefore = startDateTime.minusMinutes(30);
+            // 오늘 날짜의 시작시간으로 LocalDateTime 생성
+            LocalDateTime eventDateTime = now.toLocalDate().atTime(hour, minute);
 
-            // 현재 시간과 30분 전 시간의 차이 계산
-            long minutesDifference = Math.abs(
-                    java.time.Duration.between(now, thirtyMinutesBefore).toMinutes()
-            );
+            // 30분 전 시간 계산
+            LocalDateTime notificationTime = eventDateTime.minusMinutes(30);
 
-            // 5분 간격 스케줄러에 맞춰 ±7분 오차 허용
-            boolean shouldSend = minutesDifference <= 7;
+            // 현재 시간이 알림 시간의 ±7분 범위 내에 있는지 확인
+            LocalDateTime windowStart = notificationTime.minusMinutes(7);
+            LocalDateTime windowEnd = notificationTime.plusMinutes(7);
 
-            if (shouldSend) {
-                log.info("디데이 알림 발송 조건 충족 - 시작시간: {}, 30분 전: {}, 현재: {}, 차이: {}분",
-                        startTime, thirtyMinutesBefore.toLocalTime(), now.toLocalTime(), minutesDifference);
-            }
+            boolean shouldSend = !now.isBefore(windowStart) && !now.isAfter(windowEnd);
+
+            log.info("알림 전송 시간 검증 - 이벤트시간: {}, 알림시간: {}, 현재시간: {}, 범위: {} ~ {}, 전송여부: {}",
+                    eventDateTime, notificationTime, now, windowStart, windowEnd, shouldSend);
 
             return shouldSend;
+
         } catch (NumberFormatException e) {
-            log.error("시작시간 파싱 오류: {}", startTime, e);
-            return false;
-        } catch (Exception e) {
-            log.error("알림 발송 조건 확인 중 오류: {}", startTime, e);
+            log.error("시간 파싱 오류 - startTime: {}, 에러: {}", startTime, e.getMessage());
             return false;
         }
     }

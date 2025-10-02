@@ -216,45 +216,44 @@ public class PushNotificationService {
 
     // Firebase 메시징 예외 처리
     private void handleFirebaseMessagingException(FirebaseMessagingException e, String fcmToken) {
-        String errorCode = e.getErrorCode().name();
-        String tokenPreview = fcmToken != null && fcmToken.length() > 20
-                ? fcmToken.substring(0, 20) + "..."
-                : fcmToken;
+        MessagingErrorCode errorCode = e.getMessagingErrorCode();
+        String shortToken = fcmToken.substring(0, Math.min(20, fcmToken.length()));
 
         switch (errorCode) {
-            case "UNREGISTERED":
-            case "INVALID_REGISTRATION":
-                log.warn("유효하지 않은 FCM 토큰 - 토큰: {}, 에러코드: {}", tokenPreview, errorCode);
-                removeInvalidFcmToken(fcmToken);
+            case UNREGISTERED:
+                log.warn("등록되지 않은 FCM 토큰 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
+                // 유효하지 않은 토큰을 DB에서 제거하거나 무효화 처리
+                handleInvalidToken(fcmToken);
                 break;
-            case "NOT_FOUND":
-                log.warn("FCM 토큰을 찾을 수 없음 - 토큰: {} (앱 재설치 또는 토큰 만료 가능성)", tokenPreview);
-                removeInvalidFcmToken(fcmToken);
+            case INVALID_ARGUMENT:
+                log.error("잘못된 FCM 요청 파라미터 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
                 break;
-            case "QUOTA_EXCEEDED":
-                log.error("FCM 할당량 초과");
+            case SENDER_ID_MISMATCH:
+                log.error("발신자 ID 불일치 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
                 break;
-            case "SENDER_ID_MISMATCH":
-                log.error("잘못된 발신자 ID - Firebase 프로젝트 설정 확인 필요");
+            case QUOTA_EXCEEDED:
+                log.error("FCM 할당량 초과 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
+                break;
+            case UNAVAILABLE:
+                log.warn("FCM 서비스 일시적 이용 불가 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
+                break;
+            case INTERNAL:
+                log.error("FCM 내부 오류 - 토큰: {}..., 에러: {}", shortToken, e.getMessage());
                 break;
             default:
-                log.error("FCM 전송 실패 - 토큰: {}, 코드: {}, 메시지: {}",
-                        tokenPreview, errorCode, e.getMessage());
+                log.error("알 수 없는 FCM 오류 [{}] - 토큰: {}..., 에러: {}", errorCode, shortToken, e.getMessage());
         }
     }
 
-    /**
-     * 유효하지 않은 FCM 토큰을 DB에서 제거
-     */
-    private void removeInvalidFcmToken(String fcmToken) {
+    // 유효하지 않은 토큰 처리
+    private void handleInvalidToken(String fcmToken) {
         try {
-            userJpaRepo.findByFcmToken(fcmToken).ifPresent(user -> {
-                user.updateFcmToken(null);
-                userJpaRepo.save(user);
-                log.info("유효하지 않은 FCM 토큰 제거 완료 - 사용자 ID: {}", user.getId());
-            });
+            // FCM 토큰을 null로 업데이트하여 무효화
+            userJpaRepo.updateFcmTokenToNull(fcmToken);
+            log.info("유효하지 않은 FCM 토큰 무효화 완료 - 토큰: {}...",
+                    fcmToken.substring(0, Math.min(20, fcmToken.length())));
         } catch (Exception e) {
-            log.error("FCM 토큰 제거 중 오류 발생: {}", e.getMessage(), e);
+            log.error("FCM 토큰 무효화 처리 실패 - 에러: {}", e.getMessage());
         }
     }
 }

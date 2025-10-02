@@ -165,26 +165,30 @@ public class MemoService {
     // 메모 업데이트 시 가족들에게 푸시 알림 전송 (자신 제외)
     private void sendMemoUpdateNotification(User writer) {
         try {
-            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
-                    .orElse(null);
-
-            if (family == null) {
+            if (writer.getFamilyCode() == null) {
+                log.warn("가족 코드가 없는 사용자 - ID: {}", writer.getId());
                 return;
             }
 
-            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+            // FCM 토큰이 있는 가족 구성원만 조회
+            List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(writer.getFamilyCode());
 
+            int notificationCount = 0;
             for (User member : familyMembers) {
-                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
-                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                // 자신은 제외
+                if (!member.getId().equals(writer.getId())) {
                     pushNotificationService.sendMemoAddedNotification(
                             member.getFcmToken(),
                             writer.getUsername()
                     );
+                    notificationCount++;
                 }
             }
+
+            log.info("메모 업데이트 알림 전송 완료 - 작성자: {}, 수신자: {}명",
+                    writer.getUsername(), notificationCount);
         } catch (Exception e) {
-            log.warn("메모 업데이트 푸시 알림 전송 실패: {}", e.getMessage());
+            log.error("메모 업데이트 푸시 알림 전송 실패: {}", e.getMessage(), e);
         }
     }
 }
