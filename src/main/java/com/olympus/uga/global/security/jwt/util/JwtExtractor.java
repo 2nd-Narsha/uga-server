@@ -10,7 +10,6 @@ import com.olympus.uga.global.security.jwt.enums.TokenType;
 import com.olympus.uga.global.security.jwt.error.JwtErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -52,7 +51,7 @@ public class JwtExtractor {
         }
 
         Jws<Claims> claims = getClaims(token);
-        Long userId = Long.valueOf(claims.getBody().getSubject());
+        Long userId = Long.valueOf(claims.getPayload().getSubject());
 
         User user = userJpaRepo.findById(userId)
                 .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
@@ -63,19 +62,19 @@ public class JwtExtractor {
     }
 
     public Long getUserId(String token) {
-        return Long.valueOf(getClaims(token).getBody().getSubject());
+        return Long.valueOf(getClaims(token).getPayload().getSubject());
     }
 
     public boolean isWrongType(String token, TokenType tokenType) {
         Jws<Claims> claims = getClaims(token);
-        Object header = claims.getHeader().get(Header.JWT_TYPE);
+        Object header = claims.getHeader().get("typ");
 
         return !tokenType.toString().equals(String.valueOf(header));
     }
 
     public Jws<Claims> getClaims(String token) {
         try{
-            return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
         } catch (ExpiredJwtException e) {
             throw new CustomException(JwtErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
