@@ -82,22 +82,35 @@ public class AppleOAuthService {
      * Client Secret JWT 토큰 생성
      */
     private String makeClientSecretToken() {
-        String token = Jwts.builder()
-                .subject(clientId)
-                .issuer(teamId)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + THIRTY_DAYS_MS))
-                .audience()
-                .add("https://appleid.apple.com")
-                .and()
-                .header()
-                .keyId(keyId)
-                .and()
-                .signWith(getPrivateKey(), Jwts.SIG.ES256)
-                .compact();
+        log.info("[애플 로그인] teamId: {}", teamId);
+        log.info("[애플 로그인] clientId: {}", clientId);
+        log.info("[애플 로그인] keyId: {}", keyId);
+        log.info("[애플 로그인] privateKey length: {}", privateKey != null ? privateKey.length() : "null");
 
-        log.info("[애플 로그인] 클라이언트 시크릿 토큰 생성 완료");
-        return token;
+        try {
+            long now = System.currentTimeMillis();
+
+            String token = Jwts.builder()
+                    .subject(clientId)
+                    .issuer(teamId)
+                    .issuedAt(new Date(now))
+                    .expiration(new Date(now + THIRTY_DAYS_MS))
+                    .audience()
+                    .add("https://appleid.apple.com")
+                    .and()
+                    .header()
+                    .keyId(keyId)
+                    .add("alg", "ES256")
+                    .and()
+                    .signWith(getPrivateKey(), Jwts.SIG.ES256)
+                    .compact();
+
+            log.info("[애플 로그인] 클라이언트 시크릿 토큰 생성 완료");
+            return token;
+        } catch (Exception e) {
+            log.error("[애플 로그인] 토큰 생성 실패", e);
+            throw new RuntimeException("애플 client_secret 토큰 생성 실패: " + e.getMessage());
+        }
     }
 
     /**
@@ -105,13 +118,16 @@ public class AppleOAuthService {
      */
     private PrivateKey getPrivateKey() {
         try {
-            byte[] privateKeyBytes = Base64.getDecoder().decode(privateKey);
+            // 공백, 줄바꿈 제거
+            String cleanedKey = privateKey.replaceAll("\\s+", "");
+
+            byte[] privateKeyBytes = Base64.getDecoder().decode(cleanedKey);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             return keyFactory.generatePrivate(keySpec);
         } catch (Exception e) {
             log.error("[애플 로그인] Private Key 생성 실패", e);
-            throw new RuntimeException("애플 Private Key 생성 실패");
+            throw new RuntimeException("애플 Private Key 생성 실패: " + e.getMessage());
         }
     }
 
@@ -122,7 +138,7 @@ public class AppleOAuthService {
         // 애플 공개키 가져오기
         List<ApplePublicKeyDto> publicKeys = getApplePublicKeys();
 
-        // JWT 파싱 및 검증
+        // JWT 파싱 및 검증 (0.12.6 버전)
         AppleKeyLocator keyLocator = new AppleKeyLocator(publicKeys);
 
         Claims claims = Jwts.parser()
