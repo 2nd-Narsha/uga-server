@@ -143,27 +143,30 @@ public class ScheduleService {
     // 스케줄 추가 시 가족들에게 푸시 알림 전송 (자신 제외)
     private void sendScheduleAddedNotification(User writer, String scheduleTitle) {
         try {
-            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
-                    .orElse(null);
-
-            if (family == null) {
+            if (writer.getFamilyCode() == null) {
+                log.warn("가족 코드가 없는 사용자 - ID: {}", writer.getId());
                 return;
             }
 
-            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+            // familyCode로 직접 조회 (FCM 토큰이 있는 사용자만)
+            List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(writer.getFamilyCode());
 
+            int notificationCount = 0;
             for (User member : familyMembers) {
-                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
-                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                // 자신은 제외
+                if (!member.getId().equals(writer.getId())) {
                     pushNotificationService.sendScheduleAddedNotification(
                             member.getFcmToken(),
                             writer.getUsername(),
                             scheduleTitle
                     );
+                    notificationCount++;
                 }
             }
+
+            log.info("스케줄 추가 알림 전송 완료 - 일정: {}, 수신자: {}명", scheduleTitle, notificationCount);
         } catch (Exception e) {
-            log.warn("스케줄 추가 푸시 알림 전송 실패: {}", e.getMessage());
+            log.error("스케줄 추가 푸시 알림 전송 실패: {}", e.getMessage(), e);
         }
     }
 }

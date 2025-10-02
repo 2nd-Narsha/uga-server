@@ -137,22 +137,32 @@ public class UgaUseCase {
         ugaContributionJpaRepo.save(contribution);
     }
 
+    // 우가 성장 알림 전송
     private void sendUgaGrowthNotification(Family family, Uga uga) {
         try {
-            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+            if (family.getFamilyCode() == null) {
+                log.warn("가족 코드가 없는 Family - ID: {}", family.getFamilyCode());
+                return;
+            }
+
+            // FCM 토큰이 있는 가족 구성원만 조회
+            List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(family.getFamilyCode());
             int growthLevel = getGrowthLevel(uga.getGrowth());
 
+            int notificationCount = 0;
             for (User member : familyMembers) {
-                if (member.getFcmToken() != null) {
-                    pushNotificationService.sendUgaGrowthNotification(
-                            member.getFcmToken(),
-                            growthLevel,
-                            uga.getUgaName()
-                    );
-                }
+                pushNotificationService.sendUgaGrowthNotification(
+                        member.getFcmToken(),
+                        growthLevel,
+                        uga.getUgaName()
+                );
+                notificationCount++;
             }
+
+            log.info("우가 성장 알림 전송 완료 - 우가: {}, 레벨: {}, 수신자: {}명",
+                    uga.getUgaName(), growthLevel, notificationCount);
         } catch (Exception e) {
-            log.warn("우가 성장 푸시 알림 전송 실패: {}", e.getMessage());
+            log.error("우가 성장 푸시 알림 전송 실패: {}", e.getMessage(), e);
         }
     }
 

@@ -6,7 +6,6 @@ import com.olympus.uga.domain.calendar.error.CalendarErrorCode;
 import com.olympus.uga.domain.calendar.presentation.dto.request.DDayReq;
 import com.olympus.uga.domain.calendar.presentation.dto.request.DDayUpdateReq;
 import com.olympus.uga.domain.calendar.presentation.dto.response.DDayListRes;
-import com.olympus.uga.domain.family.domain.Family;
 import com.olympus.uga.domain.family.domain.repo.FamilyJpaRepo;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.user.domain.repo.UserJpaRepo;
@@ -108,27 +107,30 @@ public class DDayService {
     // 디데이 추가 시 가족들에게 푸시 알림 전송 (자신 제외)
     private void sendDdayAddedNotification(User writer, String ddayTitle) {
         try {
-            Family family = familyJpaRepo.findByMemberListContaining(writer.getId())
-                    .orElse(null);
-
-            if (family == null) {
+            if (writer.getFamilyCode() == null) {
+                log.warn("가족 코드가 없는 사용자 - ID: {}", writer.getId());
                 return;
             }
 
-            List<User> familyMembers = userJpaRepo.findAllById(family.getMemberList());
+            // familyCode로 직접 조회 (훨씬 간단하고 확실함)
+            List<User> familyMembers = userJpaRepo.findByFamilyCodeWithFcmToken(writer.getFamilyCode());
 
+            int notificationCount = 0;
             for (User member : familyMembers) {
-                // 자신은 제외하고 FCM 토큰이 있는 경우에만 전송
-                if (!member.getId().equals(writer.getId()) && member.getFcmToken() != null) {
+                // 자신은 제외
+                if (!member.getId().equals(writer.getId())) {
                     pushNotificationService.sendDdayAddedNotification(
                             member.getFcmToken(),
                             writer.getUsername(),
                             ddayTitle
                     );
+                    notificationCount++;
                 }
             }
+
+            log.info("디데이 추가 알림 전송 완료 - 이벤트: {}, 수신자: {}명", ddayTitle, notificationCount);
         } catch (Exception e) {
-            log.warn("디데이 추가 푸시 알림 전송 실패: {}", e.getMessage());
+            log.error("디데이 추가 푸시 알림 전송 실패: {}", e.getMessage(), e);
         }
     }
 }
