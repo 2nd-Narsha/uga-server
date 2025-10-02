@@ -54,11 +54,11 @@ oauth:
     client-secret: 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
     redirect-uri: https://uga.r-e.kr/oauth/google/login
   apple:
-    team-id: YOUR_TEAM_ID  # 애플 개발자 페이지 우상단 코드
-    client-id: com.olympus.uga  # Service ID Identifier
-    key-id: YOUR_KEY_ID  # 생성한 KEY ID
-    private-key: YOUR_PRIVATE_KEY_WITHOUT_HEADERS  # -----BEGIN/END----- 제거하고 줄바꿈도 제거한 키
-    redirect-uri: https://yourdomain.com/api/oauth/redirect/apple
+    team-id: 688647KH4L
+    client-id: com.olympus.service
+    key-id: C9748B2N8F
+    private-key: MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg+pVgY8QUGiQNyUpoQknaf3xu2EOSi7tt7b5HfrKXu9CgCgYIKoZIzj0DAQehRANCAARYXpOxGf0/tCWrNrOgfLRyD40fLpoF94aH5ZCU49WELSgCzeELIhueSu6cCf1K1IRDH90cJruX9yIkiSuCzTR6
+    redirect-uri: https://uga.r-e.kr/oauth/apple/login
 
 springdoc:
   api-docs:
