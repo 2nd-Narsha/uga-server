@@ -62,19 +62,31 @@ public class AppleOAuthService {
                 .build();
 
         try {
+            log.info("[애플 로그인] 토큰 요청 시작");
+            log.info("[애플 로그인] code: {}", code);
+            log.info("[애플 로그인] clientId: {}", clientId);
+
+            String clientSecret = makeClientSecretToken();
+            log.info("[애플 로그인] clientSecret 생성 완료");
+
             return webClient.post()
                     .uri(uriBuilder -> uriBuilder.path("/auth/token")
                             .queryParam("grant_type", "authorization_code")
                             .queryParam("client_id", clientId)
-                            .queryParam("client_secret", makeClientSecretToken())
+                            .queryParam("client_secret", clientSecret)
                             .queryParam("code", code)
                             .build())
                     .retrieve()
                     .bodyToMono(AppleTokenResponseDto.class)
                     .block();
         } catch (WebClientResponseException e) {
-            log.error("[애플 로그인 실패]: {}", e.getResponseBodyAsString(), e);
+            log.error("[애플 로그인 실패] 상태코드: {}", e.getStatusCode());
+            log.error("[애플 로그인 실패] 응답 본문: {}", e.getResponseBodyAsString());
+            log.error("[애플 로그인 실패] 헤더: {}", e.getHeaders());
             throw new RuntimeException("애플 로그인 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("[애플 로그인] 예상치 못한 에러", e);
+            throw new RuntimeException("애플 로그인 중 오류 발생: " + e.getMessage());
         }
     }
 
