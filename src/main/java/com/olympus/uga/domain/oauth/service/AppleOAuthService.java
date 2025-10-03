@@ -150,7 +150,7 @@ public class AppleOAuthService {
         // 애플 공개키 가져오기
         List<ApplePublicKeyDto> publicKeys = getApplePublicKeys();
 
-        // JWT 파싱 및 검증 (0.12.6 버전)
+        // JWT 파싱 및 검증
         AppleKeyLocator keyLocator = new AppleKeyLocator(publicKeys);
 
         Claims claims = Jwts.parser()
@@ -161,10 +161,19 @@ public class AppleOAuthService {
 
         log.info("[애플 로그인] id_token 검증 완료: {}", claims.toString());
 
-        // User 엔티티 생성
+        String email = claims.get("email", String.class);
+        String oauthId = claims.getSubject();
+
+        // 이메일이 없는 경우 처리
+        if (email == null) {
+            log.warn("[애플 로그인] 이메일 정보 없음 - oauthId로만 식별: {}", oauthId);
+            // oauthId 기반으로 더미 이메일 생성 (선택사항)
+            // email = oauthId + "@apple.privaterelay.appleid.com";
+        }
+
         return User.builder()
-                .email(claims.get("email", String.class))
-                .oauthId(claims.getSubject())
+                .email(email)  // null일 수 있음
+                .oauthId(oauthId)
                 .loginType(LoginType.APPLE)
                 .point(0)
                 .isCheckedMailbox(true)
