@@ -1,4 +1,6 @@
 package com.olympus.uga.domain.auth.presentation.dto.request;
 
-public record RefreshReq(String refreshToken){
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record RefreshReq(@JsonProperty("token") String refreshToken){
 }
