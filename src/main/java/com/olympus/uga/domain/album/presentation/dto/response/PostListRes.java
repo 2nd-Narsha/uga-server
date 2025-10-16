@@ -14,7 +14,7 @@ public record PostListRes(Long postId,
     public static PostListRes from(Post post, Long commentCount, List<String> imageUrls) {
         return new PostListRes(
                 post.getPostId(),
-                post.getWriter().getProfileImage(),
+                post.getWriter().getCharacter().getImageUrl(),
                 post.getWriter().getUsername(),
                 post.getContent(),
                 imageUrls,
