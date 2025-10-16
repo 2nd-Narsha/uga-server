@@ -9,7 +9,7 @@ public record CommentRes(Long commentId,
     public static CommentRes from(Comment comment) {
         return new CommentRes(
                 comment.getCommentId(),
-                comment.getWriter().getProfileImage(),
+                comment.getWriter().getCharacter().getImageUrl(),
                 comment.getWriter().getUsername(),
                 comment.getContent()
         );
