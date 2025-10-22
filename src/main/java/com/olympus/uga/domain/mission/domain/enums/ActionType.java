@@ -24,5 +24,11 @@ public enum ActionType {
     UGA_ITEM_BUY,
 
     // 일정 관련
-    SCHEDULE_CREATE
+    SCHEDULE_CREATE,
+
+    //  AI 질문 답변 관련
+    AI_QUESTION_ANSWER,
+
+    // 우가 상담소 관련
+    UGA_CONSULTATION
 }
