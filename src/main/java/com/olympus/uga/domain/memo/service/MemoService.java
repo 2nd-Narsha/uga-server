@@ -139,7 +139,7 @@ public class MemoService {
         Uga uga = ugaJpaRepo.findById(family.getPresentUgaId())
                 .orElseThrow(() -> new CustomException(UgaErrorCode.UGA_NOT_FOUND));
 
-        boolean isChecked = user.getWatcher().contains(userId);
+        boolean isChecked = targetUser.getWatcher().contains(user.getId());
 
         double contributionRate = ugaContributionCalculator.calculateContributionRate(
                 uga.getId(), userId, uga.getTotalGrowthDays()
