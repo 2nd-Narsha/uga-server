@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      host: 10.0.0.83
+      host: 10.0.0.238
 #      host: localhost
       port: 6379
   servlet:
