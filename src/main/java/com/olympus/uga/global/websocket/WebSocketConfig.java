@@ -40,4 +40,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         registry.addHandler(webSocketHandler, "/ws-native")  // 🔥 경로 변경 (/ws/native → /ws-native)
                 .setAllowedOriginPatterns("*");
     }
+    // 테스트용 주석
 }
