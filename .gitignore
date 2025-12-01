@@ -40,3 +40,4 @@ out/
 
 # Firebase service account key
 firebase-service-account.json
+application.yml
