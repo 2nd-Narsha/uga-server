@@ -22,6 +22,30 @@ jobs:
           java-version: 17
           distribution: 'temurin'
 
+      - name: Set yml file
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: src/main/resources/application.yml
+        env:
+          spring.datasource.url: ${{ secrets.DB_URL }}
+          spring.datasource.username: ${{ secrets.DB_USER }}
+          spring.datasource.password: ${{ secrets.DB_PW }}
+          spring.data.redis.host: ${{ secrets.REDIS_HOST }}
+          spring.data.redis.port: ${{ secrets.REDIS_PORT }}
+          jwt.secretKey: ${{ secrets.SECRET_KEY }}
+          cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY }}
+          cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_KEY }}
+          coolsms.api.key: ${{ secrets.COOLSMS_API_KEY }}
+          coolsms.api.secret: ${{ secrets.COOLSMS_API_SECRET }}
+          coolsms.api.number: ${{ secrets.COOLSMS_NUMBER }}
+          oauth.kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+          oauth.kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          oauth.google.client-id: ${{ secrets.GOOGLE_CLIENT_ID }}
+          oauth.google.client-secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          oauth.apple.team-id: ${{ secrets.APPLE_TEAM_ID }}
+          oauth.apple.key-id: ${{ secrets.APPLE_KEY_ID }}
+          oauth.apple.private-key: ${{ secrets.APPLE_PRIVATE_KEY }}
+
       # 2. Gradle 캐시 (의존성 빠른 복원)
       - name: Cache Gradle packages
         uses: actions/cache@v3
