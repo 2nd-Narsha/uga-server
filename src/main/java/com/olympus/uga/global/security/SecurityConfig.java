@@ -36,6 +36,10 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/sms/**").permitAll()
                                 .requestMatchers("/oauth/**").permitAll()
+                                .requestMatchers("/ws", "/ws/**").permitAll()  // SockJS 경로
+                                .requestMatchers("/ws-native").permitAll()     // 순수 WebSocket
+                                .requestMatchers("/ws-stomp").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs").permitAll()
                                 .requestMatchers("/user/**").authenticated()
                                 .requestMatchers("/family/**").authenticated()
                                 .requestMatchers("/uga/**").authenticated()
@@ -48,7 +52,6 @@ public class SecurityConfig {
                                 .requestMatchers("/calendar/**").authenticated()
                                 .requestMatchers("/attend/**").authenticated()
                                 .requestMatchers("/mission/**").authenticated()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs").permitAll()
                                 .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

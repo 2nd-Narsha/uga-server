@@ -23,6 +23,11 @@ public class WebSocketMessage {
         MEMO_UPDATE,           // 메모 업데이트
         LETTER_RECEIVED,       // 편지 도착
         ATTENDANCE_CHECK,      // 출석 체크
-        FAMILY_ACTIVITY       // 가족 활동 알림
+        FAMILY_ACTIVITY,       // 가족 활동 알림
+        SYSTEM,
+        JOIN_FAMILY,
+        JOIN_USER,
+        LEAVE_FAMILY,
+        ERROR
     }
 }
