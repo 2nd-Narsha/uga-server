@@ -1,6 +1,7 @@
 package com.olympus.uga.domain.oauth.usecase;
 
 import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
+import com.olympus.uga.domain.mission.service.MissionAssignService;
 import com.olympus.uga.domain.oauth.presentation.dto.response.GoogleUserInfoDto;
 import com.olympus.uga.domain.oauth.presentation.dto.response.KakaoUserInfoDto;
 import com.olympus.uga.domain.oauth.service.AppleOAuthService;
@@ -30,6 +31,7 @@ public class OAuthUseCase {
     private final GoogleOAuthService googleOAuthService;
     private final AppleOAuthService appleOAuthService;
     private final JwtProvider jwtProvider;
+    private final MissionAssignService missionAssignService;
 
     @Transactional
     public ResponseData<SignInRes> loginWithKakaoToken(String accessToken) {
@@ -38,7 +40,9 @@ public class OAuthUseCase {
         User user = userJpaRepo.findByOauthIdAndLoginType(userInfo.id(), LoginType.KAKAO)
                 .orElseGet(() -> {
                     User newUser = registerKakaoUser(userInfo);
-                    return userJpaRepo.save(newUser);
+                    User saved = userJpaRepo.save(newUser);
+                    missionAssignService.assignMissionsToNewUser(saved); // 미션부여
+                    return saved;
                 });
 
         return ResponseData.ok("카카오 로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
@@ -51,7 +55,9 @@ public class OAuthUseCase {
         User user = userJpaRepo.findByOauthIdAndLoginType(userInfo.id(), LoginType.GOOGLE)
                 .orElseGet(() -> {
                     User newUser = registerGoogleUser(userInfo);
-                    return userJpaRepo.save(newUser);
+                    User saved = userJpaRepo.save(newUser);
+                    missionAssignService.assignMissionsToNewUser(saved);
+                    return saved;
                 });
 
         return ResponseData.ok("구글 로그인에 성공하였습니다.", jwtProvider.createToken(user.getId()));
@@ -66,7 +72,9 @@ public class OAuthUseCase {
         User user = userJpaRepo.findByOauthIdAndLoginType(appleUser.getOauthId(), LoginType.APPLE)
                 .orElseGet(() -> {
                     User newUser = appleUser;
-                    return userJpaRepo.save(newUser);
+                    User saved = userJpaRepo.save(appleUser);
+                    missionAssignService.assignMissionsToNewUser(saved);
+                    return saved;
                 });
 
         // 기존 회원인 경우 로그인 시간 업데이트

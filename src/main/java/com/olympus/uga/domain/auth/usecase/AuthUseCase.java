@@ -4,6 +4,7 @@ import com.olympus.uga.domain.auth.presentation.dto.request.RefreshReq;
 import com.olympus.uga.domain.auth.presentation.dto.request.SignInReq;
 import com.olympus.uga.domain.auth.presentation.dto.response.RefreshRes;
 import com.olympus.uga.domain.auth.presentation.dto.response.SignInRes;
+import com.olympus.uga.domain.mission.service.MissionAssignService;
 import com.olympus.uga.domain.sms.error.SmsErrorCode;
 import com.olympus.uga.domain.user.domain.User;
 import com.olympus.uga.domain.auth.error.AuthErrorCode;
@@ -30,6 +31,7 @@ public class AuthUseCase {
     private final JwtProvider jwtProvider;
     private final BCryptPasswordEncoder passwordEncoder;
     private final StringRedisTemplate redisTemplate;
+    private final MissionAssignService missionAssignService;
 
     @Transactional
     public Response signUp(SignUpReq req) {
@@ -42,8 +44,8 @@ public class AuthUseCase {
             throw new CustomException(SmsErrorCode.PHONE_NUM_NOT_VERIFIED);
         }
 
-        // TODO: 미션 할당
-        userJpaRepo.save(SignUpReq.fromSignUpReq(req, passwordEncoder.encode(req.password())));
+        User savedUser = userJpaRepo.save(SignUpReq.fromSignUpReq(req, passwordEncoder.encode(req.password())));
+        missionAssignService.assignMissionsToNewUser(savedUser); // 미션 부여
         redisTemplate.delete("sms:verified:" + req.phoneNum());
 
         return Response.created("회원가입에 성공하였습니다.");
