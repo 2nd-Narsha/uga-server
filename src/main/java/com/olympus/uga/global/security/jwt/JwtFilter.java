@@ -38,7 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 || uri.startsWith("/swagger-resources")     // Swagger 리소스
                 || uri.startsWith("/webjars/")              // JS/CSS 정적 파일
                 || uri.equals("/favicon.ico")               // 파비콘
-                || uri.startsWith("/oauth/")) {
+                || uri.startsWith("/oauth/")
+                || uri.startsWith("/ws")) {
             filterChain.doFilter(request, response);
             return;
         }
