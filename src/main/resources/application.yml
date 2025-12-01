@@ -1,0 +1,80 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER}
+    password: ${DB_PW}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+firebase:
+  config:
+    path: firebase-service-account.json
+
+cloud:
+  aws:
+    s3:
+      bucket: ugafinal
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+
+jwt:
+  secretKey: ${SECRET_KEY}
+  refreshExp: 604800000 # 1week
+  accessExp: 6000000 # 2hour
+
+coolsms:
+  api:
+    key: ${COOLSMS_API_KEY}
+    secret: ${COOLSMS_API_SECRET}
+    number: ${COOLSMS_NUMBER}
+
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+    redirect-uri: https://uga.r-e.kr/oauth/kakao/login
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: https://uga.r-e.kr/oauth/google/login
+  apple:
+    team-id: ${APPLE_TEAM_ID}
+    client-id: com.olympus.uga
+    key-id: ${APPLE_KEY_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
+    redirect-uri: https://uga.r-e.kr/oauth/apple/login
+
+springdoc:
+  api-docs:
+    enabled: true
+    version: openapi_3_0
+    path: /v3/api-docs
+
+  default-consumes-media-type: application/json
+  auto-tag-classes: true
+  groups:
+    enabled: false
+
+  swagger-ui:
+    tags-sorter: alpha
+    operationsSorter: alpha
+    path: /swagger-ui/index.html
+
+  server:
+    forward-headers-strategy: framework
+    use-forward-headers: true
